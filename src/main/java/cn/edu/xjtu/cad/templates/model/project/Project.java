@@ -1,4 +1,4 @@
-package cn.edu.xjtu.cad.templates.model;
+package cn.edu.xjtu.cad.templates.model.project;
 
 
 import java.util.Date;
@@ -48,6 +48,8 @@ public class Project {
     private String creator;
     private int num;
 
+
+    private int referID;
     public Project() {
     }
 
@@ -134,4 +136,12 @@ public class Project {
         this.creator = creator;
     }
 
+
+    public int getReferID() {
+        return referID;
+    }
+
+    public void setReferID(int referID) {
+        this.referID = referID;
+    }
 }

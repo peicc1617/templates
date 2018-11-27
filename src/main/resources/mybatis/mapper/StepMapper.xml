@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="cn.edu.xjtu.cad.templates.dao.StepMapper">
+    <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
+
+    <insert id="addAllSteps" parameterType="java.util.List">
+        INSERT INTO project_step VALUES
+        <foreach collection="stepList" item="item" index="index" separator=",">
+            (#{item.projectID},
+            #{item.stepIndex},
+            #{item.name},
+            #{item.description})
+        </foreach>
+    </insert>
+
+    <insert id="addStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">
+        INSERT INTO project_step  VALUES
+            (#{item.projectID},
+            #{item.stepIndex},
+            #{item.name},
+            #{item.description})
+    </insert>
+
+    <delete id="deleteStep">
+        DELETE FROM step WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}
+    </delete>
+
+    <update id="updateStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">
+        UPDATE project_step SET
+        name = #{step.name},description = #{step.description}
+        WHERE projectID = #{step.projectID} AND stepIndex =#{step.stepIndex}
+    </update>
+
+    <select id="getStepsOfProject" resultType="java.util.List" parameterType="int">
+      SELECT * FROM project_step
+      WHERE projectID = #{projectID}
+    </select>
+
+    <select id="getStep" resultType="cn.edu.xjtu.cad.templates.model.project.Step" parameterType="int">
+        SELECT * FROM project_step
+        WHERE projectID = #{projectID} AND stepIndex = #{stepIndex}
+    </select>
+
+</mapper>
