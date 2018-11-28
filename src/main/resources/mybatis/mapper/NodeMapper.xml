@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="cn.edu.xjtu.cad.templates.dao.NodeMapper">
+    <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
+
+    <insert id="addAllNodes" parameterType="java.util.List">
+        INSERT INTO project_node (projectID,nodeIndex,name,description,goal,stepIndex) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.projectID},
+            #{item.nodeIndex},
+            #{item.name},
+            #{item.description},
+            #{item.goal},
+            #{item.stepIndex})
+        </foreach>
+    </insert>
+
+    <insert id="addNode" parameterType="cn.edu.xjtu.cad.templates.model.project.node.Node">
+        INSERT INTO project_step  VALUES
+            (#{projectID},
+            #{nodeIndex},
+            #{name},
+            #{description},
+            #{goal}
+            #{stepIndex})
+    </insert>
+
+    <delete id="deleteNode">
+        DELETE FROM project_node WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}
+    </delete>
+
+    <update id="updateNode" parameterType="cn.edu.xjtu.cad.templates.model.project.node.Node">
+        UPDATE project_node SET
+        name = #{name},
+        description = #{description},
+        stepIndex = #{stepIndex},
+        goal = #{goal},
+        review = #{review},
+        state = #{state},
+        appName = #{appName},
+        appPath = #{appPath},
+        templateProjectID = #{templateProjectID},
+        lockState = #{lockState}
+        WHERE projectID = #{projectID} AND stepIndex =#{stepIndex}
+    </update>
+
+    <!--<select id="getNodesOfProject" resultType="cn.edu.xjtu.cad.templates.model.project.node.Node" parameterType="int">-->
+      <!--SELECT * FROM project_node-->
+      <!--WHERE projectID = #{projectID}-->
+    <!--</select>-->
+
+    <!--<select id="getNode" resultType="cn.edu.xjtu.cad.templates.model.project.node.Node" parameterType="int">-->
+        <!--SELECT * FROM project_node-->
+        <!--WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}-->
+    <!--</select>-->
+</mapper>

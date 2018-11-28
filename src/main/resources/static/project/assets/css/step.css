@@ -1,0 +1,255 @@
+#menu {
+    display: block;
+    margin: 0 auto;
+    overflow: visible;
+}
+
+
+/* 已完成的节点样式 */
+.stepnode.finished {
+    fill: white;
+    pointer-events: auto;
+    stroke:#71C671;
+    stroke-width: 1;
+}
+.stepnode.finished.template {
+    stroke:#00A5E0;
+}
+/* 未完成的节点样式 */
+.stepnode.unfinished {
+    fill: white;
+    pointer-events: auto;
+    stroke: #aaa;
+    stroke-width: 1;
+}
+.stepnode:hover{
+    stroke:#7eeeee;
+    stroke-width: 3;
+}
+.finished-path {
+    fill: none;
+    stroke: #00A5E0;
+    stroke-width: 2;
+    marker-end: url("#markerArrow1");
+}
+
+circle.locked {
+    fill: #aaa;
+}
+
+.unfinished-path {
+    fill: none;
+    stroke: #D53F40;
+    stroke-width: 2;
+    marker-end: url("#markerArrow2");
+}
+
+/* 待链接的样式 */
+.line-path{
+    fill: none;
+    stroke: #00A5E0;
+    stroke-width: 1;
+    marker-end: url("#markerArrow1");
+}
+
+.to-delete-path{
+    stroke: #D53F40;
+    marker-end: url("#markerArrow3");
+}
+.finished-path-marker{
+    fill:#00A5E0
+}
+.unfinished-path-marker{
+    fill:#D53F40
+}
+
+
+
+.node-text {
+    fill: black;
+    font-weight: bold;
+}
+
+.item .sector {
+    transition: all .1s linear;
+    fill: #333;
+    stroke: #eee;
+    stroke-width: 1;
+}
+
+/* .item:hover .sector {
+    fill: #9A2764;
+} */
+
+.menu-trigger {
+    fill: #D53F40;
+    pointer-events: auto;
+}
+
+.menu-trigger:hover {
+    cursor: pointer;
+}
+
+use {
+    fill: #fff;
+}
+
+/* .item:hover use {
+    fill: #fff;
+} */
+
+.closeMenu {
+    animation-name: closeMenu;
+    animation-duration: 0.5s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+    /* animation-iteration-count: infinite; */
+}
+.closeMenu.init{
+    display: none;
+}
+
+.openMenu {
+    animation-name: openMenu;
+    animation-duration: 0.5s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+    /* animation-iteration-count: infinite; */
+}
+
+.stage-step-title text {
+    stroke-width: 1;
+    fill:#ffffff;
+    /* stroke: #000000; */
+    /* font-style:italic */
+}
+.stage-step-title rect {
+    stroke-width: 1;
+    fill:#1874CD;
+    border-radius:10;
+
+}
+.stage-step-title use {
+    fill: #ffffff;  
+    color: #A4DFD1;  
+}
+@keyframes closeMenu {
+    0% {
+        transform: scale(1);
+    }
+    30% {
+        /* transform: scale(1.2); */
+        transform: matrix(1.2, 0, 0, 1.2, calc(var(--curNodex) * 0.2 * -1), calc(var(--curNodeY) * 0.2 * -1));
+    }
+
+    60% {
+        /* transform: scale(1.2); */
+        transform: matrix(0.1, 0, 0, 0.1, calc(var(--curNodex) * 0.9), calc(var(--curNodeY) * 0.9));
+    }
+    100% {
+        transform: matrix(0, 0, 0, 0, calc(var(--curNodex) * 1), calc(var(--curNodeY) * 1));
+    }
+}
+
+@keyframes openMenu {
+    100% {
+        transform: scale(1);
+    }
+    60% {
+        /* transform: scale(1.2); */
+        transform: matrix(1.2, 0, 0, 1.2, calc(var(--curNodex) * 0.2 * -1), calc(var(--curNodeY) * 0.2 * -1));
+    }
+
+    30% {
+        /* transform: scale(1.2); */
+        transform: matrix(0.1, 0, 0, 0.1, calc(var(--curNodex) * 0.9), calc(var(--curNodeY) * 0.9));
+    }
+    0% {
+        transform: matrix(0, 0, 0, 0, calc(var(--curNodex) * 1), calc(var(--curNodeY) * 1));
+    }
+}
+
+.drawer:hover {
+    stroke:#fac400;
+    stroke-width:2
+}
+.stage-step-title
+
+
+@keyframes openDrawer{
+    0% {
+        transform: translateY();
+    }
+    25% {
+        transform: translateY(calc(var(--dh)/4));
+    }
+    50% {
+        transform: translateY(calc(var(--dh)/2));
+    }
+    75% {
+        transform: translateY(calc(var(--dh)/4*3));
+    }
+    100% {
+        transform: translateY(calc(var(--dh)));
+    }
+}
+
+.closeDrawer {
+    animation-name: closeDrawer;
+    animation-duration: 0.2s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+    /* animation-iteration-count: infinite; */
+}
+
+@keyframes closeDrawer{
+    0% {
+        transform: translateY(calc(var(--dh)));
+    }
+    25% {
+        transform: translateY(calc(var(--dh)/4*3));
+    }
+    50% {
+        transform: translateY(calc(var(--dh)/2));
+    }
+    75% {
+        transform: translateY(calc(var(--dh)/4));
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.inMenuItem {
+    animation-name: inMenuItem;
+    animation-duration: 1s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+}
+
+@keyframes inMenuItem {
+
+    100% {
+        opacity: 1;
+        /*结尾状态 透明度为1*/
+        /* transform: translate(calc(var(--curNodex)*0.2*-1),calc(var(--curNodeY)*0.2*-1)); */
+        /* transform: matrix(1.2, 0, 0, 1.2, calc(var(--curNodex)*0.2*-1), calc(var(--curNodeY)*0.2*-1)); */
+        /* transform: scale(1); */
+    }
+}
+
+.outMenuItem {
+    animation-name: afterMenuItem;
+    animation-duration: 1s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+}
+
+@keyframes outMenuItem {
+    100% {
+        transform: scale(1);
+    }
+}
+.no-text{
+    display:none;
+}

@@ -1,0 +1,704 @@
+<html>
+<head>
+    <title>创新方法工作平台</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="description" content="overview &amp; stats"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/jquery-ui.min.css"/>
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace.min.css"/>
+    <link href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/webresources/ace-master/assets/font-awesome/4.5.0/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-rtl.min.css"/>
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-skins.min.css"/>
+    <link rel="stylesheet" href="css/step.css">
+    <link rel="stylesheet" href="/webresources/bootstrap/bootstrap-table/bootstrap-table.css">
+
+    <link rel="stylesheet" href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css">
+    <link rel="stylesheet" href="css/step.css">
+    <script src="js/projectID.js"></script>
+
+    <script>
+        //首先获取ID
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        }
+
+        PROJECT_ID = parseInt(getQueryString("projectID"));
+        //解析projectID，
+        if (isNaN(PROJECT_ID)) {
+            //如果解析出错误
+            alert("参数错误");//后续跳转
+        }
+        var ANALYSIS_MSG = {
+            projectID: PROJECT_ID,
+            type: 0,
+            content: ""
+        };
+        const MSG_TYPE_TABLE = {
+            "PROJECT": 1,
+            "NODE": 2,
+            "USER": 3,
+            "RESULT": 4
+        }
+        const STATE_ERROR = {
+            button: {
+                style: "btn-danger",
+                text: "错误",
+            },
+            li: []
+        }
+        const STATE_DIV = {
+            "0": {
+                button: {
+                    style: "btn-light",
+                    text: "待绑定",
+                },
+            },
+            "1": {
+                button: {
+                    style: "btn-grey",
+                    text: "待审阅",
+                },
+                li: [
+                    {text: "接受", state: 3},
+                    {text: "待修改", state: 2},
+                ]
+            },
+            "2": {
+                button: {
+                    style: "btn-warning",
+                    text: "待修改"
+                },
+                li: [
+                    {text: "接受", state: 3},
+                ]
+            },
+            "3": {
+                button: {
+                    style: "btn-success",
+                    text: "已接受"
+                },
+                li: [
+                    {text: "待修改", state: 2},
+                ]
+            },
+        };
+    </script>
+</head>
+<body class="no-skin">
+<div id="navbarDiv" class="navbar navbar-default ace-save-state navbar-fixed-top">
+    <div class="navbar navbar-default" id="navbarHtml">
+        <div class="navbar-container" id="navbar-container">
+            <button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler"
+                    data-target="#sidebarDiv">
+                <span class="sr-only">Toggle sidebar</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <div class="navbar-header pull-left">
+                <a id="href0" href="http://innovation.xjtu.edu.cn/" class="navbar-brand">
+                    <small>
+                        <i class="fa fa-leaf"></i>小微企业多创新方法融合与集成应用平台
+                    </small>
+                </a>
+                <a id="href1" href="#" class="navbar-brand">
+                    <small>
+                        <small class="showAppNameDiv">创新方法柔性模板</small>
+                    </small>
+                </a>
+            </div>
+            <div class="navbar-header pull-right" role="navigation">
+                <ul class="nav ace-nav" style="height: 20px;">
+                    <li class="grey">
+                        <a id="href2" data-toggle="dropdown" href="&lt;%=basePath%&gt;appList" onclick="gotoHref(this)"
+                           class="dropdown-toggle">
+                            <img class="nav-user-photo" type="text/javascript"
+                                 src="/webresources/ace-master/assets/images/avatars/platform.png" alt="平台首页"> 平台主页
+                        </a>
+                    </li>
+                    <li class="purple">
+                        <a href="#" onclick="gotoHref(this)">
+                            <img class="nav-user-photo" type="text/javascript"
+                                 src="/webresources/ace-master/assets/images/avatars/process.png" alt="模板层"> 模板层
+                        </a>
+                    </li>
+                    <li class="green">
+                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
+                            <img class="nav-user-photo" type="text/javascript"
+                                 src="/webresources/ace-master/assets/images/avatars/tool.png" alt="工具集"> 工具集
+
+                        </a>
+                    </li>
+                    <li class="light-blue">
+                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
+                            <img id="userAvatar" class="nav-user-photo" type="text/javascript"
+                                 src="/webresources/ace-master/assets/images/avatars/avatar2.png"
+                                 alt="用户头像">
+                            <span class="user-info">
+                                    <small>欢迎光临,</small>
+                                    <span id="userName">111</span>
+                                </span>
+                            <i class="icon-caret-down"></i>
+                        </a>
+                        <ul id="userDropDown"
+                            class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                            <li>
+                                <a href="#" onclick="gotoUserInfo()">
+                                    <i class="icon-user"></i> 个人资料</a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a href="#" onclick="logout()" style="cursor:pointer;">
+                                    <i class="icon-off"></i> 退出</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="main-container ace-save-state" id="main-container">
+    <script type="text/javascript">
+        try {
+            ace.settings.loadState('main-container')
+        } catch (e) {
+        }
+    </script>
+    <div id="sidebar" class="sidebar                  responsive     ace-save-state sidebar-fixed" data-sidebar="true"
+         data-sidebar-scroll="true"
+         data-sidebar-hover="true">
+        <script type="text/javascript">
+            try {
+                ace.settings.loadState('sidebar')
+            } catch (e) {
+            }
+        </script>
+
+        <div class="sidebar-shortcuts" id="sidebar-shortcuts">
+            <div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
+                <button class="btn btn-success">
+                    <i class="ace-icon fa fa-signal"></i>
+                </button>
+
+                <button class="btn btn-info">
+                    <i class="ace-icon fa fa-pencil"></i>
+                </button>
+
+                <button class="btn btn-warning">
+                    <i class="ace-icon fa fa-users"></i>
+                </button>
+
+                <button class="btn btn-danger">
+                    <i class="ace-icon fa fa-cogs"></i>
+                </button>
+            </div>
+
+            <div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
+                <span class="btn btn-success"></span>
+
+                <span class="btn btn-info"></span>
+
+                <span class="btn btn-warning"></span>
+
+                <span class="btn btn-danger"></span>
+            </div>
+        </div>
+        <!-- /.sidebar-shortcuts -->
+        <ul class="nav nav-list" id="sideList">
+        </ul>
+        <!-- /.nav-list -->
+
+        <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
+            <i id="sidebar-toggle-icon" class="ace-save-state ace-icon fa fa-angle-double-left"
+               data-icon1="ace-icon fa fa-angle-double-left"
+               data-icon2="ace-icon fa fa-angle-double-right"></i>
+        </div>
+    </div>
+    <div class="main-content">
+
+        <div class="main-content-inner">
+            <div class="breadcrumbs ace-save-state breadcrumbs-fixed" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <li>
+                        <i class="ace-icon fa fa-home home-icon"></i>
+                        <a href="#">创新方法工具平台</a>
+                    </li>
+
+                    <li>
+                        <a href="#">柔性模板</a>
+                    </li>
+                </ul>
+                <!-- /.breadcrumb -->
+            </div>
+
+            <div class="page-content">
+                <div class="page-header">
+                    <h1>
+                        柔性模板
+                        <small>
+                            <i class="ace-icon fa fa-angle-double-right"></i>
+                            <strong id="project_name"></strong>
+                            <div class="pull-right">
+                 <span class="btn btn-sm "
+                       onclick="javascript:location ='/CAI-templates/manager.html?projectID='+PROJECT_ID">
+															进入项目
+															<i class="ace-icon fa fa-signal"></i>
+														</span>
+                                <span class="btn btn-primary btn-sm tooltip-primary"
+                                      onclick="javascript:location ='/CAI-templates/info.html?projectID='+PROJECT_ID">
+															项目信息
+															<i class="ace-icon fa fa-lightbulb-o"></i>
+														</span>
+                                <span class="btn btn-purple btn-sm tooltip-purple"
+                                      onclick="javascript:location ='/CAI-templates/report.html?projectID='+PROJECT_ID">
+															导出报告
+															<i class="ace-icon fa fa-print"></i>
+														</span>
+                            </div>
+                        </small>
+                    </h1>
+                </div>
+                <!-- /.ace-settings-box -->
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <h3 class="header smaller red">权限介绍</h3>
+
+                            <div class="row">
+                                <div class="col-xs-4 col-sm-3 pricing-span-header">
+                                    <div class="widget-box transparent">
+                                        <div class="widget-header">
+                                            <h5 class="widget-title bigger lighter">权限管理</h5>
+                                        </div>
+
+                                        <div class="widget-body">
+                                            <div class="widget-main no-padding">
+                                                <ul class="list-unstyled list-striped pricing-table-header">
+                                                    <li>管理员指定</li>
+                                                    <li>工程用户管理</li>
+                                                    <li>阶段增删</li>
+                                                    <li>阶段修改</li>
+                                                    <li>绑定数据</li>
+                                                    <li>查看数据</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-8 col-sm-9 pricing-span-body">
+                                    <div class="pricing-span">
+                                        <div class="widget-box pricing-box-small widget-color-red3">
+                                            <div class="widget-header">
+                                                <h5 class="widget-title bigger lighter">未审核</h5>
+                                            </div>
+
+                                            <div class="widget-body">
+                                                <div class="widget-main no-padding">
+                                                    <ul class="list-unstyled list-striped pricing-table">
+                                                        <li><i class="ace-icon fa fa-times red"></i></li>
+                                                        <li><i class="ace-icon fa fa-times red"></i></li>
+                                                        <li><i class="ace-icon fa fa-times red"></i></li>
+                                                        <li><i class="ace-icon fa fa-times red"></i></li>
+                                                        <li><i class="ace-icon fa fa-times red"></i></li>
+
+                                                        <li>
+                                                            <i class="ace-icon fa fa-times red"></i>
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                                <div>
+                                                    <a href="#" class="btn btn-block btn-sm btn-danger">
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="pricing-span">
+                                        <div class="widget-box pricing-box-small widget-color-orange">
+                                            <div class="widget-header">
+                                                <h5 class="widget-title bigger lighter">普通成员</h5>
+                                            </div>
+
+                                            <div class="widget-body">
+                                                <div class="widget-main no-padding">
+                                                    <ul class="list-unstyled list-striped pricing-table">
+                                                        <li><i class="ace-icon fa fa-times red"></i></li>
+                                                        <li><i class="ace-icon fa fa-times red"></i></li>
+                                                        <li><i class="ace-icon fa fa-times red"></i></li>
+                                                        <li><i class="ace-icon fa fa-times red"></i></li>
+                                                        <li><i class="ace-icon fa fa-check green"></i>可配置</li>
+                                                        <li>
+                                                            <i class="ace-icon fa fa-check green"></i>可配置
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+
+                                                <div>
+                                                    <a href="#" class="btn btn-block btn-sm btn-warning">
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="pricing-span">
+                                        <div class="widget-box pricing-box-small widget-color-blue">
+                                            <div class="widget-header">
+                                                <h5 class="widget-title bigger lighter">管理员</h5>
+                                            </div>
+
+                                            <div class="widget-body">
+                                                <div class="widget-main no-padding">
+                                                    <ul class="list-unstyled list-striped pricing-table">
+                                                        <li><i class="ace-icon fa fa-times red"></i></li>
+                                                        <li><i class="ace-icon fa fa-check green"></i> 可配置
+                                                        </li>
+
+                                                        <li><i class="ace-icon fa fa-check green"></i> 可配置
+                                                        </li>
+                                                        <li><i class="ace-icon fa fa-check green"></i> 可配置
+                                                        </li>
+                                                        <li><i class="ace-icon fa fa-check green"></i></li>
+
+                                                        <li>
+                                                            <i class="ace-icon fa fa-check green"></i>
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+
+                                                <div>
+                                                    <a href="#" class="btn btn-block btn-sm btn-primary">
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="pricing-span">
+                                        <div class="widget-box pricing-box-small widget-color-green">
+                                            <div class="widget-header">
+                                                <h5 class="widget-title bigger lighter">超级管理员</h5>
+                                            </div>
+
+                                            <div class="widget-body">
+                                                <div class="widget-main no-padding">
+                                                    <ul class="list-unstyled list-striped pricing-table">
+                                                        <li><i class="ace-icon fa fa-check green"></i></li>
+                                                        <li><i class="ace-icon fa fa-check green"></i></li>
+                                                        <li><i class="ace-icon fa fa-check green"></i></li>
+                                                        <li><i class="ace-icon fa fa-check green"></i></li>
+                                                        <li><i class="ace-icon fa fa-check green"></i></li>
+
+                                                        <li>
+                                                            <i class="ace-icon fa fa-check green"></i>
+                                                        </li>
+                                                    </ul>
+
+
+                                                </div>
+
+                                                <div>
+                                                    <a href="#" class="btn btn-block btn-sm btn-success">
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-12 widget-box transparent">
+                                <div class="widget-header widget-header-flat">
+                                    <h4 class="widget-title lighter">权限配置</h4>
+                                    <div class="widget-toolbar">
+                                        <span class="badge badge-danger" data-target="#user-new-modal" data-toggle="modal" >邀请用户</span>
+                                        <span class="badge badge-info" onclick="saveToServer()">保存修改</span>
+                                    </div>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main no-padding">
+                                        <table id="user-table" >
+                                        </table>
+                                    </div>
+                                    <!-- /.widget-main -->
+                                </div>
+                                <!-- /.widget-body -->
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <!-- /.page-content -->
+        </div>
+        <!-- /.main-content -->
+
+        <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+            <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+        </a>
+        <script type="text/javascript" src="/webresources/ace-master/assets/js/jquery-2.1.4.min.js"></script>
+        <script type="text/javascript" src="/webresources/ace-master/assets/js/ace.min.js"></script>
+        <script type="text/javascript" src="/webresources/ace-master/assets/js/ace-extra.min.js"></script>
+        <script type="text/javascript" src="/webresources/ace-master/assets/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/webresources/ace-master/assets/js/ace-elements.min.js"></script>
+        <script src="/webresources/ace-master/assets/js/jquery-ui.min.js"></script>
+        <script src="/webresources/bootstrap/bootstrap-table/bootstrap-table.js"></script>
+        <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+        <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+        <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
+        <script src="/webresources/common/js/userLogin.js"></script>
+        <script src="/webresources/common/js/nav-list.js"></script>
+
+        <script src="/webresources/common/js/analysis.js"></script>
+
+
+        <script>
+            // <%--var USER_DATA = <%--%>
+            // <%--JSONArray jsonArray = new JSONArray();--%>
+            // <%--for (User user : userList) {--%>
+            // <%--if(user.getAu()==User.CREATOR||user.getAu()==User.APPLY) continue;--%>
+            // <%--JSONObject jsonObject = new JSONObject();--%>
+            // <%--jsonObject.put("username",user.getUsername());--%>
+            // <%--jsonObject.put("superManager",user.getAu()==User.SUPERMANAGER?"1":"0");--%>
+            // <%--jsonObject.put("userManager",user.isUserManager()?"1":"0");--%>
+            // <%--for (Integer integer : user.getRole().keySet()) {--%>
+            // <%--jsonObject.put("node-"+integer,user.getRole().get(integer));--%>
+            // <%--}--%>
+            // <%--jsonArray.add(jsonObject);--%>
+            //
+            // <%--}--%>
+            // <%--out.print(jsonArray.toJSONString());--%>
+            // <%--%>--%>
+            var CHANGED_USER_LIST = [];
+            var nodeEditable = {
+                type: 'select',
+                title: '权限',
+                emptytext: "-",
+                source: [{value: "<%=Person.NODE_MANAGER%>", text: "管理"}, {
+                    value: "<%=Person.NODE_DATA%>",
+                    text: "绑定"
+                }, {value: "<%=Person.NODE_VIEW%>", text: "查看"}]
+            }
+            var USER_NAME = {};//用户名数组
+            $(function () {
+                Analysis.message=ANALYSIS_MSG;
+                var option = {
+                    columns: [{
+                        field: 'username',
+                        title: '用户名'
+                    }, {
+                        field: 'superManager',
+                        title: '超级管理员',
+                        editable: {
+                            type: 'select',
+                            title: '权限',
+                            source: [{value: "1", text: "是"}, {value: "0", text: "否"}]
+                        }
+                    }, {
+                        field: 'userManager',
+                        title: '用户管理',
+
+                        editable: {
+                            type: 'select',
+                            title: '权限',
+                            source: [{value: "1", text: "是"}, {value: "0", text: "否"}]
+                        }
+                    }
+                    <%
+                    List<Node> nodeList = project.getNodes();
+                for (Node node : nodeList) {
+                    out.print(",{ field: 'node-"+node.getNodeIndex()+"', title: '阶段:"+node.getName()+"',editable: nodeEditable}");
+                }
+            %>, {
+                    field: 'deleteUser',
+                        title: '删除用户',
+                        formatter: function (value, row, index) {
+                        USER_NAME[row.username]=true;
+                        return "<button class=\"btn btn-xs btn-danger\" onclick=\"deleteUser('" + row.username + "')\">\n" +
+                            "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<i class=\"ace-icon fa fa-trash-o bigger-120\"></i>\n" +
+                            "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</button>";
+                    }
+                }],
+
+                onEditableSave: function (field, row, oldValue, $el) {
+                    CHANGED_USER_LIST.push(row);
+                }
+            }
+                $("#user-table").bootstrapTable(option);
+                $("#user-table").bootstrapTable("refreshOptions",{
+                    height:400,
+                    striped: true,  //表格显示条纹，默认为false
+                    pagination: true, // 在表格底部显示分页组件，默认false
+                    pageList: [10,20], // 设置页面可以显示的数据条数
+                    pageSize: 10, // 页面数据条数
+                    pageNumber: 1, // 首页页码,
+                    ajax : function (request) {
+                        $.ajax({
+
+                                type : "GET",
+                                url : "/CAI-templates/api/project/user",
+                                data:{id:PROJECT_ID,
+                            contentType: "application/json;charset=utf-8",
+                            dataType:"json",
+                            success : function (data) {
+                            var tableData = [];
+                            data.forEach(function (v,i,arr) {
+                                if(v.au!=10){
+                                    var row = {
+                                        username:v.username,
+                                        superManager:0,
+                                        userManager:0,
+                                    };
+                                    if(v.au==9){
+                                        row['superManager']=1;
+                                    }
+                                    if(v.userManager){
+                                        row.userManager=1;
+                                    }
+                                    for(let attr in v.role){
+                                        row['node-'+attr]=v.role[attr];
+                                    }
+                                    tableData.push(row);
+                                }
+
+                            })
+                            request.success({
+                                row : tableData
+                            });
+                            $('#user-table').bootstrapTable('load', tableData);
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            // 状态码
+                            console.log(XMLHttpRequest.status);
+                            // 状态
+                            console.log(XMLHttpRequest.readyState);
+                            // 错误信息
+                            console.log(textStatus);
+                        }
+                    });
+                    },
+                })
+                $("#user-new-modal").on('show.bs.modal', function (e) {
+                    $("#user-list-table").bootstrapTable("refresh")
+                })
+
+
+            });
+
+            function deleteUser(username) {
+                if (window.confirm("是否从项目中删除该成员,如果进行删除，该成员在绑定在项目内的数据都会解除绑定")) {
+                    console.log("确认删除");
+                    $.ajax({
+                            'url': '/CAI-templates/api/project/user',
+                            'type': 'post',
+                            'data': {
+                                '_method': 'delete',
+                                'id':PROJECT_ID,
+                            'username': username
+                        },
+                        success: function (data) {
+                        ANALYSIS_MSG.type=MSG_TYPE_TABLE.USER
+                        ANALYSIS_MSG.content="将用户["+username+"]请离了项目";
+                        Analysis.send();
+                        console.log("删除成功");
+                    }
+                })
+                } else {
+                    console.log("取消删除");
+                }
+
+            }
+
+            function saveToServer() {
+                if (CHANGED_USER_LIST.length > 0) {
+                    $.ajax({
+                            'url': '<%=request.getContextPath()%>/api/project/user',
+                            'type': 'post',
+                            'data': {
+                                '_method': 'put',
+                                'id':PROJECT_ID,
+                            'userList': JSON.stringify(CHANGED_USER_LIST)
+                        },
+                        async:false,
+                        success: function (data) {
+
+                        ANALYSIS_MSG.type=MSG_TYPE_TABLE.NODE
+                        ANALYSIS_MSG.content="修改用户";
+                        CHANGED_USER_LIST.forEach(function (value, index, array) {
+                            ANALYSIS_MSG.content+="["+value.username+"]"
+                        })
+                        ANALYSIS_MSG.content+="的权限";
+                        Analysis.send();
+
+                        alert("保存成功")
+                    }
+                })
+                }else {
+                    alert("未发生任何修改")
+                }
+                $("#user-table").bootstrapTable('refresh')
+
+            }
+
+            function opFormatter(value,row,index) {
+                const username = row.username;
+                $button = $("<a></a>").attr({
+                    username:row.username,
+                });
+                if(!USER_NAME[username]){
+
+                    $button.attr({
+                        'class':'blue',
+                        'onclick':'addUserToProject(this)',
+                    }).append("<i class=\"ace-icon glyphicon glyphicon-plus bigger-120\"></i>")
+                }
+                $div = $("<div></div>").addClass("action-buttons").append($button);
+                return $div[0].outerHTML;
+            }
+
+            function addUserToProject(e){
+                $.ajax({
+                        url:'/CAI-templates/api/project/user',
+                        'type':'POST',
+                        'data':{
+                            _method:'post',
+                            'id':PROJECT_ID,
+                        'username':$(e).attr('username')
+                    },
+                    success:function (data) {
+                    alert("添加成功")
+
+                    ANALYSIS_MSG.type=MSG_TYPE_TABLE.USER
+                    ANALYSIS_MSG.content="邀请用户["+$(e).attr('username')+"]加入项目"
+                    Analysis.send();
+
+                    $("#user-table").bootstrapTable('refresh')
+                    $("#user-list-table").bootstrapTable("refresh");
+                }
+            })
+            }
+        </script>
+
+    </div>
+</div>
+</body>
+
+</html>

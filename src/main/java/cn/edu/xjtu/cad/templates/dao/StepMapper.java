@@ -1,6 +1,8 @@
 package cn.edu.xjtu.cad.templates.dao;
 
 import cn.edu.xjtu.cad.templates.model.project.Step;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -8,7 +10,8 @@ import java.util.List;
 @Repository
 public interface StepMapper {
 
-    boolean addAllSteps(List<Step> stepList);
+
+    int addAllSteps(List<Step> list);
 
     boolean addStep(Step step);
 
@@ -16,8 +19,10 @@ public interface StepMapper {
 
     boolean updateStep(Step step);
 
+    @Select("SELECT * FROM project_step WHERE projectID = #{projectID}")
     List<Step> getStepsOfProject(int projectID);
 
-    Step getStep(int projectID,int stepIndex);
+    @Select("SELECT * FROM project_node  WHERE projectID = #{projectID} AND stepIndex = #{stepIndex}")
+    Step getStep(@Param("projectID") int projectID,@Param("stepIndex") int stepIndex);
 
 }

@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement
-@ComponentScan("cn.edu.xjtu.cad.templates.controller")
+@ComponentScan({"cn.edu.xjtu.cad.templates.controller","cn.edu.xjtu.cad.templates"})
 @MapperScan("cn.edu.xjtu.cad.templates.dao")
 public class TemplatesApplication {
 

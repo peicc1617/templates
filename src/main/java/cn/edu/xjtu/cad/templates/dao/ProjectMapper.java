@@ -1,10 +1,7 @@
 package cn.edu.xjtu.cad.templates.dao;
 
 import cn.edu.xjtu.cad.templates.model.project.Project;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,31 +27,33 @@ public interface ProjectMapper {
      * @param project 项目内容
      * @return
      */
-    boolean addProject(Project project);
+    int addProject(Project project);
 
     /**
      * 查询当前项目ID对应的项目
-     * @param username 当前用户名
      * @param projectID 项目ID
      * @return 返回该项目信息，如果为null，说明当前项目不存在
      */
-    @Select("SELECT * from project,project_person project_person.username=#{username}")
-    Project getProjectByUsernameAndID(String username,int projectID);
+    @Select("SELECT * from project  where id = #{projectID}")
+    Project getProjectByID(int projectID);
 
     /**
      * 更新项目信息
      * @param project 项目信息
      * @return
      */
-    @Update("UPDATE project set name = #{project.name} where projectID = #{projectID}")
-    void updateProjectInfo(@Param("project") Project project);
+    @Update("UPDATE project set name = #{name}," +
+            "description = #{description}," +
+            "tags = #{tags} " +
+            "where id = #{id}")
+    void updateProjectInfo( Project project);
 
     /**
      * 根据ID删除项目
      * @param projectID 需要删除的项目ID
      * @return 返回是否删除成功
      */
-    @Delete("DELETE FROM project where projectID = #{projectID}")
+    @Delete("DELETE FROM project where id = #{projectID}")
     void deleteProject(int projectID);
 
 }

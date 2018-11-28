@@ -14,7 +14,7 @@ public interface ReferMapper {
     List<Refer> getAllRefer();
 
 
-    @Select("SELECT * FROM refer where id = #{referID}")
+    @Select("SELECT * FROM refer where referID = #{referID}")
     Refer getReferByID(int referID);
 
 

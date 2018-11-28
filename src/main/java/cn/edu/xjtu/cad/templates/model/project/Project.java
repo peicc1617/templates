@@ -1,7 +1,11 @@
 package cn.edu.xjtu.cad.templates.model.project;
 
 
+import cn.edu.xjtu.cad.templates.model.project.node.Node;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Project {
     /**
@@ -50,6 +54,10 @@ public class Project {
 
 
     private int referID;
+
+    List<Step> steps = new ArrayList<>();
+    List<Node> nodes = new ArrayList<>();
+    List<Edge> edges = new ArrayList<>();
     public Project() {
     }
 
@@ -143,5 +151,29 @@ public class Project {
 
     public void setReferID(int referID) {
         this.referID = referID;
+    }
+
+    public List<Step> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(List<Step> steps) {
+        this.steps = steps;
+    }
+
+    public List<Node> getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(List<Node> nodes) {
+        this.nodes = nodes;
+    }
+
+    public List<Edge> getEdges() {
+        return edges;
+    }
+
+    public void setEdges(List<Edge> edges) {
+        this.edges = edges;
     }
 }
