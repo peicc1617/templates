@@ -1,0 +1,387 @@
+[
+  {
+    "appPath": "/",
+    "displayName": "Welcome to Tomcat",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 11
+  },
+  {
+    "appPath": "/7W4H",
+    "displayName": "7W4H",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "管理平台；后台App",
+    "webAppCategory": "创新思维",
+    "webAppDescription": "这是基础创新方法管理平台，主要进行webApp管理",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/Achievements",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 6
+  },
+  {
+    "appPath": "/Application",
+    "displayName": "应用案例",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 6
+  },
+  {
+    "appPath": "/ApplicationStyle",
+    "displayName": "创新方法管理平台",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 1,
+    "webAppAttributeLabel": "管理平台；后台App",
+    "webAppCategory": "知识工程",
+    "webAppDescription": "这是基础创新方法管理平台，主要进行webApp管理",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/BMCanvas",
+    "displayName": "画布模型",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 2,
+    "webAppAttributeLabel": "绘制商业画布模型；分析产品",
+    "webAppCategory": "企业管理",
+    "webAppDescription": "一种能够帮助创业者催生创意、降低猜测、确保他们找对了目标用户、合理解决问题的工具。",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/CAI-templates",
+    "displayName": "Archetype Created Web Application",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 3
+  },
+  {
+    "appPath": "/DrawVSM",
+    "displayName": "mxgraph_com",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0
+  },
+  {
+    "appPath": "/InnovationAPPManageKits",
+    "displayName": "创新方法管理平台",
+    "running": true,
+    "usingNumber": 1,
+    "visitNum": 7,
+    "webAppAttributeLabel": "管理平台；后台App",
+    "webAppCategory": "知识工程",
+    "webAppDescription": "这是基础创新方法管理平台，主要进行webApp管理",
+    "webAppIcon": "/liaoxiaoqiang/imgs/创新方法管理平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/InnovationTrain",
+    "displayName": "创新方法培训平台",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 2,
+    "webAppAttributeLabel": "培训平台",
+    "webAppCategory": "创新思维",
+    "webAppDescription": "这是基础创新方法管理培训平台，主要用于创新方法电子课程",
+    "webAppIcon": "创新方法培训平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/MEvaluate",
+    "displayName": "价值流成熟度评估",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "成熟度评估；价值流分析",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "评估价值流分析过程中成熟度，度量价值流使用程度。",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v4.0"
+  },
+  {
+    "appPath": "/PQanalysis",
+    "displayName": "PQ分析",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "PQ分析；车间布局优化",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "用来对生产的产品按照数量进行分类，然后根据分类结果对生产车间进行布局优化。",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/Pareto",
+    "displayName": "帕累托图",
+    "running": true,
+    "usingNumber": 1,
+    "visitNum": 2,
+    "webAppAttributeLabel": "绘图工具；帕累托图",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "这是一种绘图工具，用于分析问题对结果影响的大小。",
+    "webAppIcon": "帕累托图.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/SIPOC",
+    "displayName": "SIPOC图",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 1,
+    "webAppAttributeLabel": "管理平台；工具App",
+    "webAppCategory": "创新思维",
+    "webAppDescription": "这是一款在线绘图工具，用于绘制SIPOC图",
+    "webAppIcon": "SIPOC.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/SMED",
+    "displayName": "快速换产",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "快速换产；优化换模时间",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "将模具的产品换模时间、生产启动时间或调整时间等尽可能减少的一种过程改进方法。可显著地缩短机器安装、设定换模所需的时间。",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/SPC_P",
+    "displayName": "P控制图",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 1
+  },
+  {
+    "appPath": "/SPlan",
+    "displayName": "精益计划",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "精益计划；精益生产",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "这是基础创新方法管理平台，主要进行webApp管理",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/bpNetwork",
+    "displayName": "神经网络",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0
+  },
+  {
+    "appPath": "/dataForVSM",
+    "displayName": "数据统计",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "数据统计；价值流分析",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "用适当的统计分析方法对收集来的大量数据进行分析，提取有用信息和形成结论而对数据加以详细研究和概括总结的过程。",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v3.0"
+  },
+  {
+    "appPath": "/define",
+    "displayName": "问题定义",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "DMAIC；问题定义阶段",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "这是问题定义阶段，主要用于DMAIC项目问题定义",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/docs",
+    "displayName": "Tomcat Documentation",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0
+  },
+  {
+    "appPath": "/efs",
+    "displayName": "灵敏度分析",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 1,
+    "webAppAttributeLabel": "管理平台；工具App",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "这是基础创新方法管理平台，主要进行webApp管理",
+    "webAppIcon": "efs.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/examples",
+    "displayName": "Servlet and JSP Examples",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0
+  },
+  {
+    "appPath": "/fishbone",
+    "displayName": "鱼骨图",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 1,
+    "webAppAttributeLabel": "绘图，主要因素",
+    "webAppCategory": "产品设计",
+    "webAppDescription": "这是鱼骨图App，主要绘制鱼骨图，功能是分析问题的主要因素",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v5.0"
+  },
+  {
+    "appPath": "/histogram",
+    "displayName": "直方图",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "管理平台；工具",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "这是一款在线绘图工具",
+    "webAppIcon": "直方图.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/host-manager",
+    "displayName": "Tomcat Host Manager Application",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0
+  },
+  {
+    "appPath": "/innovation",
+    "displayName": "Struts 2 - Maven Archetype - Starter",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0
+  },
+  {
+    "appPath": "/kano",
+    "displayName": "kano分析",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "需求分析，产品设计",
+    "webAppCategory": "产品设计",
+    "webAppDescription": "以分析用户需求对用户满意的影响为基础，体现了产品性能和用户满意之间的非线性关系",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/lineBalance_V3",
+    "displayName": "Struts 2 - Maven Archetype - Starter",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0
+  },
+  {
+    "appPath": "/manager",
+    "displayName": "Tomcat Manager Application",
+    "running": true,
+    "usingNumber": 1,
+    "visitNum": 9
+  },
+  {
+    "appPath": "/mepn",
+    "displayName": "工艺性能分析",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "管理平台；工具App",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "用于分析工艺性能，寻找工艺网络中的关键节点",
+    "webAppIcon": "工艺性能分析.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/msa",
+    "displayName": "测量系统分析",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "管理平台；工具App",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "用于分析测量系统的可靠性与稳定性",
+    "webAppIcon": "msa.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/news",
+    "displayName": "新闻动态",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 6,
+    "webAppAttributeLabel": "管理平台；后台App",
+    "webAppCategory": "其他",
+    "webAppDescription": "这是平台新闻，可以浏览创新方法平台新闻动态",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v1.0"
+  },
+  {
+    "appPath": "/newsFiles",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 33
+  },
+  {
+    "appPath": "/predict",
+    "displayName": "质量预测",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "管理平台；工具App",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "这是质量预测app，你需要做的只是收集数据、输入、点击计算，你就可以轻松预测得到预测质量",
+    "webAppIcon": "质量预测.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/projectManager",
+    "displayName": "Archetype Created Web Application",
+    "running": true,
+    "usingNumber": 1,
+    "visitNum": 8
+  },
+  {
+    "appPath": "/radar",
+    "displayName": "雷达图",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "雷达图；指标对比",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "将一个公司的各项财务分析所得的数字或比率，就其比较重要的项目集中划在一个圆形的图表上",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/vsm",
+    "displayName": "VSM分析",
+    "running": true,
+    "usingNumber": 0,
+    "visitNum": 0,
+    "webAppAttributeLabel": "价值流分析",
+    "webAppCategory": "质量分析",
+    "webAppDescription": "针对生产的产品，利用生产作业的文件及采购成本,分析产品的规格与需求,采购部门通常使用这方法来降低成本。",
+    "webAppIcon": "创新方法管理平台.png",
+    "webAppVersion": "v2.0"
+  },
+  {
+    "appPath": "/webresources",
+    "running": true,
+    "usingNumber": 1,
+    "visitNum": 41
+  }
+]

@@ -16,11 +16,11 @@ public interface ProjectMapper {
      * @param username
      * @return 返回项目列表
      */
-    @Select("SELECT project.`name`,project.id " +
-            "FROM project,project_person " +
-            "WHERE project.id = project_person.projectID AND project_person.username=#{username} " +
-            "ORDER BY project.createTime DESC;")
-    List<Project> getProjectListByUsername(String username);
+    @Select("SELECT project.`name`,project.id,project.createTime " +
+            "FROM project,project_role " +
+            "WHERE project.id = project_role.projectID AND project_role.username=#{username} AND project_role.projectRole = #{role} " +
+            "ORDER BY project.createTime")
+    List<Project> getOwnedProjectListByUsernameWithRole(@Param("username") String username,@Param("role")int  role);
 
     /**
      * 新建项目

@@ -38,6 +38,13 @@ public class NodeResult {
      * 已接受，表示审阅过后待接受的数据
      */
     public final static int ACCEPT = 3;
+
+    public final static String DISABLE_MESSAGE = "原数据丢失，请重新绑定";
+    public final static String EDIT_MESSAGE = "原数据更新，请重新审阅";
+    public final static String APPLY_MESSAGE = "数据绑定，请审阅";
+    public final static String TO_EDIT_MESSAGE = "数据需要修改，请查看";
+    public final static String PASSED_MESSAGE = "数据已通过";
+
     /**
      * 是否绑定
      */
@@ -45,7 +52,7 @@ public class NodeResult {
 
     private Date editTime;
 
-    private String projectName;
+    private String resultName;
 
     private String message;
 
@@ -120,12 +127,12 @@ public class NodeResult {
         this.editTime = editTime;
     }
 
-    public String getProjectName() {
-        return projectName;
+    public String getResultName() {
+        return resultName;
     }
 
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
+    public void setResultName(String resultName) {
+        this.resultName = resultName;
     }
 
     public int getResultID() {

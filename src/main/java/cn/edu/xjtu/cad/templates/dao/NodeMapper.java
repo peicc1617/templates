@@ -13,7 +13,7 @@ public interface NodeMapper {
 
     int addNode(Node  node);
 
-    boolean deletNode(int projectID,int nodeIndex);
+    boolean deleteNode(int projectID,int nodeIndex);
 
     boolean updateNode(Node node);
 

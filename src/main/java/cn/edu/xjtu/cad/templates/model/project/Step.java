@@ -35,14 +35,19 @@ public class Step {
      */
     private String description;
     /**
-     * 节点的创建时间
+     * 阶段的创建时间
      */
     private Date createTime;
 
     /**
-     * 节点的修改时间
+     * 阶段的修改时间
      */
     private Date editTime;
+
+    /**
+     * 阶段总结
+     */
+    private String summary;
 
     public int getStepIndex() {
         return stepIndex;
@@ -90,5 +95,13 @@ public class Step {
 
     public void setEditTime(Date editTime) {
         this.editTime = editTime;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 }

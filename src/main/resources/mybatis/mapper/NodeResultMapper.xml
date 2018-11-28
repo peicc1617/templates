@@ -25,11 +25,23 @@
         <!--DELETE FROM step WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}-->
     <!--</delete>-->
 
-    <!--<update id="updateStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">-->
-        <!--UPDATE project_step SET-->
-        <!--name = #{step.name},description = #{step.description}-->
-        <!--WHERE projectID = #{step.projectID} AND stepIndex =#{step.stepIndex}-->
-    <!--</update>-->
+    <select id="getResultListByNodeIndexAndUserName" resultType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
+        SELECT * FROM project_node_result
+        WHERE projectID = #{id} AND nodeIndex = #{index} AND username in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="updateNodeResult" parameterType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
+        UPDATE project_node_result SET
+        state = #{state},
+        resultKey =#{resultKey},
+        message = #{message},
+        resultID = #{resultID},
+        resultName = #{resultName}
+       WHERE projectID = #{projectID} AND nodeIndex =#{nodeIndex} AND username = #{username}
+    </update>
 
     <!--<select id="getStepsOfProject" resultType="java.util.List" parameterType="int">-->
       <!--SELECT * FROM project_step-->

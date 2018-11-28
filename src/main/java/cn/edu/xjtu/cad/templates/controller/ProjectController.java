@@ -29,12 +29,30 @@ public class ProjectController {
    @Autowired
     ProjectRoleMapper projectRoleMapper;
 
-    @RequestMapping(value = "/all",method = RequestMethod.GET)
-    public List<Project> getProjectListByUsername(){
+    /**
+     * 获取当前用户所出的所有项目
+     * @return 返回项目列表JSON格式
+     */
+    @RequestMapping(value = "/owned",method = RequestMethod.GET)
+    public List<Project> getOwnedProjectListByUsername(){
 //        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");
-        List<Project> projectList = projectMapper.getProjectListByUsername(curUsername);
+        List<Project> projectList = projectMapper.getOwnedProjectListByUsernameWithRole(curUsername,ProjectRole.CREATOR);
         return projectList;
     }
+
+    @RequestMapping(value = "/joined",method = RequestMethod.GET)
+    public List<Project> getJoinedProjectListByUsername(){
+//        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");
+        List<Project> projectList = projectMapper.getOwnedProjectListByUsernameWithRole(curUsername,ProjectRole.APPLY);
+        projectList.addAll(projectMapper.getOwnedProjectListByUsernameWithRole(curUsername,ProjectRole.MEMBER));
+        return projectList;
+    }
+
+    /**
+     * 获取id对应项目
+     * @param projectID 项目ID
+     * @return 返回该项目，JSON格式
+     */
     @RequestMapping(value = "",method = RequestMethod.GET)
     public Project getProjectByProjectID(int projectID){
 //        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");
@@ -42,6 +60,11 @@ public class ProjectController {
 
     }
 
+    /**
+     * 创建项目
+     * @param project 项目的基本信息
+     * @return 返回是否创建成功，True or False
+     */
     @RequestMapping(value = "",method = RequestMethod.POST)
     public boolean createProject(Project project){
 //        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");
@@ -49,6 +72,12 @@ public class ProjectController {
         return true;
     }
 
+    /**
+     * 修改项目名
+     * @param projectName 新项目名
+     * @param projectID 项目的ID
+     * @return 返回是否修改成功， True or False
+     */
     @RequestMapping(value = "/name",method = RequestMethod.PUT)
     public int updateProjectName(String projectName,int projectID){
 //        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");
@@ -63,6 +92,12 @@ public class ProjectController {
         return 0;
     }
 
+    /**
+     * 更新项目描述
+     * @param projectDescription 项目描述
+     * @param projectID 项目的ID
+     * @return 返回是否修改成功，True or False
+     */
     @RequestMapping(value = "/description",method = RequestMethod.PUT)
     public int updateProjectDes(String projectDescription,int projectID){
 //        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");
@@ -78,6 +113,12 @@ public class ProjectController {
 
     }
 
+    /**
+     * 修改项目的标签
+     * @param projectTags 项目的新标签
+     * @param projectID 项目的ID
+     * @return 返回是否修改成功， true or false
+     */
     @RequestMapping(value = "/tags",method = RequestMethod.PUT)
     public int updateProjectTags(String projectTags,int projectID){
 //        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");

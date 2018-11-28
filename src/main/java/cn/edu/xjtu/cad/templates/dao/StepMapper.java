@@ -23,6 +23,6 @@ public interface StepMapper {
     List<Step> getStepsOfProject(int projectID);
 
     @Select("SELECT * FROM project_node  WHERE projectID = #{projectID} AND stepIndex = #{stepIndex}")
-    Step getStep(@Param("projectID") int projectID,@Param("stepIndex") int stepIndex);
+    Step getStep(@Param("projectID") int projectID, @Param("stepIndex") int stepIndex);
 
 }

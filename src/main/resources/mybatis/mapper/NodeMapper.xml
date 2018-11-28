@@ -17,12 +17,12 @@
     </insert>
 
     <insert id="addNode" parameterType="cn.edu.xjtu.cad.templates.model.project.node.Node">
-        INSERT INTO project_step  VALUES
+        INSERT INTO project_node  (projectID,nodeIndex,name,description,goal,stepIndex) VALUES
             (#{projectID},
             #{nodeIndex},
             #{name},
             #{description},
-            #{goal}
+            #{goal},
             #{stepIndex})
     </insert>
 
@@ -36,13 +36,14 @@
         description = #{description},
         stepIndex = #{stepIndex},
         goal = #{goal},
-        review = #{review},
+        summary = #{summary},
         state = #{state},
         appName = #{appName},
         appPath = #{appPath},
+        appIcon = #{appIcon},
         templateProjectID = #{templateProjectID},
         lockState = #{lockState}
-        WHERE projectID = #{projectID} AND stepIndex =#{stepIndex}
+        WHERE projectID = #{projectID} AND nodeIndex =#{nodeIndex}
     </update>
 
     <!--<select id="getNodesOfProject" resultType="cn.edu.xjtu.cad.templates.model.project.node.Node" parameterType="int">-->

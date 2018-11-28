@@ -7,6 +7,9 @@ public class ProjectRole {
     private int memberRole;
     public final static int CREATOR = 1;
     public final static int SUPERMANAGER = 2;
+    public final static int MEMBER = 3;
+    public final static int APPLY = 4;
+
     public final static int NO_MEMBER_M = 1;
     public final static int MEMBER_M = 0;
 

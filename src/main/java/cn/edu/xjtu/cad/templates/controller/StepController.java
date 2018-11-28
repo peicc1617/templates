@@ -33,9 +33,33 @@ public class StepController {
     }
 
 
-    @RequestMapping(value = "",method = RequestMethod.PUT)
-    public boolean updateStep(Step step){
-        stepMapper.updateStep(step);
+    @RequestMapping(value = "name",method = RequestMethod.PUT)
+    public boolean updateStepName(int projectID,int stepIndex,String name){
+        Step step = stepMapper.getStep(projectID,stepIndex);
+        if(step!=null){
+            step.setName(name);
+            stepMapper.updateStep(step);
+        }
+        return true;
+    }
+
+    @RequestMapping(value = "description",method = RequestMethod.PUT)
+    public boolean updateStepDes(int projectID,int stepIndex,String description){
+        Step step = stepMapper.getStep(projectID,stepIndex);
+        if(step!=null){
+            step.setDescription(description);
+            stepMapper.updateStep(step);
+        }
+        return true;
+    }
+
+    @RequestMapping(value = "summary",method = RequestMethod.PUT)
+    public boolean updateStep(int projectID,int stepIndex,String summary){
+        Step step = stepMapper.getStep(projectID,stepIndex);
+        if(step!=null){
+            step.setSummary(summary);
+            stepMapper.updateStep(step);
+        }
         return true;
     }
 }

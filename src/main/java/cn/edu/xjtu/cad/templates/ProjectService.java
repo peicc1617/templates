@@ -64,6 +64,7 @@ public class ProjectService {
         project.setSteps(stepMapper.getStepsOfProject(projectID));
         project.setNodes(nodeMapper.getNodesOfProject(projectID));
         project.setEdges(edgeMapper.getEdgesOfProject(projectID));
+        project.setMembers(projectRoleMapper.getRoleOfProject(projectID));
         return project;
     }
     @Transactional(propagation = Propagation.SUPPORTS)

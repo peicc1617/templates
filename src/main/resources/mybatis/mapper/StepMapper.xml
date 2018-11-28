@@ -10,16 +10,18 @@
             (#{item.projectID},
             #{item.stepIndex},
             #{item.name},
-            #{item.description})
+            #{item.description},
+            #{item.summary})
         </foreach>
     </insert>
 
     <insert id="addStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">
         INSERT INTO project_step  VALUES
-            (#{item.projectID},
-            #{item.stepIndex},
-            #{item.name},
-            #{item.description})
+            (#{projectID},
+            #{stepIndex},
+            #{name},
+            #{description},
+            #{summary})
     </insert>
 
     <delete id="deleteStep">
@@ -28,8 +30,8 @@
 
     <update id="updateStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">
         UPDATE project_step SET
-        name = #{step.name},description = #{step.description}
-        WHERE projectID = #{step.projectID} AND stepIndex =#{step.stepIndex}
+        name = #{name},description = #{description},summary = #{summary}
+        WHERE projectID = #{projectID} AND stepIndex =#{stepIndex}
     </update>
 
     <!--<select id="getStepsOfProject" resultType="java.util.List" parameterType="int">-->

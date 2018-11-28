@@ -55,9 +55,10 @@ public class Project {
 
     private int referID;
 
-    List<Step> steps = new ArrayList<>();
-    List<Node> nodes = new ArrayList<>();
-    List<Edge> edges = new ArrayList<>();
+    private List<Step> steps = new ArrayList<>();
+    private List<Node> nodes = new ArrayList<>();
+    private List<Edge> edges = new ArrayList<>();
+    private List<ProjectRole> members = new ArrayList<>();
     public Project() {
     }
 
@@ -175,5 +176,29 @@ public class Project {
 
     public void setEdges(List<Edge> edges) {
         this.edges = edges;
+    }
+
+    public List<ProjectRole> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<ProjectRole> members) {
+        this.members = members;
+    }
+
+    public Date getEditTime() {
+        return editTime;
+    }
+
+    public void setEditTime(Date editTime) {
+        this.editTime = editTime;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

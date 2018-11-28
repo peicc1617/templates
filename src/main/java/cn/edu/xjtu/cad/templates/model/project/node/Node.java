@@ -36,7 +36,7 @@ public class Node {
     /**
      * 当前节点的状态
      */
-    private int state;
+    private boolean state;
 
     /**
      * 节点描述
@@ -51,7 +51,7 @@ public class Node {
     /**
      * 阶段的总结
      */
-    private String review;
+    private String summary;
 
     /**
      * 节点的创建时间
@@ -66,6 +66,7 @@ public class Node {
     private String appName;
     private String appPath;
 
+    private String appIcon;
     private int templateProjectID;
 
     private boolean lockState;
@@ -122,11 +123,11 @@ public class Node {
         this.name = name;
     }
 
-    public int getState() {
+    public boolean isState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(boolean state) {
         this.state = state;
     }
 
@@ -146,15 +147,13 @@ public class Node {
         this.goal = goal;
     }
 
-    public String getReview() {
-        return review;
+    public String getSummary() {
+        return summary;
     }
 
-    public void setReview(String review) {
-        this.review = review;
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
-
-
 
     public Date getCreateTime() {
         return createTime;
@@ -216,5 +215,13 @@ public class Node {
 
     public void setStepIndex(int stepIndex) {
         this.stepIndex = stepIndex;
+    }
+
+    public String getAppIcon() {
+        return appIcon;
+    }
+
+    public void setAppIcon(String appIcon) {
+        this.appIcon = appIcon;
     }
 }
