@@ -10,9 +10,6 @@ public class ProjectRole {
     public final static int MEMBER = 3;
     public final static int APPLY = 4;
 
-    public final static int NO_MEMBER_M = 1;
-    public final static int MEMBER_M = 0;
-
     public ProjectRole() {
     }
 
@@ -46,6 +43,7 @@ public class ProjectRole {
     public void setProjectRole(int projectRole) {
         this.projectRole = projectRole;
     }
+
 
     public int getMemberRole() {
         return memberRole;

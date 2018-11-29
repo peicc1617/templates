@@ -174,77 +174,80 @@ function loadCurStepResult() {
     // }
     let newbindingResults = new Map();
     //向projectManager发送请求，已绑定数据的最新状态
-    $.ajax({
-        url: "/projectManager/api/v1/project/binding",
-        type: "GET",
-        async: false,
-        data: {
-            projectID:PROJECT_ID,
-            toolName: CUR_NODE.appPath.substring(1, CUR_NODE.appPath.length),
-            // resultKeys:resultKeys
-            resultKeys: JSON.stringify(resultKeys)
-        },
-        success: function (data) {
-            if (data.state) {
-                //当请求成功后。打印请求结果
-                console.log(data.content)
-                var projectArr = data.content;
-                for (let i = 0; i < projectArr.length; i++) {
-                    //同时填充新的结果
-                    newbindingResults.set(projectArr[i].resultKey, projectArr[i]);
+    if(resultKeys.length>0){
+        $.ajax({
+            url: "/projectManager/api/v1/project/binding",
+            type: "GET",
+            async: false,
+            data: {
+                projectID:PROJECT_ID,
+                toolName: CUR_NODE.appPath.substring(1, CUR_NODE.appPath.length),
+                // resultKeys:resultKeys
+                resultKeys: JSON.stringify(resultKeys)
+            },
+            success: function (data) {
+                if (data.state) {
+                    //当请求成功后。打印请求结果
+                    console.log(data.content)
+                    var projectArr = data.content;
+                    for (let i = 0; i < projectArr.length; i++) {
+                        //同时填充新的结果
+                        newbindingResults.set(projectArr[i].resultKey, projectArr[i]);
+                    }
+                } else {
+                    console.log(data.error)
                 }
+            }
+        })
+
+        let disableResultArr = [];
+        let outOfDateResultArr = [];
+        //对比绑定记录的状态变化，更新状态信息
+        hasbindingResults.forEach((value, resultKey) => {
+            if (!newbindingResults.has(resultKey)) {
+                disableResultArr.push(value);
             } else {
-                console.log(data.error)
-            }
-        }
-    })
-
-    let disableResultArr = [];
-    let outOfDateResultArr = [];
-    //对比绑定记录的状态变化，更新状态信息
-    hasbindingResults.forEach((value, resultKey) => {
-        if (!newbindingResults.has(resultKey)) {
-            disableResultArr.push(value);
-        } else {
-            if(value['state']!=0 && value['editTime']>hasbindingResults['editTime']){
-                outOfDateResultArr.push(value);
-            }else {
-                CUR_NODE['results'].push(value);
-            }
-        }
-    })
-    if(disableResultArr.length>0){
-        $.ajax({
-            url:"/templates/api/project/node/result/list/disable",
-            type:"PUT",
-
-            async:false,
-            data:{
-                projectID:PROJECT_ID,
-                nodeIndex:CUR_NODE.nodeIndex,
-                usernameList:disableResultArr.map(result=>result.username).join()
-            },
-            success:function (data) {
-                CUR_NODE['results'] =  CUR_NODE['results'].concat(data);
+                if(value['state']!=0 && value['editTime']>hasbindingResults['editTime']){
+                    outOfDateResultArr.push(value);
+                }else {
+                    CUR_NODE['results'].push(value);
+                }
             }
         })
-    }
-    if(outOfDateResultArr.length>0){
-        $.ajax({
-            url:"/templates/api/project/node/result/list/outDate",
-            type:"PUT",
-            async:false,
+        if(disableResultArr.length>0){
+            $.ajax({
+                url:"/templates/api/project/node/result/list/disable",
+                type:"PUT",
 
-            data:{
-                projectID:PROJECT_ID,
-                nodeIndex:CUR_NODE.nodeIndex,
-                usernameList:outOfDateResultArr.map(result=>result.username).join()
-            },
-            success:function (data) {
-                CUR_NODE['results'] =   CUR_NODE['results'].concat(data);
+                async:false,
+                data:{
+                    projectID:PROJECT_ID,
+                    nodeIndex:CUR_NODE.nodeIndex,
+                    usernameList:disableResultArr.map(result=>result.username).join()
+                },
+                success:function (data) {
+                    CUR_NODE['results'] =  CUR_NODE['results'].concat(data);
+                }
+            })
+        }
+        if(outOfDateResultArr.length>0){
+            $.ajax({
+                url:"/templates/api/project/node/result/list/outDate",
+                type:"PUT",
+                async:false,
 
-            }
-        })
+                data:{
+                    projectID:PROJECT_ID,
+                    nodeIndex:CUR_NODE.nodeIndex,
+                    usernameList:outOfDateResultArr.map(result=>result.username).join()
+                },
+                success:function (data) {
+                    CUR_NODE['results'] =   CUR_NODE['results'].concat(data);
+
+                }
+            })
+        }
+
     }
 
     function toPercent(point){

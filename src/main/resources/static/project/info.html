@@ -1,23 +1,52 @@
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <title>创新方法工作平台</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="description" content="overview &amp; stats"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-    <link rel="stylesheet" href="/webresources/ace-master/assets/css/jquery-ui.min.css"/>
+
+    <!-- bootstrap & fontawesome -->
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace.min.css"/>
-    <link href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
     <link rel="stylesheet" href="/webresources/ace-master/assets/font-awesome/4.5.0/css/font-awesome.min.css"/>
-    <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-rtl.min.css"/>
-    <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-skins.min.css"/>
-    <link rel="stylesheet" href="css/step.css">
+
+    <!-- page specific plugin styles -->
+
+    <!-- text fonts -->
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/fonts.googleapis.com.css"/>
+
+    <!-- ace styles -->
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace.min.css" class="ace-main-stylesheet"
+          id="main-ace-style"/>
     <link rel="stylesheet" href="/webresources/bootstrap/bootstrap-table/bootstrap-table.css">
 
-    <link rel="stylesheet" href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css">
-    <link rel="stylesheet" href="css/step.css">
-    <script src="assets/js/projectID.js"></script>
+    <!--[if lte IE 9]>
+    <link rel="stylesheet" href="assets/css/ace-part2.min.css" class="ace-main-stylesheet"/>
+    <![endif]-->
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-skins.min.css"/>
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-rtl.min.css"/>
 
+
+    <!--[if lte IE 9]>
+    <link rel="stylesheet" href="assets/css/ace-ie.min.css"/>
+    <![endif]-->
+
+    <!-- inline styles related to this page -->
+
+    <!-- ace settings handler -->
+    <script src="/webresources/ace-master/assets/js/ace-extra.min.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+
+    <!--[if lte IE 8]>
+    <script src="assets/js/html5shiv.min.js"></script>
+    <script src="assets/js/respond.min.js"></script>
+    <![endif]-->
+    <link href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/webresources/bootstrap/bootstrap-table/bootstrap-table.css">
+    <link rel="stylesheet" href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css">
+    <script src="assets/js/projectID.js"></script>
     <script>
         //首先获取ID
         function getQueryString(name) {
@@ -90,78 +119,8 @@
     </script>
 </head>
 <body class="no-skin">
-<div id="navbarDiv" class="navbar navbar-default ace-save-state navbar-fixed-top">
-    <div class="navbar navbar-default" id="navbarHtml">
-        <div class="navbar-container" id="navbar-container">
-            <button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler"
-                    data-target="#sidebarDiv">
-                <span class="sr-only">Toggle sidebar</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <div class="navbar-header pull-left">
-                <a id="href0" href="http://innovation.xjtu.edu.cn/" class="navbar-brand">
-                    <small>
-                        <i class="fa fa-leaf"></i>小微企业多创新方法融合与集成应用平台
-                    </small>
-                </a>
-                <a id="href1" href="#" class="navbar-brand">
-                    <small>
-                        <small class="showAppNameDiv">创新方法柔性模板</small>
-                    </small>
-                </a>
-            </div>
-            <div class="navbar-header pull-right" role="navigation">
-                <ul class="nav ace-nav" style="height: 20px;">
-                    <li class="grey">
-                        <a id="href2" data-toggle="dropdown" href="&lt;%=basePath%&gt;appList" onclick="gotoHref(this)"
-                           class="dropdown-toggle">
-                            <img class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/platform.png" alt="平台首页"> 平台主页
-                        </a>
-                    </li>
-                    <li class="purple">
-                        <a href="#" onclick="gotoHref(this)">
-                            <img class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/process.png" alt="模板层"> 模板层
-                        </a>
-                    </li>
-                    <li class="green">
-                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-                            <img class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/tool.png" alt="工具集"> 工具集
-
-                        </a>
-                    </li>
-                    <li class="light-blue">
-                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-                            <img id="userAvatar" class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/avatar2.png"
-                                 alt="用户头像">
-                            <span class="user-info">
-                                    <small>欢迎光临,</small>
-                                    <span id="userName">111</span>
-                                </span>
-                            <i class="icon-caret-down"></i>
-                        </a>
-                        <ul id="userDropDown"
-                            class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
-                            <li>
-                                <a href="#" onclick="gotoUserInfo()">
-                                    <i class="icon-user"></i> 个人资料</a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="#" onclick="logout()" style="cursor:pointer;">
-                                    <i class="icon-off"></i> 退出</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
+<div id="navbar" class="navbar navbar-default  ace-save-state">
+    <script src="assets/js/nav-bar.js"></script>
 </div>
 <div class="main-container ace-save-state" id="main-container">
     <script type="text/javascript">
@@ -456,9 +415,9 @@
         <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
         <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
         <script src="/webresources/common/js/userLogin.js"></script>
-        <script src="/webresources/common/js/nav-list.js"></script>
+        <script src="assets/js/nav-list.js"></script>
 
-        <script src="/webresources/common/js/analysis.js"></script>
+
 
         <script>
             $(function () {
@@ -537,8 +496,6 @@
                         personViewRefresh(project.members);
                     }
                 })
-                Analysis.message = ANALYSIS_MSG;
-
             })
             AU_TABLE = {
                 'CREATOR': 1,

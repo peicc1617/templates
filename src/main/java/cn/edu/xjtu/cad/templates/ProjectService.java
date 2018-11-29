@@ -72,7 +72,7 @@ public class ProjectService {
          projectMapper.addProject(project);
         int projectID = project.getId();
         //新建项目权限
-        ProjectRole projectRole = new ProjectRole(projectID,project.getCreator(),ProjectRole.CREATOR,ProjectRole.MEMBER_M);
+        ProjectRole projectRole = new ProjectRole(projectID,project.getCreator(),ProjectRole.CREATOR,1);
         projectRoleMapper.addProjectRole(projectRole);
 
         //向数据库中添加阶段

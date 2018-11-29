@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface ProjectRoleMapper {
@@ -21,8 +22,8 @@ public interface ProjectRoleMapper {
     @Select("SELECT * FROM project_role where projectID = #{projectID} ")
     List<ProjectRole> getRoleOfProject(int projectID);
 
-    @Update("UPDATE project_role SET projectRole = #{projectRole.projectRole},memberRole = #{projectRole.memberRole}" +
-            "WHERE projectID = #{projectRole.projectID} AND username =#{projectRole.username}")
+    @Update("UPDATE project_role SET projectRole = #{projectRole},memberRole = #{memberRole} " +
+            "WHERE projectID = #{projectID} AND username =#{username}")
     boolean updateProjectRole(ProjectRole projectRole);
 
 
@@ -34,4 +35,7 @@ public interface ProjectRoleMapper {
 
     @Select("SELECT username FROM project_role where projectID = #{projectID} AND memberRole = #{role}")
     List<String> getMemberManagerOfProject(@Param("projectID") int projectID,@Param("role") int role);
+
+    @Select("SELECT * FROM project_role where projectID = #{id} AND username = #{name}")
+    ProjectRole getRoleOfMemberInProject(@Param("id")int projectID,@Param("name") String username);
 }

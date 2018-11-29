@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -144,15 +145,38 @@ public class ProjectController {
     public List<ProjectRole> getProjectRoleByID(int projectID){
         return projectRoleMapper.getRoleOfProject(projectID);
     }
+    @RequestMapping(value = "role/map",method = RequestMethod.GET)
+    public Map<String,Integer> getProjectRoleByID(){
+        Map<String,Integer> map = new HashMap<>();
+        map.put("普通成员",ProjectRole.MEMBER);
+        map.put("超级管理员",ProjectRole.SUPERMANAGER);
+        map.put("创建者",ProjectRole.CREATOR);
+        return map;
+    }
 
-    @RequestMapping(value = "member/role",method = RequestMethod.GET)
+
+    @RequestMapping(value = "role/member",method = RequestMethod.GET)
     public ProjectRole getProjectRole(int projectID,String username){
         return projectRoleMapper.getMemberRoleOfProject(projectID,username);
     }
 
     @RequestMapping(value = "role",method = RequestMethod.PUT)
-    public boolean updateProjectRole(ProjectRole projectRole){
-        projectRoleMapper.updateProjectRole(projectRole);
+    public boolean updateProjectRole(int projectID,String username,int projectRole){
+        ProjectRole role = projectRoleMapper.getRoleOfMemberInProject(projectID,username);
+        if(role!=null){
+            role.setProjectRole(projectRole);
+            projectRoleMapper.updateProjectRole(role);
+        }
+        return true;
+    }
+
+    @RequestMapping(value = "role/member",method = RequestMethod.PUT)
+    public boolean updateProjectMemberRole(int projectID,String username,int memberRole){
+        ProjectRole role = projectRoleMapper.getRoleOfMemberInProject(projectID,username);
+        if(role!=null){
+            role.setMemberRole(memberRole);
+            projectRoleMapper.updateProjectRole(role);
+        }
         return true;
     }
 

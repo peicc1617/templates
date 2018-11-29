@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <title>创新方法工作平台</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -68,78 +69,8 @@
     </script>
 </head>
 <body class="no-skin">
-<div id="navbarDiv" class="navbar navbar-default ace-save-state navbar-fixed-top">
-    <div class="navbar navbar-default" id="navbarHtml">
-        <div class="navbar-container" id="navbar-container">
-            <button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler"
-                    data-target="#sidebarDiv">
-                <span class="sr-only">Toggle sidebar</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <div class="navbar-header pull-left">
-                <a id="href0" href="http://innovation.xjtu.edu.cn/" class="navbar-brand">
-                    <small>
-                        <i class="fa fa-leaf"></i>小微企业多创新方法融合与集成应用平台
-                    </small>
-                </a>
-                <a id="href1" href="#" class="navbar-brand">
-                    <small>
-                        <small class="showAppNameDiv">创新方法柔性模板</small>
-                    </small>
-                </a>
-            </div>
-            <div class="navbar-header pull-right" role="navigation">
-                <ul class="nav ace-nav" style="height: 20px;">
-                    <li class="grey">
-                        <a id="href2" data-toggle="dropdown" href="&lt;%=basePath%&gt;appList" onclick="gotoHref(this)"
-                           class="dropdown-toggle">
-                            <img class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/platform.png" alt="平台首页"> 平台主页
-                        </a>
-                    </li>
-                    <li class="purple">
-                        <a href="#" onclick="gotoHref(this)">
-                            <img class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/process.png" alt="模板层"> 模板层
-                        </a>
-                    </li>
-                    <li class="green">
-                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-                            <img class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/tool.png" alt="工具集"> 工具集
-
-                        </a>
-                    </li>
-                    <li class="light-blue">
-                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-                            <img id="userAvatar" class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/avatar2.png"
-                                 alt="用户头像">
-                            <span class="user-info">
-                                    <small>欢迎光临,</small>
-                                    <span id="userName">111</span>
-                                </span>
-                            <i class="icon-caret-down"></i>
-                        </a>
-                        <ul id="userDropDown"
-                            class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
-                            <li>
-                                <a href="#" onclick="gotoUserInfo()">
-                                    <i class="icon-user"></i> 个人资料</a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="#" onclick="logout()" style="cursor:pointer;">
-                                    <i class="icon-off"></i> 退出</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
+<div id="navbar" class="navbar navbar-default  ace-save-state">
+    <script src="assets/js/nav-bar.js"></script>
 </div>
 <div class="main-container ace-save-state" id="main-container">
     <script type="text/javascript">
@@ -219,11 +150,11 @@
                 <div class="page-header">
                     <h1>
                         柔性模板
-                        <small >
+                        <small>
                             <i class="ace-icon fa fa-angle-double-right"></i>
                             <strong id="project_name"></strong>
                             <div class="pull-right">
-                 <span class="btn btn-sm " onclick="javascript:location ='/templates/manager.html?projectID='+PROJECT_ID">
+                 <span class="btn btn-sm " onclick="javascript:location ='/templates/project/project.html?projectID='+PROJECT_ID">
 															进入项目
 															<i class="ace-icon fa fa-signal"></i>
 														</span>
@@ -235,6 +166,7 @@
 															导出报告
 															<i class="ace-icon fa fa-print"></i>
 														</span>
+
                             </div>
                         </small>
                     </h1>

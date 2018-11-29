@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <title>创新方法工作平台</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -90,78 +91,8 @@
     </script>
 </head>
 <body class="no-skin">
-<div id="navbarDiv" class="navbar navbar-default ace-save-state navbar-fixed-top">
-    <div class="navbar navbar-default" id="navbarHtml">
-        <div class="navbar-container" id="navbar-container">
-            <button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler"
-                    data-target="#sidebarDiv">
-                <span class="sr-only">Toggle sidebar</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <div class="navbar-header pull-left">
-                <a id="href0" href="http://innovation.xjtu.edu.cn/" class="navbar-brand">
-                    <small>
-                        <i class="fa fa-leaf"></i>小微企业多创新方法融合与集成应用平台
-                    </small>
-                </a>
-                <a id="href1" href="#" class="navbar-brand">
-                    <small>
-                        <small class="showAppNameDiv">创新方法柔性模板</small>
-                    </small>
-                </a>
-            </div>
-            <div class="navbar-header pull-right" role="navigation">
-                <ul class="nav ace-nav" style="height: 20px;">
-                    <li class="grey">
-                        <a id="href2" data-toggle="dropdown" href="&lt;%=basePath%&gt;appList" onclick="gotoHref(this)"
-                           class="dropdown-toggle">
-                            <img class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/platform.png" alt="平台首页"> 平台主页
-                        </a>
-                    </li>
-                    <li class="purple">
-                        <a href="#" onclick="gotoHref(this)">
-                            <img class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/process.png" alt="模板层"> 模板层
-                        </a>
-                    </li>
-                    <li class="green">
-                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-                            <img class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/tool.png" alt="工具集"> 工具集
-
-                        </a>
-                    </li>
-                    <li class="light-blue">
-                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-                            <img id="userAvatar" class="nav-user-photo" type="text/javascript"
-                                 src="/webresources/ace-master/assets/images/avatars/avatar2.png"
-                                 alt="用户头像">
-                            <span class="user-info">
-                                    <small>欢迎光临,</small>
-                                    <span id="userName">111</span>
-                                </span>
-                            <i class="icon-caret-down"></i>
-                        </a>
-                        <ul id="userDropDown"
-                            class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
-                            <li>
-                                <a href="#" onclick="gotoUserInfo()">
-                                    <i class="icon-user"></i> 个人资料</a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="#" onclick="logout()" style="cursor:pointer;">
-                                    <i class="icon-off"></i> 退出</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
+<div id="navbar" class="navbar navbar-default  ace-save-state">
+    <script src="assets/js/nav-bar.js"></script>
 </div>
 <div class="main-container ace-save-state" id="main-container">
     <script type="text/javascript">
@@ -245,18 +176,15 @@
                             <i class="ace-icon fa fa-angle-double-right"></i>
                             <strong id="project_name"></strong>
                             <div class="pull-right">
-                 <span class="btn btn-sm "
-                       onclick="javascript:location ='/CAI-templates/manager.html?projectID='+PROJECT_ID">
+                 <span class="btn btn-sm " onclick="javascript:location ='/templates/project/project.html?projectID='+PROJECT_ID">
 															进入项目
 															<i class="ace-icon fa fa-signal"></i>
 														</span>
-                                <span class="btn btn-primary btn-sm tooltip-primary"
-                                      onclick="javascript:location ='/CAI-templates/info.html?projectID='+PROJECT_ID">
+                                <span class="btn btn-primary btn-sm tooltip-primary" onclick="javascript:location ='/templates/project/info.html?projectID='+PROJECT_ID">
 															项目信息
 															<i class="ace-icon fa fa-lightbulb-o"></i>
 														</span>
-                                <span class="btn btn-purple btn-sm tooltip-purple"
-                                      onclick="javascript:location ='/CAI-templates/report.html?projectID='+PROJECT_ID">
+                                <span class="btn btn-purple btn-sm tooltip-purple" onclick="javascript:location ='/templates/project/report.html?projectID='+PROJECT_ID">
 															导出报告
 															<i class="ace-icon fa fa-print"></i>
 														</span>
@@ -424,17 +352,19 @@
                         <div class="row">
                             <div class="col-xs-12 col-sm-12 widget-box transparent">
                                 <div class="widget-header widget-header-flat">
-                                    <h4 class="widget-title lighter">权限配置</h4>
+                                    <h4 class="widget-title lighter">模板权限控制</h4>
                                     <div class="widget-toolbar">
-                                        <span class="badge badge-danger" data-target="#user-new-modal" data-toggle="modal" >邀请用户</span>
-                                        <span class="badge badge-info" onclick="saveToServer()">保存修改</span>
+                                        <span class="badge badge-danger" data-target="#user-new-modal"
+                                              data-toggle="modal">邀请用户</span>
                                     </div>
                                 </div>
 
                                 <div class="widget-body">
                                     <div class="widget-main no-padding">
-                                        <table id="user-table" >
+                                        <table id="project-role-table">
+
                                         </table>
+
                                     </div>
                                     <!-- /.widget-main -->
                                 </div>
@@ -451,6 +381,40 @@
         </div>
         <!-- /.main-content -->
 
+        <div class="modal fade" id="user-new-modal" tabindex="-1" role="dialog" aria-labelledby="userListModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="userListModalLabel">选择新的用户邀请</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <table id="user-list-table" data-height="400"
+                                       data-url="/CAI-templates/user/list">
+                                    <thead>
+                                    <tr>
+                                        <th data-field="username">用户名</th>
+                                        <th data-field="personName">用户昵称</th>
+                                        <th data-field="jobNumber">工号</th>
+                                        <th data-field="telphone">电话</th>
+                                        <th data-field="email">邮箱</th>
+                                        <th data-field="op" data-formatter="opFormatter">操作</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
         <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
             <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
         </a>
@@ -465,235 +429,152 @@
         <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
         <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
         <script src="/webresources/common/js/userLogin.js"></script>
-        <script src="/webresources/common/js/nav-list.js"></script>
+        <script src="assets/js/nav-list.js"></script>
+
 
         <script src="/webresources/common/js/analysis.js"></script>
 
 
         <script>
-            // <%--var USER_DATA = <%--%>
-            // <%--JSONArray jsonArray = new JSONArray();--%>
-            // <%--for (User user : userList) {--%>
-            // <%--if(user.getAu()==User.CREATOR||user.getAu()==User.APPLY) continue;--%>
-            // <%--JSONObject jsonObject = new JSONObject();--%>
-            // <%--jsonObject.put("username",user.getUsername());--%>
-            // <%--jsonObject.put("superManager",user.getAu()==User.SUPERMANAGER?"1":"0");--%>
-            // <%--jsonObject.put("userManager",user.isUserManager()?"1":"0");--%>
-            // <%--for (Integer integer : user.getRole().keySet()) {--%>
-            // <%--jsonObject.put("node-"+integer,user.getRole().get(integer));--%>
-            // <%--}--%>
-            // <%--jsonArray.add(jsonObject);--%>
-            //
-            // <%--}--%>
-            // <%--out.print(jsonArray.toJSONString());--%>
-            // <%--%>--%>
-            var CHANGED_USER_LIST = [];
-            var nodeEditable = {
-                type: 'select',
-                title: '权限',
-                emptytext: "-",
-                source: [{value: "<%=Person.NODE_MANAGER%>", text: "管理"}, {
-                    value: "<%=Person.NODE_DATA%>",
-                    text: "绑定"
-                }, {value: "<%=Person.NODE_VIEW%>", text: "查看"}]
-            }
-            var USER_NAME = {};//用户名数组
-            $(function () {
-                Analysis.message=ANALYSIS_MSG;
-                var option = {
+            let PROJECT_USERNAME = new Set();
+            $(document).ready(function () {
+
+                $('#user-new-modal').on('show.bs.modal',
+                    function() {
+                        $("#user-list-table").bootstrapTable('refresh');
+
+                    })
+                $("#project-role-table").bootstrapTable({
                     columns: [{
+                        field: 'id',
+                        visible: false
+                    }, {
                         field: 'username',
-                        title: '用户名'
-                    }, {
-                        field: 'superManager',
-                        title: '超级管理员',
-                        editable: {
-                            type: 'select',
-                            title: '权限',
-                            source: [{value: "1", text: "是"}, {value: "0", text: "否"}]
+                        title: '用户名',
+                        formatter:function (value) {
+                            PROJECT_USERNAME.add(value);
+                            return value;
                         }
                     }, {
-                        field: 'userManager',
-                        title: '用户管理',
-
+                        field: 'projectRole',
+                        title: '项目内角色',
                         editable: {
                             type: 'select',
-                            title: '权限',
-                            source: [{value: "1", text: "是"}, {value: "0", text: "否"}]
+                            title: '修改项目内的角色',
+                            source: function () {
+                                var result = [];
+                                $.ajax({
+                                    url: '/templates/api/project/role/map',
+                                    async: false,
+                                    type: "get",
+                                    success: function (data, status) {
+                                        for (let text in data) {
+                                            result.push({value: data[text], text: text});
+                                        }
+
+                                    }
+                                });
+                                return result;
+                            }
                         }
-                    }
-                    <%
-                    List<Node> nodeList = project.getNodes();
-                for (Node node : nodeList) {
-                    out.print(",{ field: 'node-"+node.getNodeIndex()+"', title: '阶段:"+node.getName()+"',editable: nodeEditable}");
-                }
-            %>, {
-                    field: 'deleteUser',
-                        title: '删除用户',
-                        formatter: function (value, row, index) {
-                        USER_NAME[row.username]=true;
-                        return "<button class=\"btn btn-xs btn-danger\" onclick=\"deleteUser('" + row.username + "')\">\n" +
-                            "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<i class=\"ace-icon fa fa-trash-o bigger-120\"></i>\n" +
-                            "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</button>";
-                    }
-                }],
-
-                onEditableSave: function (field, row, oldValue, $el) {
-                    CHANGED_USER_LIST.push(row);
-                }
-            }
-                $("#user-table").bootstrapTable(option);
-                $("#user-table").bootstrapTable("refreshOptions",{
-                    height:400,
-                    striped: true,  //表格显示条纹，默认为false
-                    pagination: true, // 在表格底部显示分页组件，默认false
-                    pageList: [10,20], // 设置页面可以显示的数据条数
-                    pageSize: 10, // 页面数据条数
-                    pageNumber: 1, // 首页页码,
-                    ajax : function (request) {
-                        $.ajax({
-
-                                type : "GET",
-                                url : "/CAI-templates/api/project/user",
-                                data:{id:PROJECT_ID,
-                            contentType: "application/json;charset=utf-8",
-                            dataType:"json",
-                            success : function (data) {
-                            var tableData = [];
-                            data.forEach(function (v,i,arr) {
-                                if(v.au!=10){
-                                    var row = {
-                                        username:v.username,
-                                        superManager:0,
-                                        userManager:0,
-                                    };
-                                    if(v.au==9){
-                                        row['superManager']=1;
-                                    }
-                                    if(v.userManager){
-                                        row.userManager=1;
-                                    }
-                                    for(let attr in v.role){
-                                        row['node-'+attr]=v.role[attr];
-                                    }
-                                    tableData.push(row);
-                                }
-
-                            })
-                            request.success({
-                                row : tableData
+                    }, {
+                        field: 'memberRole',
+                        title: '是否可以管理用户',
+                        editable: {
+                            type: 'select',
+                            title: '部门',
+                            source: [{value: 1, text: '是'}, {value: 0, text: '否'}]
+                        }
+                    },{
+                        field:'op',
+                        title:'删除用户',
+                        formatter:function (value,row,index) {
+                            $button = $("<button></button>").attr({
+                                'class': 'btn btn-xs btn-danger',
+                                'onclick':'removeFromProject("'+row.username+'")'
                             });
-                            $('#user-table').bootstrapTable('load', tableData);
-                        },
-                        error: function (XMLHttpRequest, textStatus, errorThrown) {
-                            // 状态码
-                            console.log(XMLHttpRequest.status);
-                            // 状态
-                            console.log(XMLHttpRequest.readyState);
-                            // 错误信息
-                            console.log(textStatus);
+                            return $button.append('<i class="ace-icon fa fa-trash-o bigger-120"></i>')[0].outerHTML;
                         }
-                    });
-                    },
+                    }],
+                    url: "/templates/api/project/role?projectID=" + PROJECT_ID,
+                    method: "GET",
+                    onEditableSave(field, row, oldValue, $el) {
+                        let url = "/templates/api/project/role";
+                        if (field == "memberRole") {
+                            url += "/member";
+                        }
+                        let data = {
+                            projectID: PROJECT_ID,
+                            username: row.username,
+                        }
+                        data[field] = row[field];
+                        $.ajax({
+                            url: url,
+                            method: "PUT",
+                            data: data,
+                            async: false,
+                            success: function (data) {
+                                alert("修改成功")
+                            },
+                            error: function () {
+                                row[field] = oldValue;
+                                alert("修改失败")
+                            },
+                        })
+                    }
                 })
-                $("#user-new-modal").on('show.bs.modal', function (e) {
-                    $("#user-list-table").bootstrapTable("refresh")
-                })
-
-
+                $("#user-list-table").bootstrapTable();
             });
 
-            function deleteUser(username) {
-                if (window.confirm("是否从项目中删除该成员,如果进行删除，该成员在绑定在项目内的数据都会解除绑定")) {
-                    console.log("确认删除");
-                    $.ajax({
-                            'url': '/CAI-templates/api/project/user',
-                            'type': 'post',
-                            'data': {
-                                '_method': 'delete',
-                                'id':PROJECT_ID,
-                            'username': username
-                        },
-                        success: function (data) {
-                        ANALYSIS_MSG.type=MSG_TYPE_TABLE.USER
-                        ANALYSIS_MSG.content="将用户["+username+"]请离了项目";
-                        Analysis.send();
-                        console.log("删除成功");
-                    }
-                })
-                } else {
-                    console.log("取消删除");
-                }
-
-            }
-
-            function saveToServer() {
-                if (CHANGED_USER_LIST.length > 0) {
-                    $.ajax({
-                            'url': '<%=request.getContextPath()%>/api/project/user',
-                            'type': 'post',
-                            'data': {
-                                '_method': 'put',
-                                'id':PROJECT_ID,
-                            'userList': JSON.stringify(CHANGED_USER_LIST)
-                        },
-                        async:false,
-                        success: function (data) {
-
-                        ANALYSIS_MSG.type=MSG_TYPE_TABLE.NODE
-                        ANALYSIS_MSG.content="修改用户";
-                        CHANGED_USER_LIST.forEach(function (value, index, array) {
-                            ANALYSIS_MSG.content+="["+value.username+"]"
-                        })
-                        ANALYSIS_MSG.content+="的权限";
-                        Analysis.send();
-
-                        alert("保存成功")
-                    }
-                })
-                }else {
-                    alert("未发生任何修改")
-                }
-                $("#user-table").bootstrapTable('refresh')
-
-            }
-
-            function opFormatter(value,row,index) {
+            function opFormatter(value, row, index) {
                 const username = row.username;
                 $button = $("<a></a>").attr({
-                    username:row.username,
+                    username: row.username,
                 });
-                if(!USER_NAME[username]){
+                if (!PROJECT_USERNAME.has(username)) {
 
                     $button.attr({
-                        'class':'blue',
-                        'onclick':'addUserToProject(this)',
+                        'class': 'blue',
+                        'onclick':'addToProject("'+row.username+'")'
                     }).append("<i class=\"ace-icon glyphicon glyphicon-plus bigger-120\"></i>")
+                    $div = $("<div></div>").addClass("action-buttons").append($button);
+                    return $div[0].outerHTML;
                 }
-                $div = $("<div></div>").addClass("action-buttons").append($button);
-                return $div[0].outerHTML;
             }
 
-            function addUserToProject(e){
+            function addToProject(username) {
                 $.ajax({
-                        url:'/CAI-templates/api/project/user',
-                        'type':'POST',
-                        'data':{
-                            _method:'post',
-                            'id':PROJECT_ID,
-                        'username':$(e).attr('username')
+                    url: '/templates/api/project/role',
+                    'type': 'POST',
+                    'data': {
+                        projectID: PROJECT_ID,
+                        username: username,
+                        projectRole: 3,
+                        memberRole: 0
                     },
-                    success:function (data) {
-                    alert("添加成功")
+                    success: function (data) {
+                        alert("添加成功")
+                        PROJECT_USERNAME.add(username);
+                        $("#project-role-table").bootstrapTable('refresh')
+                        $("#user-list-table").bootstrapTable("refresh");
+                    }
+                })
+            }
 
-                    ANALYSIS_MSG.type=MSG_TYPE_TABLE.USER
-                    ANALYSIS_MSG.content="邀请用户["+$(e).attr('username')+"]加入项目"
-                    Analysis.send();
-
-                    $("#user-table").bootstrapTable('refresh')
-                    $("#user-list-table").bootstrapTable("refresh");
-                }
-            })
+            function removeFromProject (username) {
+                $.ajax({
+                    url: '/templates/api/project/role',
+                    'type': 'DELETE',
+                    'data': {
+                        projectID: PROJECT_ID,
+                        username: username,
+                    },
+                    success: function (data) {
+                        alert("删除成功")
+                        PROJECT_USERNAME.delete(username);
+                        $("#project-role-table").bootstrapTable('refresh')
+                    }
+                })
             }
         </script>
 
