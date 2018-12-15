@@ -91,7 +91,7 @@
     </script>
 </head>
 <body class="no-skin">
-<div id="navbar" class="navbar navbar-default  ace-save-state">
+<div id="navbar" class="navbar navbar-default          ace-save-state navbar-fixed-top">
     <script src="assets/js/nav-bar.js"></script>
 </div>
 <div class="main-container ace-save-state" id="main-container">
@@ -154,7 +154,7 @@
     <div class="main-content">
 
         <div class="main-content-inner">
-            <div class="breadcrumbs ace-save-state breadcrumbs-fixed" id="breadcrumbs">
+            <div class="breadcrumbs ace-save-state fixed" id="breadcrumbs">
                 <ul class="breadcrumb">
                     <li>
                         <i class="ace-icon fa fa-home home-icon"></i>
@@ -428,12 +428,7 @@
         <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
         <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
         <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
-        <script src="/webresources/common/js/userLogin.js"></script>
         <script src="assets/js/nav-list.js"></script>
-
-
-        <script src="/webresources/common/js/analysis.js"></script>
-
 
         <script>
             let PROJECT_USERNAME = new Set();
@@ -468,8 +463,8 @@
                                     async: false,
                                     type: "get",
                                     success: function (data, status) {
-                                        for (let text in data) {
-                                            result.push({value: data[text], text: text});
+                                        for (let role in data) {
+                                            result.push({value: role, text: data[role]});
                                         }
 
                                     }
@@ -478,14 +473,6 @@
                             }
                         }
                     }, {
-                        field: 'memberRole',
-                        title: '是否可以管理用户',
-                        editable: {
-                            type: 'select',
-                            title: '部门',
-                            source: [{value: 1, text: '是'}, {value: 0, text: '否'}]
-                        }
-                    },{
                         field:'op',
                         title:'删除用户',
                         formatter:function (value,row,index) {
@@ -496,7 +483,7 @@
                             return $button.append('<i class="ace-icon fa fa-trash-o bigger-120"></i>')[0].outerHTML;
                         }
                     }],
-                    url: "/templates/api/project/role?projectID=" + PROJECT_ID,
+                    url: "/templates/api/project/role/userList?projectID=" + PROJECT_ID,
                     method: "GET",
                     onEditableSave(field, row, oldValue, $el) {
                         let url = "/templates/api/project/role";

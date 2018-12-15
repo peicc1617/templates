@@ -1,4 +1,3 @@
-
 $(document).ready(function(){
     $('#state-change-btn').on('click', finish);
 
@@ -70,10 +69,7 @@ function updateNodeHref(params) {
  * @description 查看某个节点的函数
  */
 function viewNode() {
-    //设置当前节点的显示区域
-    updateView();
-    //加载结果列表
-    loadCurStepResult();
+
 }
 
 /**
@@ -158,19 +154,6 @@ function updateView() {
     }
 }
 
-
-
-
-// /**
-//  * @description 弹出修改节点的模态框
-//  */
-// function editNodeInfo() {
-//     $("#node-name").val(CUR_NODE.name);
-//     $("#node-description").val(CUR_NODE.description);
-//     $("#node-goal").val(CUR_NODE.goal);
-//     $("#cur-node-info-view-modal").modal('show');
-// }
-
 /**
  * @description 修改某个节点的信息
  */
@@ -220,6 +203,7 @@ function bindingApp(appName,appPath,appIcon){
         success: function (data) {
             CUR_NODE.appName=appName;
             CUR_NODE.appPath = appPath;
+            CUR_NODE.appIcon = appIcon;
             updateView();
         }
 
@@ -247,34 +231,43 @@ function swapTemplate(){
         }
     })
 }
-//向后台发送添加节点的请求
-function addNode(node) {
-    $.ajax({
-        url: "/templates/api/project/node",
-        type: "POST",
-        data: node,
-        success: function (data) {
-            stage.option.nodes.push(newNode);
-            stage.refreshGrid();
-        }
-    })
 
+var NODE_JS = {
+    beforeAddNode:function (node) {
+        $.ajax({
+            url: "/templates/api/project/node",
+            type: "POST",
+            data: node,
+            success: function (data) {
+                stage.option.nodes.push(node);
+                stage.resetView();
+            }
+        })
+    },
+    beforeRemoveNode:function (node) {
+        $.ajax({
+            url: "/templates/api/project/node",
+            type: "DELETE",
+            data: {
+                id: PROJECT_ID,
+                nodeIndex: node.nodeIndex,
+            },
+            success: function (data) {
+
+            }
+        })
+    },
+    beforeViewNode:function(node){
+        CUR_NODE = node;
+        //设置当前节点的显示区域
+        updateView();
+        //加载结果列表
+        loadCurStepResult();
+    }
+    
 }
 
-//向后台发送删除节点的请求
-function removeNode() {
-    $.ajax({
-        url: "/templates/api/project/node",
-        type: "DELETE",
-        data: {
-            id: PROJECT_ID,
-            nodeIndex: CUR_NODE.nodeIndex,
-        },
-        success: function (data) {
-            stage.refreshGrid();
-        }
-    })
-}
+
 
 //锁定当前节点
 /**

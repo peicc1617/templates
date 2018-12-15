@@ -1,5 +1,5 @@
-var TOOL_PROJECT_RESULT;
-var USER_RESULT;
+var TOOL_PROJECT_RESULT={};
+var USER_RESULT = {};
 $(function () {
     $('#tool-result-modal').on('show.bs.modal', function (e) {
         $("#tool-project-table").bootstrapTable("refreshOptions", {
@@ -283,7 +283,7 @@ function toolProjectPreView(value, row, index) {
     $(preview).addClass("btn btn-minier preview").text("预览");
     var binding = document.createElement("button");
     $(binding).addClass("btn btn-minier btn-primary");
-    if (USER_RESULT.resultKey && USER_RESULT['resultID'] == row.id) {
+    if (USER_RESULT['resultKey'] && USER_RESULT['resultID'] == row.id) {
         //如果该数据已绑定,显示已绑定,点击后进行解绑
         $(binding).removeClass("btn-primary")
             .addClass("btn-success")

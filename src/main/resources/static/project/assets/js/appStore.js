@@ -6,7 +6,7 @@ function rowFormatter(value, row, index, field){
 return '<div class="media search-media">' +
     '<div class="media-left">' +
     '<a href="#">' +
-    '<img class="media-object" data-src="" alt="32x32" src="/webresources/APPicons/'+appIcon+'" data-holder-rendered="true" style="width: 32px; height: 32px;">' +
+    '<img class="media-object" data-src="" alt="32x32" src="'+appIcon+'" data-holder-rendered="true" style="width: 32px; height: 32px;">' +
     '</a></div>' +
     '<div class="media-body">' +
     '<div>' +
@@ -18,7 +18,7 @@ return '<div class="media search-media">' +
     '<div class="search-actions text-center">' +
     '<span class="text-info">热度</span>' +
     '<span class="blue bolder">'+row.visitNum+'</span>' +
-    '<a class="search-btn-action btn btn-sm btn-block btn-info" onclick="chooseThis(\''+row.appPath+'\',\''+row.displayName+'\',\'/webresources/APPicons/'+appIcon+'\')">选择该方法</a>' +
+    '<a class="search-btn-action btn btn-sm btn-block btn-info" onclick="chooseThis(\''+row.appPath+'\',\''+row.displayName+'\',\''+appIcon+'\')">选择该方法</a>' +
     '</div>' +
     '</div></div>';
 }

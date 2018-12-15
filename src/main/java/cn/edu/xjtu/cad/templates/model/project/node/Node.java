@@ -1,10 +1,9 @@
 package cn.edu.xjtu.cad.templates.model.project.node;
 
-import cn.edu.xjtu.cad.templates.model.project.Member;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import cn.edu.xjtu.cad.templates.model.project.User;
+
+import java.util.*;
 
 /**
  * 项目的节点类，对应数据库中的project_node表，利用项目ID和节点在项目内的索引index作为联合主键
@@ -12,9 +11,10 @@ import java.util.List;
 public class Node {
 
     public Node() {
+
     }
 
-    public Node(int projectID, int stepIndex, int nodeIndex, String name) {
+    public Node(int projectID, String stepIndex, String nodeIndex, String name) {
         this.projectID = projectID;
         this.nodeIndex = nodeIndex;
         this.name = name;
@@ -26,9 +26,9 @@ public class Node {
      */
     private int projectID;
 
-    private int nodeIndex;
+    private String nodeIndex;
 
-    private int stepIndex;
+    private String stepIndex;
     /**
      * 节点的名称
      */
@@ -71,21 +71,13 @@ public class Node {
 
     private boolean lockState;
 
-
-
+    private List<String> preNodeIndexList ;
+    private List<String> nextNodeIndexList ;
     /**
      * 阶段包含的成员
      */
-    private List<Member> memberList= new ArrayList<>();
     private List<NodeResult> resultList = new ArrayList<>();
 
-    public List<Member> getMemberList() {
-        return memberList;
-    }
-
-    public void setMemberList(List<Member> memberList) {
-        this.memberList = memberList;
-    }
 
     public List<NodeResult> getResultList() {
         return resultList;
@@ -99,11 +91,11 @@ public class Node {
      * 阶段包含创新方法工具的个数
      */
 
-    public int getNodeIndex() {
+    public String getNodeIndex() {
         return nodeIndex;
     }
 
-    public void setNodeIndex(int nodeIndex) {
+    public void setNodeIndex(String nodeIndex) {
         this.nodeIndex = nodeIndex;
     }
 
@@ -171,6 +163,21 @@ public class Node {
         this.editTime = editTime;
     }
 
+    public List<String> getPreNodeIndexList() {
+        return preNodeIndexList;
+    }
+
+    public void setPreNodeIndexList(List<String> preNodeIndexList) {
+        this.preNodeIndexList = preNodeIndexList;
+    }
+
+    public List<String> getNextNodeIndexList() {
+        return nextNodeIndexList;
+    }
+
+    public void setNextNodeIndexList(List<String> nextNodeIndexList) {
+        this.nextNodeIndexList = nextNodeIndexList;
+    }
 
     public String getAppName() {
         return appName;
@@ -209,11 +216,11 @@ public class Node {
         return lockState;
     }
 
-    public int getStepIndex() {
+    public String getStepIndex() {
         return stepIndex;
     }
 
-    public void setStepIndex(int stepIndex) {
+    public void setStepIndex(String stepIndex) {
         this.stepIndex = stepIndex;
     }
 

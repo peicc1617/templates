@@ -1,22 +1,30 @@
 package cn.edu.xjtu.cad.templates.model.project.node;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class NodeRole {
     private int projectID;
-    private int nodeIndex;
+    private String nodeIndex;
     private String username;
-    private int nodeRole;
-    public final static int MANAGER = 2;
-    public final static int OPERATOR = 1;
-    public final static int VIEWER = 0;
+    private NodeRoleType nodeRole;
 
     public NodeRole() {
     }
 
-    public NodeRole(int projectID, int nodeIndex, String username, int nodeRole) {
+    public NodeRole(int projectID, String nodeIndex, String username, NodeRoleType nodeRole) {
         this.projectID = projectID;
         this.nodeIndex = nodeIndex;
         this.username = username;
         this.nodeRole = nodeRole;
+    }
+
+    public static Map<String,String> getNodeRoleTypeMap(){
+        Map<String,String> stringStringMap = new HashMap<>(NodeRoleType.values().length,1);
+        for (NodeRoleType type : NodeRoleType.values()) {
+            stringStringMap.put(type.toString(),type.getName());
+        }
+        return stringStringMap;
     }
 
     public int getProjectID() {
@@ -27,11 +35,11 @@ public class NodeRole {
         this.projectID = projectID;
     }
 
-    public int getNodeIndex() {
+    public String getNodeIndex() {
         return nodeIndex;
     }
 
-    public void setNodeIndex(int nodeIndex) {
+    public void setNodeIndex(String nodeIndex) {
         this.nodeIndex = nodeIndex;
     }
 
@@ -43,11 +51,11 @@ public class NodeRole {
         this.username = username;
     }
 
-    public int getNodeRole() {
+    public NodeRoleType getNodeRole() {
         return nodeRole;
     }
 
-    public void setNodeRole(int nodeRole) {
+    public void setNodeRole(NodeRoleType nodeRole) {
         this.nodeRole = nodeRole;
     }
 }

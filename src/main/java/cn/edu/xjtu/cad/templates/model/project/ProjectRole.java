@@ -1,23 +1,30 @@
 package cn.edu.xjtu.cad.templates.model.project;
 
+import cn.edu.xjtu.cad.templates.model.project.node.NodeRoleType;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class ProjectRole {
     private int projectID;
     private String username;
-    private int projectRole;
-    private int memberRole;
-    public final static int CREATOR = 1;
-    public final static int SUPERMANAGER = 2;
-    public final static int MEMBER = 3;
-    public final static int APPLY = 4;
+    private ProjectRoleType projectRole;
 
     public ProjectRole() {
     }
 
-    public ProjectRole(int projectID, String username, int projectRole, int memberRole) {
+    public ProjectRole(int projectID, String username, ProjectRoleType projectRole) {
         this.projectID = projectID;
         this.username = username;
         this.projectRole = projectRole;
-        this.memberRole = memberRole;
+    }
+
+    public static Map<String,String> getProjectRoleTypeMap(){
+        Map<String,String> stringStringMap = new HashMap<>(ProjectRoleType.values().length,1);
+        for (ProjectRoleType type : ProjectRoleType.values()) {
+            stringStringMap.put(type.toString(),type.getName());
+        }
+        return stringStringMap;
     }
 
     public int getProjectID() {
@@ -36,20 +43,12 @@ public class ProjectRole {
         this.username = username;
     }
 
-    public int getProjectRole() {
+    public ProjectRoleType getProjectRole() {
         return projectRole;
     }
 
-    public void setProjectRole(int projectRole) {
+    public void setProjectRole(ProjectRoleType projectRole) {
         this.projectRole = projectRole;
     }
 
-
-    public int getMemberRole() {
-        return memberRole;
-    }
-
-    public void setMemberRole(int memberRole) {
-        this.memberRole = memberRole;
-    }
 }

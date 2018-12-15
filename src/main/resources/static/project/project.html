@@ -70,7 +70,7 @@
 </head>
 <body class="no-skin">
 <div id="navbar" class="navbar navbar-default  ace-save-state">
-    <script src="assets/js/nav-bar.js"></script>
+    <script src="/webresources/common/js/nav-bar.js"></script>
 </div>
 <div class="main-container ace-save-state" id="main-container">
     <script type="text/javascript">
@@ -132,7 +132,7 @@
     <div class="main-content">
 
         <div class="main-content-inner">
-            <div class="breadcrumbs ace-save-state breadcrumbs-fixed" id="breadcrumbs">
+            <div class="breadcrumbs ace-save-state fixed" id="breadcrumbs">
                 <ul class="breadcrumb">
                     <li>
                         <i class="ace-icon fa fa-home home-icon"></i>
@@ -176,21 +176,30 @@
 
                     <div id="svgRow" center class="row ">
                         <div class="col-xs-12">
-                            <div class="col-sm-4">
-                                <form class="form-inline pull-right">
-                                    <button id="step-create-btn" type="button" class=" btn btn-white" onclick="addStep()">
-                                        <i class="ace-icon fa fa-key bigger-110"></i>新建阶段
-                                    </button>
-                                </form>
-                                <!--<div class="input-group">-->
-                                            <!--<span class="input-group-addon">-->
-                                                <!--缩放-->
-                                            <!--</span>-->
-                                    <!--<input id="scal-value-input" type="text" class="form-control " readonly-->
-                                           <!--placeholder="1">-->
-                                <!--</div>-->
+
+                            <div class="col-sm-6" style="height:40px;line-height:35px; ">
+                                <label class="pull-right inline">
+                                    <strong class="muted smaller-90">关系</strong>
+                                    <input id="linked-change-btn" checked="checked" type="checkbox"
+                                           class="ace ace-switch ace-switch-5">
+                                    <span class="lbl middle"></span>
+                                </label>
+                                <label class="pull-right inline">
+                                    <strong class="muted smaller-90">阶段</strong>
+                                    <input id="step-change-btn" checked="checked" type="checkbox"
+                                           class="ace ace-switch ace-switch-5">
+                                    <span class="lbl middle"></span>
+                                </label>
+                                <label class="pull-right inline">
+                                    <strong class="muted smaller-90">创新方法</strong>
+                                    <input id="name-change-btn" type="checkbox" class="ace ace-switch ace-switch-5">
+                                    <span class="lbl middle"></span>
+                                </label>
+
+
+
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
                                 <svg class="center" id="toolbar" xmlns="http://www.w3.org/2000/svg" version="1.1"
                                      preserveAspectRatio="xMidYMin meet" width="100%"
                                      height="40" viewBox="0 0 430 40">
@@ -221,34 +230,23 @@
 
                                 </svg>
                             </div>
-                            <div class="col-sm-4" style="height:40px;line-height:35px; ">
-                                <label class="pull-left inline">
-                                    <strong class="muted smaller-90">关系</strong>
-                                    <input id="linked-change-btn" checked="checked" type="checkbox"
-                                           class="ace ace-switch ace-switch-5">
-                                    <span class="lbl middle"></span>
-                                </label>
-                                <label class="pull-left inline">
-                                    <strong class="muted smaller-90">阶段</strong>
-                                    <input id="step-change-btn" checked="checked" type="checkbox"
-                                           class="ace ace-switch ace-switch-5">
-                                    <span class="lbl middle"></span>
-                                </label>
-                                <label class="pull-left inline">
-                                    <strong class="muted smaller-90">创新方法</strong>
-                                    <input id="name-change-btn" type="checkbox" class="ace ace-switch ace-switch-5">
-                                    <span class="lbl middle"></span>
-                                </label>
-
-
-
-                            </div>
                         </div>
 
 
                         <svg id="mySVG" xmlns="http://www.w3.org/2000/svg" version="1.1"
                              preserveAspectRatio="xMidYMin meet">
-
+                            <g id="filterContainer">
+                                <filter id="btnFeOffset" x="0" y="0" width="200%" height="200%">
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="2.2"/>
+                                    <feOffset dx="2" dy="2" result="offsetblur"/>
+                                    <feFlood flood-color="rgba(0,0,0,0.5)"/>
+                                    <feComposite in2="offsetblur" operator="in"/>
+                                    <feMerge>
+                                        <feMergeNode/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </g>
                             <g id="symbolsContainer">
 
                                 <symbol class="icon icon-download" id="icon-1" viewBox="0 0 1000 1000">
@@ -299,11 +297,25 @@
                                 </symbol>
 
                                 <symbol class="icon icon-download" id="icon-add" viewBox="0 0 1000 1000">
-                                    <path d="M500,990C229.4,990,10,770.6,10,500S229.4,10,500,10s490,219.4,490,490S770.6,990,500,990z M500,71.3c-236.8,0-428.8,192-428.8,428.8s192,428.8,428.8,428.8c236.8,0,428.8-192,428.8-428.8C928.8,263.2,736.8,71.3,500,71.3z M699.7,529.9H529.9v169.7c0,16.5-13.4,29.9-29.9,29.9s-29.9-13.4-29.9-29.9l0-169.7H300.3c-16.5,0-29.9-13.4-29.9-29.9s13.4-29.9,29.9-29.9h169.7V300.3c0-16.5,13.4-29.9,29.9-29.9s29.9,13.4,29.9,29.9v169.7h169.7c16.5,0,29.9,13.4,29.9,29.9S716.2,529.9,699.7,529.9z"></path>
+                                    <path d="M990,578V438H570V18H430v420H10v140h420v420h140V578H990z"></path>
                                 </symbol>
                                 <symbol class="icon icon-download" id="icon-setting" viewBox="0 0 1000 1000">
                                     <path d="M957.6,384.5l-75.9,44.2c4.2,23.2,7.1,46.9,7.1,71.3c0,24.4-2.8,48.2-7.1,71.3l75.9,44.2c31,18,41.6,58,23.7,89.2l-64.8,113.2c-17.9,31.2-57.5,41.9-88.5,23.9l-76.6-44.6c-35.8,30.7-76.5,55.9-121.8,72v55.4c0,36.1-29,65.3-64.8,65.3H435.2c-35.8,0-64.8-29.3-64.8-65.3v-55.5c-45.2-16.1-85.9-41.3-121.8-72L172,841.8c-31,18-70.6,7.3-88.5-23.9L18.7,704.7c-17.9-31.3-7.3-71.2,23.7-89.2l75.9-44.2c-4.2-23.2-7.1-46.9-7.1-71.3c0-24.5,2.8-48.2,7.1-71.3l-75.9-44.2c-31-18-41.6-58-23.7-89.2l64.8-113.1c17.9-31.3,57.5-41.9,88.5-23.9l76.6,44.6c35.8-30.7,76.5-55.9,121.8-72V75.3c0-36.1,29-65.3,64.8-65.3h129.6c35.8,0,64.8,29.3,64.8,65.3v55.4c45.2,16.1,85.9,41.3,121.8,72l76.6-44.6c31-18,70.6-7.4,88.5,23.9l64.8,113.2C999.2,326.5,988.6,366.5,957.6,384.5L957.6,384.5z M909,299.6L876.6,243c-9-15.6-28.8-21-44.3-12l-90,52.4c-45.7-52-107.4-89.2-177.5-103.6V108c0-18.1-14.5-32.7-32.4-32.7h-64.8c-17.9,0-32.4,14.6-32.4,32.7v71.9c-70.1,14.4-131.8,51.6-177.5,103.6l-90-52.4c-15.5-9-35.3-3.7-44.3,12L91,299.6c-9,15.6-3.6,35.6,11.9,44.6l90.4,52.6c-10.8,32.5-17.2,67-17.2,103.2s6.4,70.7,17.2,103.1l-90.4,52.6c-15.5,9-20.8,29-11.9,44.6l32.4,56.6c9,15.6,28.7,21,44.3,12l90-52.4c45.7,52,107.4,89.2,177.5,103.6V892c0,18,14.5,32.7,32.4,32.7h64.8c17.9,0,32.4-14.6,32.4-32.7v-71.9c70.1-14.3,131.8-51.6,177.5-103.6l90,52.4c15.5,9,35.3,3.7,44.3-12l32.4-56.6c9-15.6,3.6-35.6-11.9-44.6l-90.4-52.6c10.8-32.5,17.2-67,17.2-103.1c0-36.2-6.4-70.7-17.2-103.2l90.4-52.6C912.6,335.2,918,315.3,909,299.6z M500,663.3c-89.5,0-162-73.1-162-163.3s72.5-163.3,162-163.3S662,409.8,662,500C662,590.2,589.5,663.3,500,663.3z M500,402c-53.7,0-97.2,43.9-97.2,98s43.5,98,97.2,98s97.2-43.9,97.2-98S553.7,402,500,402z"></path>
                                 </symbol>
+                                <symbol class="icon icon-download" id="icon-pre" viewBox="0 0 1000 1000">
+                                    <path d="M10,508l455,490l105-105L272.5,578H990V438H272.5L570,123L465,18L10,508z"></path>
+                                </symbol>
+                                <symbol class="icon icon-download" id="icon-next" viewBox="0 0 1000 1000">
+                                    <path d="M535,998l455-490L535,18L430,123l297.5,315H10v140h717.5L430,893L535,998z"></path>
+                                </symbol>
+                                <symbol class="icon icon-download" id="icon-pre-2" viewBox="0 0 1000 1000">
+                                    <path d="M675,18L220,508l455,490l105-105L412.5,508L780,123L675,18z"></path>
+                                </symbol>
+                                <symbol class="icon icon-download" id="icon-next-2" viewBox="0 0 1000 1000">
+                                    <path d="M780,508L325,18L220,123l367.5,385L220,893l105,105L780,508z"></path>
+                                </symbol>
+                                <symbol class="icon icon-download" id="icon-delete-2" viewBox="0 0 1000 1000">
+                                    <path d="M745,648L605,508l140-140L640,263L500,403L360,263L255,368l140,140L255,648l105,105l140-140l140,140L745,648z M500,858c-96.6,0-179.1-34.2-247.4-102.6C184.2,687.1,150,604.6,150,508s34.2-179.1,102.6-247.4C320.9,192.2,403.4,158,500,158s179.1,34.2,247.4,102.6C815.8,328.9,850,411.4,850,508s-34.2,179.1-102.6,247.4C679.1,823.8,596.6,858,500,858z M500,998c134.8,0,250.2-48,346.1-143.9C942,758.2,990,642.8,990,508c0-134.8-48-250.2-143.9-346.1S634.8,18,500,18c-134.8,0-250.2,48-346.1,143.9C58,257.8,10,373.2,10,508c0,134.8,48,250.2,143.9,346.1C249.8,950,365.2,998,500,998z"></path>                                </symbol>
                                 <defs>
                                     <marker id="markerArrow1" markerWidth="10" markerHeight="10" refx="15" refy="3"
                                             orient="auto" markerUnits="strokeWidth">
@@ -333,6 +345,9 @@
 
                             </g>
                             <g id="nodesContainer" class="svg-container">
+                            </g>
+                            <g id="toolContainer" class="svg-container">
+
                             </g>
                             <g id="tipsContainer" class="svg-container">
 
@@ -645,7 +660,7 @@
                                     <div class="row">
                                         <div class="col-xs-12 col-sm-2 center">
 															<span class="profile-picture">
-																<img id="cur-node-app-img"class="editable img-responsive" width="150" height="150" alt="Alex's Avatar" id="avatar2" src="assets/img/app.png">
+																<img id="cur-node-app-img"class="editable img-responsive" width="150" height="150" alt="创新方法APP" id="avatar2" src="assets/img/app.png">
 															</span>
 
                                             <div class="hr"></div>
@@ -1796,7 +1811,6 @@
         <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
         <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
         <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
-        <script src="/webresources/common/js/userLogin.js"></script>
         <script src="assets/js/nav-list.js"></script>
 
 
@@ -1806,9 +1820,6 @@
         <script src="assets/js/node.js"></script>
         <script src="assets/js/result.js"></script>
         <script src="assets/js/echarts.min.js"></script>
-
-        <script src="/webresources/common/js/analysis.js"></script>
-
         <script>
             $(function () {
                 $('.modal.aside').ace_aside();

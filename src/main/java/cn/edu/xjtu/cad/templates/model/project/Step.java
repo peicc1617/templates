@@ -8,7 +8,7 @@ public class Step {
     public Step() {
     }
 
-    public Step(int projectID, int stepIndex, String name, String description) {
+    public Step(int projectID, String stepIndex, String name, String description) {
         this.projectID = projectID;
         this.stepIndex= stepIndex;
         this.name = name;
@@ -18,7 +18,7 @@ public class Step {
     /**
      * 阶段的ID
      */
-    private int stepIndex;
+    private String stepIndex;
 
     /**
      * 所属的项目ID
@@ -49,11 +49,15 @@ public class Step {
      */
     private String summary;
 
-    public int getStepIndex() {
+    /**
+     * 当前阶段的次序
+     */
+    private int pos;
+    public String getStepIndex() {
         return stepIndex;
     }
 
-    public void setStepIndex(int stepIndex) {
+    public void setStepIndex(String stepIndex) {
         this.stepIndex = stepIndex;
     }
 
@@ -103,5 +107,13 @@ public class Step {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public int getPos() {
+        return pos;
+    }
+
+    public void setPos(int pos) {
+        this.pos = pos;
     }
 }

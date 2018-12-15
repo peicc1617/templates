@@ -16,12 +16,12 @@ public class Edge {
     /**
      * 边的起始节点
      */
-    private int nodeI;
+    private String nodeI;
 
     /**
      * 边的终止节点
      */
-    private int nodeJ;
+    private String nodeJ;
 
     public int getId() {
         return id;
@@ -31,19 +31,19 @@ public class Edge {
         this.id = id;
     }
 
-    public int getNodeI() {
+    public String getNodeI() {
         return nodeI;
     }
 
-    public void setNodeI(int nodeI) {
+    public void setNodeI(String nodeI) {
         this.nodeI = nodeI;
     }
 
-    public int getNodeJ() {
+    public String getNodeJ() {
         return nodeJ;
     }
 
-    public void setNodeJ(int nodeJ) {
+    public void setNodeJ(String nodeJ) {
         this.nodeJ = nodeJ;
     }
 

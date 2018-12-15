@@ -15,7 +15,7 @@ public class NodeResult {
     /**
      * 节点ID
      */
-    private int nodeIndex;
+    private String nodeIndex;
 
     /**
      * 用户名
@@ -63,7 +63,7 @@ public class NodeResult {
     public NodeResult() {
     }
 
-    public NodeResult(int projectID, int nodeIndex, String username) {
+    public NodeResult(int projectID, String nodeIndex, String username) {
         this.projectID = projectID;
         this.nodeIndex = nodeIndex;
         this.username = username;
@@ -77,11 +77,11 @@ public class NodeResult {
         this.projectID = projectID;
     }
 
-    public int getNodeIndex() {
+    public String getNodeIndex() {
         return nodeIndex;
     }
 
-    public void setNodeIndex(int nodeIndex) {
+    public void setNodeIndex(String nodeIndex) {
         this.nodeIndex = nodeIndex;
     }
 

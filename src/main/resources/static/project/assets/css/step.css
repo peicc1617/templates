@@ -4,7 +4,113 @@
     overflow: visible;
 }
 
+.work{
 
+}
+.work.node{
+
+}
+/**
+    已完成节点样式
+ */
+.work.node.finished rect{
+    fill: white;
+    pointer-events: auto;
+    stroke:#71C671;
+    stroke-width: 2;
+}
+/**
+    未完成节点样式
+ */
+.work.node.unFinished rect{
+    fill: white;
+    pointer-events: auto;
+    stroke: #aaa;
+    stroke-width: 2;
+}
+/**
+    工作节点文字
+ */
+.work.node text{
+    fill: black;
+}
+/**
+    隐藏工作节点工作菜单
+ */
+#nodeTool {
+    visibility:hidden
+}
+/**
+    显示工具节点工作菜单
+ */
+#nodeTool.active {
+    visibility:visible;
+
+}
+
+/**
+    工作节点工具菜单按钮样式
+ */
+#nodeTool circle{
+     fill:#6495ED;
+ }
+#nodeTool g:hover > circle{
+    fill:#66CDAA;
+}
+
+#stepTool {
+    visibility:hidden
+}
+
+#stepTool.active {
+    visibility:visible;
+}
+#stepTool rect{
+    fill:#1874CD;
+}
+
+#stepTool g:hover > rect{
+    fill:#66CDAA;
+}
+
+#pathTool {
+    visibility:hidden;
+}
+#pathTool.active{
+    visibility:visible;
+}
+#pathTool circle{
+    fill:#7D7D7D;
+}
+#pathTool g:hover > circle{
+    fill:#CD3333;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+
+ */
+.work.step.border{
+    stroke:#D9D9D9;
+    fill: #ffffff;
+    stroke-width:2
+}
+.work.step.border:hover{
+    stroke:#fac400;
+    fill: #ffffff;
+    stroke-width:2
+}
 /* 已完成的节点样式 */
 .stepnode.finished {
     fill: white;
@@ -76,6 +182,7 @@ circle.locked {
     stroke: #eee;
     stroke-width: 1;
 }
+
 
 /* .item:hover .sector {
     fill: #9A2764;

@@ -15,14 +15,14 @@ public interface StepMapper {
 
     boolean addStep(Step step);
 
-    boolean deleteStep(int projectID,int stepIndex);
+    boolean deleteStep(int projectID,String stepIndex);
 
     boolean updateStep(Step step);
 
-    @Select("SELECT * FROM project_step WHERE projectID = #{projectID}")
+    @Select("SELECT * FROM project_step WHERE projectID = #{projectID} ORDER BY pos")
     List<Step> getStepsOfProject(int projectID);
 
     @Select("SELECT * FROM project_node  WHERE projectID = #{projectID} AND stepIndex = #{stepIndex}")
-    Step getStep(@Param("projectID") int projectID, @Param("stepIndex") int stepIndex);
+    Step getStep(@Param("projectID") int projectID, @Param("stepIndex") String stepIndex);
 
 }

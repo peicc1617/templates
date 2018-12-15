@@ -1,6 +1,7 @@
 package cn.edu.xjtu.cad.templates.dao;
 
 import cn.edu.xjtu.cad.templates.model.project.Project;
+import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -20,8 +21,13 @@ public interface ProjectMapper {
             "FROM project,project_role " +
             "WHERE project.id = project_role.projectID AND project_role.username=#{username} AND project_role.projectRole = #{role} " +
             "ORDER BY project.createTime")
-    List<Project> getOwnedProjectListByUsernameWithRole(@Param("username") String username,@Param("role")int  role);
+    List<Project> getOwnedProjectListByUsernameWithRole(@Param("username") String username,@Param("role")ProjectRoleType role);
 
+    @Select("SELECT * " +
+            "FROM project,project_role " +
+            "WHERE project.id = project_role.projectID AND project_role.username=#{username} AND project_role.projectRole > 0 " +
+            "ORDER BY project.editTime")
+    List<Project> getProjectListByUserName(@Param("username") String username);
     /**
      * 新建项目
      * @param project 项目内容

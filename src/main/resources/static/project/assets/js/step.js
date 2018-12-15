@@ -26,22 +26,69 @@ $(document).ready(function(){
     })
 });
 
-function viewStep() {
-    $("#stepInfoRow").attr("style", "display:display");
-    $("#nodeInfoRow").attr("style", "display:none");
+const STEP_JS = {
+    /**
+     * 查看阶段
+     * @param step 阶段
+     */
+    afterViewStep:function (step) {
+        CUR_STEP = step;
+        $("#stepInfoRow").attr("style", "display:display");
+        $("#nodeInfoRow").attr("style", "display:none");
 
-    //节点的名称
-    $("#cur-step-name-href").html(CUR_STEP.name);
-    //节点的描述
-    $("#cur-step-description-href").html(CUR_STEP.description);
-    $("#cur-step-summary").html(CUR_STEP.summary)
+        //节点的名称
+        $("#cur-step-name-href").html(step.name);
+        //节点的描述
+        $("#cur-step-description-href").html(step.description);
+        $("#cur-step-summary").html(step.summary)
 
-    let resultChart = echarts.init(document.getElementById('cur-step-result-static'));
-    let activityChart = echarts.init(document.getElementById('cur-step-activity-static'));
+        let resultChart = echarts.init(document.getElementById('cur-step-result-static'));
+        let activityChart = echarts.init(document.getElementById('cur-step-activity-static'));
 
-    resultStaticFill(resultChart,0);
-    activityStaticFill(activityChart,0);
+        resultStaticFill(resultChart,0);
+        activityStaticFill(activityChart,0);
+    },
+    /**
+     * 在添加step之前
+     * @param step
+     * @returns {{true: *, step: *}}
+     */
+    beforeAddStep:function (step) {
+        $.ajax({
+            url:"/templates/api/project/step/",
+            method:"POST",
+            data:step,
+            async:false,
+            success:function (data) {
 
+                return true;
+            },
+            error:function () {
+                return false;
+            }
+        })
+    },
+    /**
+     * 在删除阶段之前向服务器发送请求
+     * @param step
+     */
+    beforeRemoveStep:function (step) {
+        $.ajax({
+            url:"/templates/api/project/step/",
+            method:"DELETE",
+            data:{
+                projectID:PROJECT_ID,
+                stepIndex:step.stepIndex,
+            },
+            async:false,
+            success:function (data) {
+                return true;
+            },
+            error:function () {
+                return false;
+            }
+        })
+    }
 }
 
 function resultStaticFill($echart,stepIndex){
@@ -143,6 +190,7 @@ function getVirtulData(year) {
     }
     return data;
 }
+
 function dateRange() {
     let date = new Date();
     return [date.getFullYear()+'-'+ (date.getMonth()+12-6)%12+'-01',date.getFullYear()+'-'+date.getMonth()+'-'+date.getDay()]
@@ -235,6 +283,11 @@ function activityStaticFill($echart,stepIndex){
 }
 
 
+/**
+ * 更新阶段信息的函数
+ * @param params
+ * @returns {*}
+ */
 function updateStepHref(params) {
     var d = new $.Deferred();
     if (params.value === 'abc') {
@@ -262,6 +315,9 @@ function updateStepHref(params) {
     }
 }
 
+/**
+ * 保存阶段总结的函数
+ */
 function saveStepSummary() {
     let summary = $("#stepSummary").html()
     $.ajax({
@@ -278,24 +334,4 @@ function saveStepSummary() {
         }
     })
 }
-/**
- * 新建阶段
- */
-function addStep() {
-    let newStep = {
-        stepIndex: stage.option.steps[stage.option.steps.length-1].stepIndex+1,
-        name:"新阶段",
-        description:"描述",
-        projectID:PROJECT_ID
-    };
 
-    $.ajax({
-        url:"/templates/api/project/step/",
-        method:"POST",
-        data:newStep,
-        success:function (data) {
-            stage.option.steps.push(newStep)
-            stage.refreshGrid();
-        }
-    })
-}

@@ -3,9 +3,7 @@ package cn.edu.xjtu.cad.templates.model.project;
 
 import cn.edu.xjtu.cad.templates.model.project.node.Node;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Project {
     /**
@@ -55,8 +53,8 @@ public class Project {
 
     private int referID;
 
-    private List<Step> steps = new ArrayList<>();
-    private List<Node> nodes = new ArrayList<>();
+    private Map<String,Step> stepMap = new HashMap<>();
+    private Map<String,Node> nodeMap = new LinkedHashMap<>();
     private List<Edge> edges = new ArrayList<>();
     private List<ProjectRole> members = new ArrayList<>();
     public Project() {
@@ -69,6 +67,7 @@ public class Project {
         this.description = description;
         this.tags = tags;
     }
+
 
     public int getId() {
         return id;
@@ -154,20 +153,21 @@ public class Project {
         this.referID = referID;
     }
 
-    public List<Step> getSteps() {
-        return steps;
+
+    public Map<String, Step> getStepMap() {
+        return stepMap;
     }
 
-    public void setSteps(List<Step> steps) {
-        this.steps = steps;
+    public void setStepMap(Map<String, Step> stepMap) {
+        this.stepMap = stepMap;
     }
 
-    public List<Node> getNodes() {
-        return nodes;
+    public Map<String, Node> getNodeMap() {
+        return nodeMap;
     }
 
-    public void setNodes(List<Node> nodes) {
-        this.nodes = nodes;
+    public void setNodeMap(Map<String, Node> nodeMap) {
+        this.nodeMap = nodeMap;
     }
 
     public List<Edge> getEdges() {
@@ -201,4 +201,6 @@ public class Project {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
+
 }

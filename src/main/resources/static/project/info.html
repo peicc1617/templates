@@ -182,7 +182,7 @@
     <div class="main-content">
 
         <div class="main-content-inner">
-            <div class="breadcrumbs ace-save-state breadcrumbs-fixed" id="breadcrumbs">
+            <div class="breadcrumbs ace-save-state fixed" id="breadcrumbs">
                 <ul class="breadcrumb">
                     <li>
                         <i class="ace-icon fa fa-home home-icon"></i>
@@ -205,17 +205,17 @@
                             <strong id="project_name"></strong>
                             <div class="pull-right">
                  <span class="btn btn-sm "
-                       onclick="javascript:location ='/CAI-templates/manager.html?projectID='+PROJECT_ID">
+                       onclick="javascript:location ='/templates/project/project.html?projectID='+PROJECT_ID">
 															进入项目
 															<i class="ace-icon fa fa-signal"></i>
 														</span>
                                 <span class="btn btn-primary btn-sm tooltip-primary"
-                                      onclick="javascript:location ='/CAI-templates/info.html?projectID='+PROJECT_ID">
+                                      onclick="javascript:location ='/templates/project/info.html?projectID='+PROJECT_ID">
 															项目信息
 															<i class="ace-icon fa fa-lightbulb-o"></i>
 														</span>
                                 <span class="btn btn-purple btn-sm tooltip-purple"
-                                      onclick="javascript:location ='/CAI-templates/report.html?projectID='+PROJECT_ID">
+                                      onclick="javascript:location ='/templates/project/report.html?projectID='+PROJECT_ID">
 															导出报告
 															<i class="ace-icon fa fa-print"></i>
 														</span>
@@ -414,7 +414,6 @@
         <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
         <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
         <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
-        <script src="/webresources/common/js/userLogin.js"></script>
         <script src="assets/js/nav-list.js"></script>
 
 
@@ -425,6 +424,7 @@
                 $("#project-name").editable({
                     type: 'text',
                     title: '输入工程名',
+                    name:'name',
                     url: updateProject,
                     validate: function (value) { //字段验证
                         if (!$.trim(value)) {
@@ -434,8 +434,9 @@
 
                 })
                 $("#project-description").editable({
-                    type: 'textarea',
+                    type: 'text',
                     title: '输入工程描述',
+                    name:'description',
                     validate: function (value) { //字段验证
                         if (!$.trim(value)) {
                             return '不能为空';
@@ -557,20 +558,16 @@
                     return d.reject('error message'); //returning error via deferred object
                 } else {
                     data = {
-                        _method: "PUT",
-                        id:PROJECT_ID
-                }
+                        projectID:PROJECT_ID,
+                    }
                     data[params.name] = params.value
                     //async saving data in js model
                     $.ajax({
-                        url: '/templates/api/project',
+                        url: '/templates/api/project/'+params.name,
                         type: 'PUT',
                         async: true,
                         data: data,
                         success: function () {
-                            ANALYSIS_MSG.type = MSG_TYPE_TABLE.PROJECT
-                            ANALYSIS_MSG.content = "修改了项目信息[" + params.name + "]：[" + params.value + "]"
-                            Analysis.send();
                             d.resolve();
                         }
                     })

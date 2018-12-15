@@ -13,7 +13,7 @@ public interface NodeMapper {
 
     int addNode(Node  node);
 
-    boolean deleteNode(int projectID,int nodeIndex);
+    boolean deleteNode(int projectID,String nodeIndex);
 
     boolean updateNode(Node node);
 
@@ -21,5 +21,5 @@ public interface NodeMapper {
     List<Node> getNodesOfProject(int projectID);
 
     @Select("SELECT * FROM project_node WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}")
-    Node getNode(@Param("projectID") int projectID,@Param("nodeIndex") int nodeIndex);
+    Node getNode(@Param("projectID") int projectID,@Param("nodeIndex") String nodeIndex);
 }
