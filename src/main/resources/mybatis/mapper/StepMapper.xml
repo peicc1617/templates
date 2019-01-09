@@ -5,28 +5,38 @@
     <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
     <resultMap type="cn.edu.xjtu.cad.templates.model.project.Step" id="step"/>
     <insert id="addAllSteps" parameterType="java.util.List">
-        INSERT INTO project_step VALUES
+        INSERT INTO project_step (projectID,stepIndex,name,description,summary,pos) VALUES
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.projectID},
             #{item.stepIndex},
             #{item.name},
             #{item.description},
-            #{item.summary})
+            #{item.summary},
+            #{item.pos})
         </foreach>
     </insert>
 
     <insert id="addStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">
-        INSERT INTO project_step  VALUES
+        INSERT INTO project_step  (projectID,stepIndex,name,description,summary,pos) VALUES
             (#{projectID},
             #{stepIndex},
             #{name},
             #{description},
-            #{summary})
+            #{summary},
+            #{pos})
     </insert>
 
     <delete id="deleteStep">
-        DELETE FROM project_step WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}
+        DELETE FROM project_step WHERE projectID = #{projectID} AND stepIndex = #{stepIndex}
     </delete>
+
+    <select id="getStepsOfProject" resultType="cn.edu.xjtu.cad.templates.model.project.Step">
+        SELECT * FROM project_step WHERE projectID = #{projectID} ORDER by pos
+    </select>
+
+    <select id="getStep" resultType="cn.edu.xjtu.cad.templates.model.project.Step">
+        SELECT * FROM project_step WHERE projectID = #{projectID} ORDER by pos
+    </select>
 
     <update id="updateStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">
         UPDATE project_step SET

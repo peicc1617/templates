@@ -9,17 +9,15 @@ import java.util.List;
 
 @Repository
 public interface NodeMapper {
-    boolean addAllNodes(List<Node> nodeList);
+    long addAllNodes(List<Node> nodeList);
 
-    int addNode(Node  node);
+    long addNode(Node  node);
 
-    boolean deleteNode(int projectID,String nodeIndex);
+    long deleteNode(@Param("projectID") long projectID,@Param("nodeIndex")  String nodeIndex);
 
-    boolean updateNode(Node node);
+    long updateNode(Node node);
 
-    @Select("SELECT * FROM project_node WHERE projectID = #{projectID}")
-    List<Node> getNodesOfProject(int projectID);
+    List<Node> getNodesOfProject(long projectID);
 
-    @Select("SELECT * FROM project_node WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}")
-    Node getNode(@Param("projectID") int projectID,@Param("nodeIndex") String nodeIndex);
+    Node getNode(@Param("projectID") long projectID,@Param("nodeIndex") String nodeIndex);
 }

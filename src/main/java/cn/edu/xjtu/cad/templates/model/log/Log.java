@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Log implements Serializable {
 
-    private int logID;
+    private long logID;
     private LogType logType;
     /**
      *
@@ -16,9 +16,9 @@ public class Log implements Serializable {
 
 
     /**
-     * 日志对应的用户名
+     * 日志对应的用户ID
      */
-    private String username;
+    private long userID;
 
 
     /**
@@ -34,10 +34,10 @@ public class Log implements Serializable {
     public Log() {
     }
 
-    public Log(LogType logType, MethodType logMethod,String username, String content, String ipAddr) {
+    public Log(LogType logType, MethodType logMethod,long userID, String content, String ipAddr) {
         this.logType = logType;
         this.logMethod = logMethod;
-        this.username = username;
+        this.userID = userID;
         this.content = content;
         this.ipAddr = ipAddr;
     }
@@ -51,11 +51,12 @@ public class Log implements Serializable {
     public String getFieldNames(String objectName){
         return null;
     }
-    public int getLogID() {
+
+    public long getLogID() {
         return logID;
     }
 
-    public void setLogID(int logID) {
+    public void setLogID(long logID) {
         this.logID = logID;
     }
 
@@ -83,13 +84,12 @@ public class Log implements Serializable {
         this.logMethod = logMethod;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public long getUserID() {
+        return userID;
     }
 
-
-    public String getUsername() {
-        return username;
+    public void setUserID(long userID) {
+        this.userID = userID;
     }
 
     public String getContent() {

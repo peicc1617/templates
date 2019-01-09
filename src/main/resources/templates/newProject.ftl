@@ -49,7 +49,7 @@
 
 <body class="no-skin">
 <div id="navbar" class="navbar navbar-default          ace-save-state">
-    <script src="assets/js/nav-bar.js"></script>
+    <script src="/webresources/common/js/nav-bar.js"></script>
 </div>
 
 <div class="main-container ace-save-state" id="main-container">
@@ -61,52 +61,7 @@
     </script>
 
 
-    <div id="sidebar" class="sidebar                  responsive                    ace-save-state">
-        <script type="text/javascript">
-            try {
-                ace.settings.loadState('sidebar')
-            } catch (e) {
-            }
-        </script>
-
-        <div class="sidebar-shortcuts" id="sidebar-shortcuts">
-            <div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
-                <button class="btn btn-success">
-                    <i class="ace-icon fa fa-signal"></i>
-                </button>
-
-                <button class="btn btn-info">
-                    <i class="ace-icon fa fa-pencil"></i>
-                </button>
-
-                <button class="btn btn-warning">
-                    <i class="ace-icon fa fa-users"></i>
-                </button>
-
-                <button class="btn btn-danger">
-                    <i class="ace-icon fa fa-cogs"></i>
-                </button>
-            </div>
-
-            <div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
-                <span class="btn btn-success"></span>
-
-                <span class="btn btn-info"></span>
-
-                <span class="btn btn-warning"></span>
-
-                <span class="btn btn-danger"></span>
-            </div>
-        </div><!-- /.sidebar-shortcuts -->
-
-        <ul class="nav nav-list" id="sideList">
-        </ul>
-        <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
-            <i id="sidebar-toggle-icon" class="ace-icon fa fa-angle-double-left ace-save-state"
-               data-icon1="ace-icon fa fa-angle-double-left"
-               data-icon2="ace-icon fa fa-angle-double-right"></i>
-        </div>
-    </div>
+    <#include "/common/navList.ftl">
 
     <div class="main-content">
         <div class="main-content-inner">
@@ -114,20 +69,10 @@
                 <ul class="breadcrumb">
                     <li>
                         <i class="ace-icon fa fa-home home-icon"></i>
-                        <a href="#">平台首页</a>
+                        <a href="#">创新方法柔性模板</a>
                     </li>
-                    <li class="active">个人主页</li>
+                    <li class="active">新建模板</li>
                 </ul><!-- /.breadcrumb -->
-
-                <div class="nav-search" id="nav-search">
-                    <form class="form-search">
-							<span class="input-icon">
-								<input type="text" placeholder="Search ..." class="nav-search-input"
-                                       id="nav-search-input" autocomplete="off"/>
-								<i class="ace-icon fa fa-search nav-search-icon"></i>
-							</span>
-                    </form>
-                </div><!-- /.nav-search -->
             </div>
 
             <div class="page-content">
@@ -140,7 +85,7 @@
                     <div class="col-xs-12">
                         <div class="row">
 
-                            <form class="form-horizontal" role="form" method="post" action="/templates/api/project/">
+                            <form id="project-form" class="form-horizontal" role="form">
                                 <input type="text" name="_method" value="POST" style="display:none">
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label no-padding-right"
@@ -148,7 +93,18 @@
                                     <div class="col-sm-9">
                                         <input type="text" id="project-name" name="name" required placeholder="请填写工程名"
                                                class="col-xs-10 col-sm-5">
+                                        <span class="help-inline col-xs-12 col-sm-7">
+												<label class="middle">
+													<input class="ace" type="checkbox" name="open" value="true">
+													<span class="lbl">公开项目</span>
+												</label>
+                                                <span class="help-button" data-rel="popover" data-trigger="hover"
+                                                      data-placement="right" data-content="公开项目所有人都能查看，可以在项目信息中更改项目公开状态"
+                                                      title="">?</span>
+											</span>
+
                                     </div>
+
                                 </div>
 
                                 <div class="form-group">
@@ -156,10 +112,10 @@
                                            for="project-creator">创建者 </label>
 
                                     <div class="col-sm-9">
-                                        <input readonly="" type="text" class="col-xs-10 col-sm-5" id="project-creator"
-                                               name="creator"
-                                               value="">
+                                        <input readonly="" type="text" class="col-xs-10 col-sm-5"
+                                               value=" ${Session["userInfo"]["nickName"]}">
                                     </div>
+
                                 </div>
 
                                 <div class="form-group">
@@ -174,7 +130,6 @@
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label no-padding-right"
                                            for="project-tags">描述关键词</label>
-
                                     <div class="col-sm-9">
                                         <div class="inline">
                                             <input type="text" name="tags" id="project-tags" value=""
@@ -200,10 +155,9 @@
                                     </div>
                                 </div>
 
-
                                 <div class="clearfix form-actions">
                                     <div class="col-md-offset-3 col-md-9">
-                                        <button class="btn btn-info" type="submit">
+                                        <button class="btn btn-info" onclick="addProject()">
                                             <i class="ace-icon fa fa-check bigger-110"></i>
                                             新建
                                         </button>
@@ -228,32 +182,7 @@
         </div>
     </div><!-- /.main-content -->
 
-    <div class="footer">
-        <div class="footer-inner">
-            <div class="footer-content">
-					<span class="bigger-120">
-						<span class="blue bolder">Ace</span>
-						Application &copy; 2013-2014
-					</span>
-
-                &nbsp; &nbsp;
-                <span class="action-buttons">
-						<a href="#">
-							<i class="ace-icon fa fa-twitter-square light-blue bigger-150"></i>
-						</a>
-
-						<a href="#">
-							<i class="ace-icon fa fa-facebook-square text-primary bigger-150"></i>
-						</a>
-
-						<a href="#">
-							<i class="ace-icon fa fa-rss-square orange bigger-150"></i>
-						</a>
-					</span>
-            </div>
-        </div>
-    </div>
-
+    <#include "/common/footer.ftl">
     <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
         <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
     </a>
@@ -311,7 +240,7 @@
 <![endif]-->
 <script type="text/javascript">
     if ('ontouchstart' in document.documentElement) document.write(
-        "<script src='/webresources/ace-master/assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+            "<script src='/webresources/ace-master/assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
 </script>
 <script src="/webresources/ace-master/assets/js/bootstrap.min.js"></script>
 
@@ -327,32 +256,27 @@
 <script src="/webresources/ace-master/assets/js/ace.min.js"></script>
 <script src="/webresources/ace-master/assets/js/bootstrap-tag.min.js"></script>
 <script src="/webresources/bootstrap/bootstrap-table/bootstrap-table.js"></script>
-
 <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
-</script>
-
-<script src="assets/js/nav-list.js"></script>
 <script>
-    USERNAME = "111";
     $(function () {
-        $("#project-creator").val(USERNAME);
         var tag_input = $('#project-tags');
+        $('[data-rel=popover]').popover({container: 'body'});
         try {
             tag_input.tag(
-                {
-                    placeholder: tag_input.attr('placeholder'),
-                    //enable typeahead by specifying the source array
-                    source: ace.vars['US_STATES'],//defined in ace.js >> ace.enable_search_ahead
-                    /**
-                     //or fetch data from database, fetch those that match "query"
-                     source: function(query, process) {
+                    {
+                        placeholder: tag_input.attr('placeholder'),
+                        //enable typeahead by specifying the source array
+                        source: ace.vars['US_STATES'],//defined in ace.js >> ace.enable_search_ahead
+                        /**
+                         //or fetch data from database, fetch those that match "query"
+                         source: function(query, process) {
 						  $.ajax({url: 'remote_source.php?q='+encodeURIComponent(query)})
 						  .done(function(result_items){
 							process(result_items);
 						  });
 						}
-                     */
-                }
+                         */
+                    }
             )
 
             //programmatically add/remove a tag
@@ -416,6 +340,16 @@
             $("#project-refer-hidden").val(row.referID);
         }
         $(e).prev().click()
+    }
+
+    function addProject() {
+        const formData = new FormData(document.getElementById("project-form"));
+        fetch('/templates/api/project', {
+            method: "post",
+            body: formData,
+        }).then(response => response.json()).then(data => {
+            window.location.href = data + "/view.html";
+        });
     }
 </script>
 </body>

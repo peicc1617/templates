@@ -11,7 +11,7 @@ public class Edge {
     /**
      * 所属的项目ID
      */
-    private int projectID;
+    private long projectID;
 
     /**
      * 边的起始节点
@@ -47,11 +47,11 @@ public class Edge {
         this.nodeJ = nodeJ;
     }
 
-    public int getProjectID() {
+    public long getProjectID() {
         return projectID;
     }
 
-    public void setProjectID(int projectID) {
+    public void setProjectID(long projectID) {
         this.projectID = projectID;
     }
 }

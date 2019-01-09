@@ -10,17 +10,18 @@ public class NodeResult {
     /**
      * 项目ID
      */
-    private int projectID;
+    private long projectID;
 
     /**
      * 节点ID
      */
     private String nodeIndex;
 
+
     /**
-     * 用户名
+     * 用户ID
      */
-    private String username;
+    private long userID;
 
     /**
      * 未绑定数据
@@ -63,17 +64,18 @@ public class NodeResult {
     public NodeResult() {
     }
 
-    public NodeResult(int projectID, String nodeIndex, String username) {
+    public NodeResult(long projectID, String nodeIndex, long userID) {
         this.projectID = projectID;
         this.nodeIndex = nodeIndex;
-        this.username = username;
+        this.userID = userID;
     }
 
-    public int getProjectID() {
+
+    public long getProjectID() {
         return projectID;
     }
 
-    public void setProjectID(int projectID) {
+    public void setProjectID(long projectID) {
         this.projectID = projectID;
     }
 
@@ -85,12 +87,12 @@ public class NodeResult {
         this.nodeIndex = nodeIndex;
     }
 
-    public String getUsername() {
-        return username;
+    public long getUserID() {
+        return userID;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserID(long userID) {
+        this.userID = userID;
     }
 
     public int getState() {

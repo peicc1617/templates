@@ -3,6 +3,10 @@
 <!--命名空间应该是对应接口的包名+接口名 -->
 <mapper namespace="cn.edu.xjtu.cad.templates.dao.LogMapper">
     <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
+
+    <select id="getProjectLog" resultType="cn.edu.xjtu.cad.templates.model.log.ProjectLog">
+        SELECT * from ${tableName} where logID = #{id}
+    </select>
     <select id="countLogOnDay" resultType="cn.edu.xjtu.cad.templates.model.log.ProjectLog">
         SELECT COUNT(1) FROM ${tableName} WHERE projectId = ${projectID}
         <if test='stepIndex >= 0'>
@@ -11,7 +15,7 @@
         <if test='nodeIndex >= 0'>
             AND nodeIndex = #{nodeIndex}
         </if>
-        <if test='username !=null'>
+        <if test='stepIndex !=null'>
             AND stepIndex = #{stepIndex}
         </if>
         <if test='logType != null'>
@@ -29,15 +33,19 @@
     </select>
 
     <insert id="addLog" parameterType="cn.edu.xjtu.cad.templates.model.project.node.Node">
-        INSERT INTO ${tableName} (logType ,logMethod,username,content${colNames}) VALUES
+        INSERT INTO ${tableName} (logType ,logMethod,userID,content${colNames}) VALUES
         (#{log.logType},
         #{log.logMethod},
-        #{log.username},
+        #{log.userID},
         #{log.content}
         <if test="fieldNames!=null">
             ${fieldNames}
         </if>
         )
     </insert>
+
+    <delete id="deleteLog">
+        DELETE FROM  ${tableName} where logID = #{id}
+    </delete>
 
 </mapper>

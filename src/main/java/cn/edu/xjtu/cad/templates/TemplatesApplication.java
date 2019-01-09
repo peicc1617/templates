@@ -1,4 +1,4 @@
-package cn.edu.xjtu.cad.templates;
+ package cn.edu.xjtu.cad.templates;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;

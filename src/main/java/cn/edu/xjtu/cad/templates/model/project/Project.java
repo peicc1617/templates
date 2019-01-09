@@ -9,7 +9,7 @@ public class Project {
     /**
      * 项目id
      */
-    private int id;
+    private long id;
 
     /**
      * 项目名称
@@ -45,21 +45,30 @@ public class Project {
      */
     private String integration;
 
+    /**
+     * 项目标签
+     */
     private String tags;
 
-    private String creator;
+    /**
+     * 项目是否公开
+     */
+    private boolean open;
+
+    private boolean code;
+
+    private long creatorID;
+
     private int num;
 
+    private long referID;
 
-    private int referID;
-
-    private Map<String,Step> stepMap = new HashMap<>();
-    private Map<String,Node> nodeMap = new LinkedHashMap<>();
+    private Map<String,Step> stepMap = new LinkedHashMap<>();
+    private Map<String,Node> nodeMap = new HashMap<>();
     private List<Edge> edges = new ArrayList<>();
     private List<ProjectRole> members = new ArrayList<>();
     public Project() {
     }
-
 
 
     public Project(String name, String description, String tags) {
@@ -68,12 +77,11 @@ public class Project {
         this.tags = tags;
     }
 
-
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -136,23 +144,21 @@ public class Project {
         this.tags = tags;
     }
 
-    public String getCreator() {
-        return creator;
+    public long getCreatorID() {
+        return creatorID;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
+    public void setCreatorID(long creatorID) {
+        this.creatorID = creatorID;
     }
 
-
-    public int getReferID() {
+    public long getReferID() {
         return referID;
     }
 
-    public void setReferID(int referID) {
+    public void setReferID(long referID) {
         this.referID = referID;
     }
-
 
     public Map<String, Step> getStepMap() {
         return stepMap;
@@ -202,5 +208,19 @@ public class Project {
         this.createTime = createTime;
     }
 
+    public boolean isOpen() {
+        return open;
+    }
 
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
+    public boolean isCode() {
+        return code;
+    }
+
+    public void setCode(boolean code) {
+        this.code = code;
+    }
 }

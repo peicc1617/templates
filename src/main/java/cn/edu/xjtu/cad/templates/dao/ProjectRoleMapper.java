@@ -11,36 +11,23 @@ import java.util.Map;
 @Repository
 public interface ProjectRoleMapper {
 
-    @Insert("INSERT INTO project_role VALUES (#{projectID},#{username},#{projectRole})")
-    boolean addProjectRole(ProjectRole projectRole);
+    long addProjectRole(ProjectRole projectRole);
 
-    @Delete("DELETE FROM project_role where projectID = #{projectID} AND username = #{username}")
-    boolean deleteProjectRole(@Param("projectID")int projectID,@Param("username") String username);
+    long deleteProjectRole(@Param("projectID")long projectID,@Param("userID") long userID);
 
-    @Select("SELECT * FROM project_role where projectID = #{projectID} AND username = #{username}")
-    ProjectRole getMemberRoleOfProject(@Param("projectID") int projectID, @Param("username") String username);
+    ProjectRole getMemberRoleOfProject(@Param("projectID") long projectID, @Param("userID") long userID);
 
-    @Select("SELECT * FROM project_role where projectID = #{projectID} ")
-    List<ProjectRole> getRoleOfProject(int projectID);
+    List<ProjectRole> getRoleOfProject(long projectID);
 
-    @Select("SELECT * FROM project_role where projectID = #{projectID} AND projectRole not in (#{roles})")
-    List<ProjectRole> getRoleOfProjectExcept(@Param("projectID")int projectID,@Param("roles")String roleTypes);
+    List<ProjectRole> getRoleOfProjectExcept(@Param("projectID")long projectID,@Param("roles")String roleTypes);
+
+    List<ProjectRole> getRoleOfProjectIn(long projectID,@Param("roles")ProjectRoleType[] roleTypes);
+
+    List<Long> getUserIDListInProjectByProjectRoleType(@Param("projectID") long projectID,@Param("role") ProjectRoleType role);
+
+    ProjectRole getRoleOfMemberInProject(@Param("id")long projectID,@Param("userID") long userID);
+
+    long updateProjectRole(@Param("projectID")long projectID,@Param("userID") long userID,@Param("newRole") ProjectRoleType role);
 
 
-    @Select("SELECT * FROM project_role where projectID = #{projectID} AND projectRole in (#{roles})")
-    List<ProjectRole> getRoleOfProjectIn(int projectID,@Param("roles")ProjectRoleType[] roleTypes);
-
-
-    @Update("UPDATE project_role SET projectRole = #{newRole}" +
-            "WHERE projectID = #{projectID} AND username =#{username}")
-    int updateProjectRole(@Param("projectID")int projectID,@Param("username") String username,@Param("newRole") ProjectRoleType role);
-
-    @Select("SELECT username FROM project_role where projectID = #{projectID} AND projectRole = #{role}")
-    String getCreatorOfProject(@Param("projectID") int projectID,@Param("role") ProjectRoleType role);
-
-    @Select("SELECT username FROM project_role where projectID = #{projectID} AND projectRole = #{role}")
-    List<String> getSuperManagerOfProject(@Param("projectID") int projectID,@Param("role") ProjectRoleType role);
-
-    @Select("SELECT * FROM project_role where projectID = #{id} AND username = #{name}")
-    ProjectRole getRoleOfMemberInProject(@Param("id")int projectID,@Param("name") String username);
 }

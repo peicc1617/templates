@@ -46,13 +46,11 @@
         WHERE projectID = #{projectID} AND nodeIndex =#{nodeIndex}
     </update>
 
-    <!--<select id="getNodesOfProject" resultType="cn.edu.xjtu.cad.templates.model.project.node.Node" parameterType="int">-->
-      <!--SELECT * FROM project_node-->
-      <!--WHERE projectID = #{projectID}-->
-    <!--</select>-->
+    <select id="getNodesOfProject" resultType="cn.edu.xjtu.cad.templates.model.project.node.Node">
+        SELECT * FROM project_node WHERE projectID = #{projectID}
+    </select>
 
-    <!--<select id="getNode" resultType="cn.edu.xjtu.cad.templates.model.project.node.Node" parameterType="int">-->
-        <!--SELECT * FROM project_node-->
-        <!--WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}-->
-    <!--</select>-->
+    <select id="getNode" resultType="cn.edu.xjtu.cad.templates.model.project.node.Node">
+        SELECT * FROM project_node WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}
+    </select>
 </mapper>

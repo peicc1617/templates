@@ -14,7 +14,13 @@ public class Node {
 
     }
 
-    public Node(int projectID, String stepIndex, String nodeIndex, String name) {
+    public Node( String stepIndex, String name) {
+        this.stepIndex = stepIndex;
+        this.nodeIndex = UUID.randomUUID().toString();
+        this.name = name;
+    }
+
+    public Node(long projectID, String stepIndex, String nodeIndex, String name) {
         this.projectID = projectID;
         this.nodeIndex = nodeIndex;
         this.name = name;
@@ -24,7 +30,7 @@ public class Node {
     /**
      * 节点所属的项目ID
      */
-    private int projectID;
+    private long projectID;
 
     private String nodeIndex;
 
@@ -99,11 +105,11 @@ public class Node {
         this.nodeIndex = nodeIndex;
     }
 
-    public int getProjectID() {
+    public long getProjectID() {
         return projectID;
     }
 
-    public void setProjectID(int projectID) {
+    public void setProjectID(long projectID) {
         this.projectID = projectID;
     }
 

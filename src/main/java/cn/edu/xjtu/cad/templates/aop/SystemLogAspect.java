@@ -27,7 +27,7 @@ public class SystemLogAspect {
     private static final ThreadLocal<Log> logThreadLocal =
             new NamedThreadLocal<>("ThreadLocal log");
 
-    private static final ThreadLocal<String> currentUser=new NamedThreadLocal<>("ThreadLocal user");
+    private static final ThreadLocal<Long> currentUser=new NamedThreadLocal<>("ThreadLocal user");
 
     @Autowired(required=false)
     private HttpServletRequest request;
@@ -56,16 +56,13 @@ public class SystemLogAspect {
     public void doBefore(JoinPoint joinPoint) throws InterruptedException{
         Map<String,String> userInfo = ((Map<String,String>)request.getSession().getAttribute("userInfo"));
         if(userInfo==null) return;
-        String username =  userInfo.get("username");
-        currentUser.set(username);
+        long userID =  Long.valueOf(userInfo.get("id"));
+        currentUser.set(userID);
     }
 
     @After("controllerAspect()")
     public void doAfter(JoinPoint joinPoint){
-        String username = currentUser.get();
-        if(Strings.isEmpty(username)) {
-            return;
-        }
+        long userID = currentUser.get();
         String remoteAddr=request.getRemoteAddr();//请求的IP
         Map<String,String[]> params=request.getParameterMap(); //请求提交的参数
         SystemControllerLog scl = null;
@@ -76,7 +73,7 @@ public class SystemLogAspect {
         }catch (Exception e){
             e.printStackTrace();
         }
-        Log log=new ProjectLog(scl.logType(), scl.methodType(),username,content,remoteAddr);
+        Log log=new ProjectLog(scl.logType(), scl.methodType(),userID,content,remoteAddr);
         log.parseParamMap(params);
         logService.addLog(log);
         logThreadLocal.set(log);

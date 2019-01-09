@@ -3,10 +3,7 @@ package cn.edu.xjtu.cad.templates.dao;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRole;
 import cn.edu.xjtu.cad.templates.model.project.node.Node;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeRole;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,19 +12,13 @@ import java.util.List;
 public interface NodeRoleMapper {
 
 
-    @Insert("INSERT INTO project_node_role VALUES " +
-            "(#{projectID},#{nodeIndex},#{username},#{nodeRole})")
-    boolean addNodeRole(NodeRole nodeRole);
+    long addNodeRole(NodeRole nodeRole);
 
-    @Delete("DELETE FROM project_node_role where projectID = #{projectID} AND nodeIndex = #{nodeIndex} AND username = #{username} ")
-    boolean deleteNodeRole(int projectID,int nodeIndex,String username);
+    long deleteNodeRole(@Param("projectID") long projectID, @Param("nodeIndex")int nodeIndex,@Param("userID") long userID);
 
-    @Select("SELECT * FROM project_node_role where projectID = #{projectID} AND nodeIndex = #{nodeIndex} AND username = #{username}")
-    ProjectRole getNodeRole(int projectID,int nodeIndex,String username);
+    ProjectRole getNodeRole(@Param("projectID")long projectID,long nodeIndex,long userID);
 
-    @Update("UPDATE project_node_role SET nodeRole = #{nodeRole.nodeRole}" +
-            "WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}AND username =#{username}")
-    boolean updateNodeRole(NodeRole nodeRole);
+    long updateNodeRole(NodeRole nodeRole);
 
-    boolean addAllNodeRole(List<NodeRole> nodeRoleList);
+    long addAllNodeRole(List<NodeRole> nodeRoleList);
 }

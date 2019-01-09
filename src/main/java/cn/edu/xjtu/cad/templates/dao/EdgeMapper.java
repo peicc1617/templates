@@ -9,8 +9,17 @@ import java.util.List;
 
 @Repository
 public interface EdgeMapper {
+    /**
+     * 将边都保存到数据库
+     * @param edgeList
+     * @return
+     */
     boolean addAllEdges(List<Edge> edgeList);
 
-    @Select("SELECT * FROM project_edge WHERE projectID = #{projectID}")
-    List<Edge> getEdgesOfProject(int projectID);
+    /**
+     * 从数据库中查询边
+     * @param projectID
+     * @return
+     */
+    List<Edge> getEdgesOfProject(long projectID);
 }

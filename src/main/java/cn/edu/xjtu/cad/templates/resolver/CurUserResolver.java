@@ -3,6 +3,7 @@ package cn.edu.xjtu.cad.templates.resolver;
 import cn.edu.xjtu.cad.templates.annotation.CurUser;
 import cn.edu.xjtu.cad.templates.dao.UserMapper;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRole;
+import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
 import cn.edu.xjtu.cad.templates.model.project.User;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeRole;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeRoleType;
@@ -14,9 +15,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,18 +34,21 @@ public class CurUserResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public User resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
-        String curUsername = ((Map<String,String>)nativeWebRequest.getAttribute("userInfo", NativeWebRequest.SCOPE_SESSION)).get("username");
-        User user = new User(curUsername);
-        List<ProjectRole> projectRoleList = userMapper.getProjectRole(curUsername);
-        List<NodeRole> nodeRoleList = userMapper.getNodeRole(curUsername);
-        user.setProjectRoleMap(projectRoleList.stream().collect(Collectors.toMap(ProjectRole::getProjectID,ProjectRole::getProjectRole)));
-        Map<Integer,Map<String,NodeRoleType>> nodeRoleMap = new HashMap<>();
-        for (NodeRole nodeRole : nodeRoleList) {
-            int projectID = nodeRole.getProjectID();
-            String nodeIndex=  nodeRole.getNodeIndex();
-            Map<String,NodeRoleType> map = nodeRoleMap.getOrDefault(projectID,new HashMap<>());
-            map.put(nodeIndex,nodeRole.getNodeRole());
+        long userID= Integer.valueOf(((Map<String,String>)nativeWebRequest.getAttribute("userInfo", NativeWebRequest.SCOPE_SESSION)).get("id"));
+        User user = new User(userID);
+        //获取用户的权限
+        List<ProjectRole> projectRoleList = userMapper.getProjectRole(userID);
+        Map<ProjectRoleType,Set<Long>> projectRoleTypeLongMap = new HashMap<>();
+        for (ProjectRoleType projectRoleType : ProjectRoleType.values()) {
+            projectRoleTypeLongMap.put(projectRoleType,new HashSet<>());
         }
-        return user;
+        projectRoleList.forEach(projectRole -> projectRoleTypeLongMap.get(projectRole.getProjectRole()).add(projectRole.getProjectID()));
+        List<NodeRole> nodeRoleList = userMapper.getNodeRole(userID);
+        Map<NodeRoleType,Set<String[]>> nodeRoleTypeSetMap = new HashMap<>();
+        for (NodeRoleType nodeRoleType : NodeRoleType.values()) {
+            nodeRoleTypeSetMap.put(nodeRoleType,new HashSet<>());
+        }
+        nodeRoleList.forEach(nodeRole -> nodeRoleTypeSetMap.get(nodeRole.getNodeRole()).add(new String[]{nodeRole.getProjectID()+"",nodeRole.getNodeIndex()}));
+        return new User(userID,projectRoleTypeLongMap,nodeRoleTypeSetMap);
     }
 }

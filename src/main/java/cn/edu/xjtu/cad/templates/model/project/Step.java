@@ -2,13 +2,19 @@ package cn.edu.xjtu.cad.templates.model.project;
 
 
 import java.util.Date;
+import java.util.UUID;
 
 public class Step {
 
     public Step() {
     }
 
-    public Step(int projectID, String stepIndex, String name, String description) {
+    public Step( String name) {
+        this.stepIndex = UUID.randomUUID().toString();
+        this.name = name;
+    }
+
+    public Step(long projectID, String stepIndex, String name, String description) {
         this.projectID = projectID;
         this.stepIndex= stepIndex;
         this.name = name;
@@ -23,7 +29,7 @@ public class Step {
     /**
      * 所属的项目ID
      */
-    private int projectID;
+    private long projectID;
 
     /**
      * 阶段的名称
@@ -61,11 +67,11 @@ public class Step {
         this.stepIndex = stepIndex;
     }
 
-    public int getProjectID() {
+    public long getProjectID() {
         return projectID;
     }
 
-    public void setProjectID(int projectID) {
+    public void setProjectID(long projectID) {
         this.projectID = projectID;
     }
 

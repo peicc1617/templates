@@ -4,42 +4,31 @@
 <mapper namespace="cn.edu.xjtu.cad.templates.dao.NodeRoleMapper">
     <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
 
+
+    <insert id="addNodeRole">
+        INSERT INTO project_node_role VALUES  (#{projectID},#{nodeIndex},#{userID},#{nodeRole})
+    </insert>
+    
     <insert id="addAllNodeRole" parameterType="java.util.List">
-        INSERT INTO project_node_role VALUES
+        INSERT INTO project_node_role (projectID,nodeIndex,userID,nodeRole) VALUES
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.projectID},
             #{item.nodeIndex},
-            #{item.username},
+            #{item.userID},
             #{item.nodeRole})
         </foreach>
     </insert>
 
-    <!--<insert id="addStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">-->
-        <!--INSERT INTO project_step  VALUES-->
-            <!--(#{item.projectID},-->
-            <!--#{item.stepIndex},-->
-            <!--#{item.name},-->
-            <!--#{item.description})-->
-    <!--</insert>-->
+    <delete id="deleteNodeRole">
+        DELETE FROM project_node_role where projectID = #{projectID} AND nodeIndex = #{nodeIndex} AND userID = #{userID}
+    </delete>
 
-    <!--<delete id="deleteStep">-->
-        <!--DELETE FROM step WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}-->
-    <!--</delete>-->
+    <select id="getNodeRole">
+        SELECT * FROM project_node_role where projectID = #{projectID} AND nodeIndex = #{nodeIndex} AND userID = #{userID}
+    </select>
 
-    <!--<update id="updateStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">-->
-        <!--UPDATE project_step SET-->
-        <!--name = #{step.name},description = #{step.description}-->
-        <!--WHERE projectID = #{step.projectID} AND stepIndex =#{step.stepIndex}-->
-    <!--</update>-->
-
-    <!--<select id="getStepsOfProject" resultType="java.util.List" parameterType="int">-->
-      <!--SELECT * FROM project_step-->
-      <!--WHERE projectID = #{projectID}-->
-    <!--</select>-->
-
-    <!--<select id="getStep" resultType="cn.edu.xjtu.cad.templates.model.project.Step" parameterType="int">-->
-        <!--SELECT * FROM project_step-->
-        <!--WHERE projectID = #{projectID} AND stepIndex = #{stepIndex}-->
-    <!--</select>-->
+    <update id="updateNodeRole">
+        UPDATE project_node_role SET nodeRole = #{nodeRole.nodeRole} WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}AND userID =#{userID}
+    </update>
 
 </mapper>

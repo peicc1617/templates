@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -51,28 +52,62 @@ public class ProjectService {
     @Autowired
     NodeRoleMapper nodeRoleMapper;
 
-    public boolean wrapProject(Project project,String username){
+    public List<Project> getAllProjectList(User user){
+        return projectMapper.getAllProjectListByUserID(user.getUserID());
+    }
+
+    public List<Project> getOwnedProjectList(User user){
+
+        return getProjectListByProjectIDList(new ArrayList<>(user.getProjectRoleTypeSetMap().get(ProjectRoleType.CREATOR)));
+    }
+
+    public List<Project> getJoinedProjectList(User user){
+        List<Long> projectIDList = new ArrayList<>(user.getProjectRoleTypeSetMap().get(ProjectRoleType.SUPER_MANAGER));
+        projectIDList.addAll(user.getProjectRoleTypeSetMap().get(ProjectRoleType.MEMBER));
+        return getProjectListByProjectIDList(projectIDList);
+    }
+
+    public List<Project> getApplyProjectList(User user){
+        return getProjectListByProjectIDList(new ArrayList<>(user.getProjectRoleTypeSetMap().get(ProjectRoleType.APPLY)));
+    }
+
+    public long createProject(Project project,long userID,long referID){
         //获取柔性模板信息
-        Refer refer = referMapper.getReferByID(project.getReferID());
+        Refer refer = referMapper.getReferByID(referID);
+        List<Step> stepList = JSONArray.parseArray(refer.getSteps(), Step.class);
         //解析模板中的阶段
-        project.setStepMap(JSONArray.parseArray(refer.getSteps(), Step.class).stream().collect(Collectors.toMap(Step::getStepIndex,Function.identity())));
+        project.setStepMap(stepList.stream().collect(Collectors.toMap(Step::getStepIndex,Function.identity())));
         //解析模板中的节点
         project.setNodeMap(JSONArray.parseArray(refer.getNodes(), Node.class).stream().collect(Collectors.toMap(Node::getStepIndex,Function.identity())));
         //解析模板的中的边
-        project.setEdges(JSONArray.parseArray(refer.getNodes(), Edge.class));
+        project.setEdges(JSONArray.parseArray(refer.getEdges(), Edge.class));
         //设置创建者
-        project.setCreator(username);
-        createProjectWithRefer(project);
-        return true;
+        project.setCreatorID(userID);
+        return addProject(project);
     }
 
-    public Project getProjectByID(int projectID){
+    public long createProject(Project project,long userID){
+        Step step = new Step("新阶段");
+        project.setStepMap(new HashMap<String,Step>(){{
+            put(step.getStepIndex(),step);
+        }});
+        Node node = new Node(step.getStepIndex(),"新的工作节点");
+        project.setNodeMap(new HashMap<String,Node>(){{
+            put(node.getNodeIndex(),node);
+        }});
+        project.setCreatorID(userID);
+        return addProject(project);
+    }
+
+    public Project getProjectByID(long projectID){
         //查询项目的基础信息
         Project project = projectMapper.getProjectByID(projectID);
         //获取项目创建者
-        project.setCreator(projectRoleMapper.getCreatorOfProject(projectID,ProjectRoleType.CREATOR));
+        project.setCreatorID(projectRoleMapper.getUserIDListInProjectByProjectRoleType(projectID,ProjectRoleType.CREATOR).get(0));
         //获取项目的阶段
-        project.setStepMap(stepMapper.getStepsOfProject(projectID).stream().collect(Collectors.toMap(Step::getStepIndex,Function.identity())));
+        stepMapper.getStepsOfProject(projectID).forEach(step->{
+            project.getStepMap().put(step.getStepIndex(),step);
+        });
         //组织项目的节点和节点之间的关系
         Map<String,Node> nodeMap =nodeMapper.getNodesOfProject(projectID).stream().collect(Collectors.toMap(Node::getNodeIndex,Function.identity()));
         for (Edge edge : edgeMapper.getEdgesOfProject(projectID)) {
@@ -95,11 +130,11 @@ public class ProjectService {
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public int createProjectWithRefer(Project project) {
-         projectMapper.addProject(project);
-        int projectID = project.getId();
+    public long addProject(Project project) {
+        projectMapper.addProject(project);
+        long projectID = project.getId();
         //新建项目权限
-        ProjectRole projectRole = new ProjectRole(projectID,project.getCreator(),ProjectRoleType.CREATOR);
+        ProjectRole projectRole = new ProjectRole(projectID,project.getCreatorID(),ProjectRoleType.CREATOR);
         projectRoleMapper.addProjectRole(projectRole);
 
         //向数据库中添加阶段
@@ -111,50 +146,43 @@ public class ProjectService {
         nodeMapper.addAllNodes(project.getNodeMap().values().stream().collect(Collectors.toList()));
 
         //构建节点-结果
-        List<NodeResult> resultList = project.getNodeMap().values().stream().map(node->new NodeResult(projectID,node.getNodeIndex(),project.getCreator())).collect(Collectors.toList());
+        List<NodeResult> resultList = project.getNodeMap().values().stream().map(node->new NodeResult(projectID,node.getNodeIndex(),project.getCreatorID())).collect(Collectors.toList());
         //向数据库中添加节点结果
         nodeResultMapper.addAllNodeResultList(resultList);
 
         //构建节点对应权限
-        List<NodeRole> nodeRoleList = project.getNodeMap().values().stream().map(node -> new NodeRole(projectID,node.getNodeIndex(),project.getCreator(),NodeRoleType.MANAGER)).collect(Collectors.toList());
+        List<NodeRole> nodeRoleList = project.getNodeMap().values().stream().map(node -> new NodeRole(projectID,node.getNodeIndex(),project.getCreatorID(),NodeRoleType.MANAGER)).collect(Collectors.toList());
         nodeRoleMapper.addAllNodeRole(nodeRoleList);
 
         //向数据库中添加边
         project.getEdges().forEach(edge -> edge.setProjectID(projectID));
-        edgeMapper.addAllEdges(project.getEdges());
-        return 0;
+        if(project.getEdges()!=null&&project.getEdges().size()!=0){
+            edgeMapper.addAllEdges(project.getEdges());
+        }
+        return projectID;
     }
+
+
 
 
     /**
      * 更新项目内的用户权限
      * @param member 当前用户
      * @param projectID 项目ID
-     * @param username 待修改的用户名
+     * @param userID 待修改的用户名
      * @param newProjectRole 新权限
      * @return
      */
     @UserRoleFilter(allowedProjectRoleTypes = {ProjectRoleType.CREATOR,ProjectRoleType.SUPER_MANAGER})
-    public Result updateRoleOfMemberInProject(User member, int projectID, String username, ProjectRoleType newProjectRole) {
-//        Map<Integer,ProjectRoleType> map = member.getProjectRoleMap();
-//        if(map.containsKey(projectID)){
-//            ProjectRoleType curUserRole = map.get(projectID);
-//            if(curUserRole==ProjectRoleType.CREATOR){
-//
-//            }else if(curUserRole==ProjectRoleType.SUPER_MANAGER){
-//
-//            }else return Result.getNoAuth();
-//            //用户在项目内
-//        }else {
-//            return Result.getNoAuth();
-//        }
-//        int changeLineNumber = projectRoleMapper.updateProjectRole(projectID,username,newProjectRole);
-//        ProjectRole role = projectRoleMapper.getRoleOfMemberInProject(projectID, username);
-//        if (role != null) {
-////            role.setProjectRole(projectRole);
-////            projectRoleMapper.updateProjectRole(role);
-//        }
-//        return null;
+    public Result updateRoleOfMemberInProject(User member, long projectID, long userID, ProjectRoleType newProjectRole) {
         return null;
+    }
+
+    public List<Project> getProjectListByProjectIDList(List<Long> projectIDList){
+        return projectMapper.getProjectListByProjectIDList(projectIDList);
+    }
+
+    public Project getProjectByCode(String code) {
+        return projectMapper.getProjectByCode(code);
     }
 }

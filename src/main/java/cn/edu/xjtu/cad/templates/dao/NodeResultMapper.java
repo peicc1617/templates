@@ -10,15 +10,34 @@ import java.util.List;
 @Repository
 public interface NodeResultMapper {
 
-    boolean addAllNodeResultList(List<NodeResult> resultList);
+    /**
+     * 将节点结果列表添加到数据库
+     * @param resultList
+     * @return
+     */
+    long addAllNodeResultList(List<NodeResult> resultList);
 
-    @Select("SELECT * FROM project_node_result where projectID = #{id} AND nodeIndex = #{index}")
-    List<NodeResult> getResultListByNodeIndex(@Param("id") int projectID,@Param("index")String nodeIndex);
+    /**
+     * 根据节点index查询结果
+     * @param projectID 项目ID
+     * @param nodeIndex 节点index
+     * @return 返回结果列表
+     */
+    List<NodeResult> getResultListByNodeIndex(@Param("id") long projectID,@Param("index")String nodeIndex);
 
-    List<NodeResult> getResultListByNodeIndexAndUserName(@Param("id")int projectID,@Param("index") String nodeIndex,@Param("list") List<String> list);
+    /**
+     * 根据节点index和多个用户ID查询结果
+     * @param projectID 项目ID
+     * @param nodeIndex 节点index
+     * @param userIDs 用户ID列表
+     * @return 返回结果列表
+     */
+    List<NodeResult> getResultListByNodeIndexAndUserIDList(@Param("id")long projectID,@Param("index") String nodeIndex,@Param("list") List<Long> userIDs);
 
-    @Select("SELECT * FROM project_node_result where projectID = #{id} AND nodeIndex = #{index} AND username = #{name}")
-    NodeResult getResult(@Param("id")int projectID,@Param("index") String nodeIndex,@Param("name") String curName);
-
-    boolean updateNodeResult(NodeResult nodeResult);
+    /**
+     * 更新多个节点结果
+     * @param nodeResultList
+     * @return 成功更新的行数
+     */
+    long updateNodeResultList(List<NodeResult> nodeResultList);
 }

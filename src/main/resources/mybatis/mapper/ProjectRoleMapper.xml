@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="cn.edu.xjtu.cad.templates.dao.ProjectRoleMapper">
+    <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
+
+
+    <insert id="addProjectRole">
+        INSERT INTO project_role VALUES (#{projectID},#{userID},#{projectRole})
+    </insert>
+
+    <insert id="addAllNodeRole" parameterType="java.util.List">
+        INSERT INTO project_node_role (projectID,nodeIndex,userID,nodeRole) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.projectID},
+            #{item.nodeIndex},
+            #{item.userID},
+            #{item.nodeRole})
+        </foreach>
+    </insert>
+
+    <delete id="deleteProjectRole">
+      DELETE FROM project_role where projectID = #{projectID} AND userID = #{userID}
+    </delete>
+
+    <select id="getMemberRoleOfProject">
+        SELECT * FROM project_role where projectID = #{projectID} AND userID = #{userID}
+    </select>
+
+    <select id="getRoleOfProject">
+        SELECT * FROM project_role where projectID = #{projectID}
+    </select>
+
+    <select id="getRoleOfProjectExcept">
+        SELECT * FROM project_role where projectID = #{projectID} AND projectRole not in (#{roles})
+    </select>
+
+    <select id="getRoleOfProjectIn">
+        SELECT * FROM project_role where projectID = #{projectID} AND projectRole in (#{roles})
+    </select>
+
+    <select id="getUserIDListInProjectByProjectRoleType">
+        SELECT userID FROM project_role where projectID = #{projectID} AND projectRole = #{role}
+    </select>
+
+    <select id="getRoleOfMemberInProject">
+        SELECT * FROM project_role where projectID = #{id} AND userID = #{name}
+    </select>
+    <update id="updateProjectRole">
+        UPDATE project_role SET projectRole = #{newRole}WHERE projectID = #{projectID} AND userID =#{userID}
+    </update>
+
+    <update id="updateNodeRole">
+        UPDATE project_node_role SET nodeRole = #{nodeRole.nodeRole} WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}AND userID =#{userID}
+    </update>
+
+</mapper>

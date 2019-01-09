@@ -10,12 +10,10 @@ import java.util.List;
 @Repository
 public interface ReferMapper {
 
-    @Select("SELECT * FROM refer")
     List<Refer> getAllRefer();
 
 
-    @Select("SELECT * FROM refer where referID = #{referID}")
-    Refer getReferByID(int referID);
+    Refer getReferByID(long referID);
 
 
 }

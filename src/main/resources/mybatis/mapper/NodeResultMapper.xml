@@ -5,52 +5,52 @@
     <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
 
     <insert id="addAllNodeResultList" parameterType="java.util.List">
-        INSERT INTO project_node_result (projectID,nodeIndex,username)VALUES
+        INSERT INTO project_node_result (projectID,nodeIndex,userID)VALUES
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.projectID},
             #{item.nodeIndex},
-            #{item.username})
+            #{item.userID})
         </foreach>
     </insert>
 
-    <!--<insert id="addStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">-->
-        <!--INSERT INTO project_step  VALUES-->
-            <!--(#{item.projectID},-->
-            <!--#{item.stepIndex},-->
-            <!--#{item.name},-->
-            <!--#{item.description})-->
-    <!--</insert>-->
+    <select id="getResultListByNodeIndex" resultType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
+        SELECT * FROM project_node_result where projectID = #{id} AND nodeIndex = #{index}
+    </select>
 
-    <!--<delete id="deleteStep">-->
-        <!--DELETE FROM step WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}-->
-    <!--</delete>-->
 
-    <select id="getResultListByNodeIndexAndUserName" resultType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
+    <select id="getResultListByNodeIndexAndUserIDList" resultType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
         SELECT * FROM project_node_result
-        WHERE projectID = #{id} AND nodeIndex = #{index} AND username in
+        WHERE projectID = #{id} AND nodeIndex = #{index} AND userID in
         <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
             #{item}
         </foreach>
     </select>
 
-    <update id="updateNodeResult" parameterType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
-        UPDATE project_node_result SET
-        state = #{state},
-        resultKey =#{resultKey},
-        message = #{message},
-        resultID = #{resultID},
-        resultName = #{resultName}
-       WHERE projectID = #{projectID} AND nodeIndex =#{nodeIndex} AND username = #{username}
+    <select id="getResult" resultType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
+       SELECT * FROM project_node_result where projectID = #{id} AND nodeIndex = #{index} AND userID = #{userID}
+    </select>
+
+    <update id="updateNodeResultList" parameterType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
+        UPDATE project_node_result
+        SET state = CASE
+        <foreach collection="list" item="item" index="index">
+            WHEN projectID = #{item.projectID} AND nodeIndex =#{item.nodeIndex} AND userID = #{item.userID} THEN #{state}
+        </foreach>,
+        SET  resultKey =CASE
+        <foreach collection="list" item="item" index="index">
+            WHEN projectID = #{item.projectID} AND nodeIndex =#{item.nodeIndex} AND userID = #{item.userID} THEN #{resultKey}
+        </foreach>,
+        SET  message =CASE
+        <foreach collection="list" item="item" index="index">
+            WHEN projectID = #{item.projectID} AND nodeIndex =#{item.nodeIndex} AND userID = #{item.userID} THEN #{message}
+        </foreach>,
+        SET  resultID =CASE
+        <foreach collection="list" item="item" index="index">
+            WHEN projectID = #{item.projectID} AND nodeIndex =#{item.nodeIndex} AND userID = #{item.userID} THEN #{resultID}
+        </foreach>,
+        SET  resultName =CASE
+        <foreach collection="list" item="item" index="index">
+            WHEN projectID = #{item.projectID} AND nodeIndex =#{item.nodeIndex} AND userID = #{item.userID} THEN #{resultName}
+        </foreach>,
     </update>
-
-    <!--<select id="getStepsOfProject" resultType="java.util.List" parameterType="int">-->
-      <!--SELECT * FROM project_step-->
-      <!--WHERE projectID = #{projectID}-->
-    <!--</select>-->
-
-    <!--<select id="getStep" resultType="cn.edu.xjtu.cad.templates.model.project.Step" parameterType="int">-->
-        <!--SELECT * FROM project_step-->
-        <!--WHERE projectID = #{projectID} AND stepIndex = #{stepIndex}-->
-    <!--</select>-->
-
 </mapper>

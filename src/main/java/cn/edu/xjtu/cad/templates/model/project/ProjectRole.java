@@ -6,16 +6,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProjectRole {
-    private int projectID;
-    private String username;
+    private long projectID;
+    private long userID;
     private ProjectRoleType projectRole;
 
     public ProjectRole() {
     }
 
-    public ProjectRole(int projectID, String username, ProjectRoleType projectRole) {
+    public ProjectRole(long projectID, long userID, ProjectRoleType projectRole) {
         this.projectID = projectID;
-        this.username = username;
+        this.userID = userID;
         this.projectRole = projectRole;
     }
 
@@ -27,20 +27,20 @@ public class ProjectRole {
         return stringStringMap;
     }
 
-    public int getProjectID() {
+    public long getProjectID() {
         return projectID;
     }
 
-    public void setProjectID(int projectID) {
+    public void setProjectID(long projectID) {
         this.projectID = projectID;
     }
 
-    public String getUsername() {
-        return username;
+    public long getUserID() {
+        return userID;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserID(long userID) {
+        this.userID = userID;
     }
 
     public ProjectRoleType getProjectRole() {

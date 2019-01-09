@@ -6,12 +6,12 @@ public class ProjectLog extends Log {
     /**
      * 操作的项目
      */
-    private int projectID;
-    private int stepIndex;
-    private int nodeIndex;
+    private long projectID;
+    private String stepIndex;
+    private String nodeIndex;
 
-    public ProjectLog(LogType logType, MethodType logMethod, String username, String content, String ipAddr) {
-        super(logType, logMethod,  username, content, ipAddr);
+    public ProjectLog(LogType logType, MethodType logMethod, long userID, String content, String ipAddr) {
+        super(logType, logMethod,  userID, content, ipAddr);
     }
 
     public boolean parseParamMap(Map<String, String[]> paramMap){
@@ -21,8 +21,12 @@ public class ProjectLog extends Log {
         String[] arr = {"-1"};
         try {
             this.projectID = Integer.valueOf(paramMap.getOrDefault("projectID",arr)[0]);
-            this.nodeIndex = Integer.valueOf(paramMap.getOrDefault("nodeIndex",arr)[0]);
-            this.stepIndex = Integer.valueOf(paramMap.getOrDefault("stepIndex",arr)[0]);
+            if(paramMap.containsKey("nodeIndex")){
+                this.nodeIndex = paramMap.getOrDefault("nodeIndex",arr)[0];
+            }
+            if(paramMap.containsKey("stepIndex")){
+                this.stepIndex = paramMap.getOrDefault("stepIndex",arr)[0];
+            }
         }catch (Exception e){
             e.printStackTrace();
             return false;
@@ -39,28 +43,27 @@ public class ProjectLog extends Log {
         return ",#{@.projectID},#{@.stepIndex},#{@.nodeIndex}".replaceAll("@",objectName);
     }
 
-    public int getProjectID() {
+    public long getProjectID() {
         return projectID;
     }
 
-    public void setProjectID(int projectID) {
+    public void setProjectID(long projectID) {
         this.projectID = projectID;
     }
 
-    public int getStepIndex() {
+    public String getStepIndex() {
         return stepIndex;
     }
 
-    public void setStepIndex(int stepIndex) {
+    public void setStepIndex(String stepIndex) {
         this.stepIndex = stepIndex;
     }
 
-    public int getNodeIndex() {
+    public String getNodeIndex() {
         return nodeIndex;
     }
 
-    public void setNodeIndex(int nodeIndex) {
+    public void setNodeIndex(String nodeIndex) {
         this.nodeIndex = nodeIndex;
     }
-
 }

@@ -4,18 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NodeRole {
-    private int projectID;
+    private long projectID;
     private String nodeIndex;
-    private String username;
+    private long userID;
     private NodeRoleType nodeRole;
 
     public NodeRole() {
     }
 
-    public NodeRole(int projectID, String nodeIndex, String username, NodeRoleType nodeRole) {
+    public NodeRole(long projectID, String nodeIndex, long userID, NodeRoleType nodeRole) {
         this.projectID = projectID;
         this.nodeIndex = nodeIndex;
-        this.username = username;
+        this.userID = userID;
         this.nodeRole = nodeRole;
     }
 
@@ -27,12 +27,8 @@ public class NodeRole {
         return stringStringMap;
     }
 
-    public int getProjectID() {
+    public long getProjectID() {
         return projectID;
-    }
-
-    public void setProjectID(int projectID) {
-        this.projectID = projectID;
     }
 
     public String getNodeIndex() {
@@ -43,12 +39,16 @@ public class NodeRole {
         this.nodeIndex = nodeIndex;
     }
 
-    public String getUsername() {
-        return username;
+    public void setProjectID(long projectID) {
+        this.projectID = projectID;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public long getUserID() {
+        return userID;
+    }
+
+    public void setUserID(long userID) {
+        this.userID = userID;
     }
 
     public NodeRoleType getNodeRole() {

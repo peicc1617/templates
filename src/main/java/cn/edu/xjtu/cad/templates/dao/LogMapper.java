@@ -13,23 +13,21 @@ import java.util.Date;
 public interface LogMapper {
 
 
-    long countProjectLog(@Param("projectID") int projectID,
+    long countProjectLog(@Param("projectID") long projectID,
                          @Param("stepIndex") int stepIndex,
                          @Param("nodeIndex") int nodeIndex,
                          @Param("startDate") Date startDate,
                          @Param("endDate") Date endDate,
                          @Param("logType") LogType type,
-                         @Param("username") String username);
+                         @Param("userID") long userID);
 
-    @Select("SELECT * from ${tableName} where logID = #{id}")
     Log getProjectLog(@Param("id")int id,@Param("tableName") String logTableName);
 
-    void addLog(@Param("log") Log log,
+    long addLog(@Param("log") Log log,
                 @Param("tableName") String logTableName,
                 @Param("colNames")String colNames,
                 @Param("fieldNames")String fieldNames);
 
-    @Delete("DELETE FROM  ${tableName} where logID = #{id}")
-    void deleteLog(@Param("id") int id,@Param("tableName") String logTableName);
+    long deleteLog(@Param("id") long id,@Param("tableName") String logTableName);
 
 }

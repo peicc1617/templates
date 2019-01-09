@@ -1,7 +1,6 @@
 var stage;
 var SVG_DOM = document.getElementsByTagNameNS('http://www.w3.org/2000/svg', 'svg')[1];
 $(document).ready(function () {
-
     //定义一些全局变量
     //div的宽度
     DIV_WIDTH = 800;
@@ -32,7 +31,7 @@ $(document).ready(function () {
         this.el = el;
         this.$el = $(el);
         this.scaleArr = [0.25, 0.33, 0.5, 0.67, 0.75, 0.8, 0.9, 1];
-        this.scale = 7;
+        this.scale = 1;
         this.init();
     }
 
@@ -40,8 +39,8 @@ $(document).ready(function () {
     WorkFlow.DEFAULTS = {
         width: undefined,
         height: undefined,
-        nodeWidth: 100,
-        nodeHeight: 40,
+        nodeWidth: 75,
+        nodeHeight: 30,
         nodeR: 20,
         "name": "new stage",
         "info": "info about this stage",
@@ -51,93 +50,97 @@ $(document).ready(function () {
         'nodesContainer': '#nodesContainer', //节点容器
         'toolContainer': '#toolContainer', //提示容器
         'tipsContainer': '#tipsContainer', //提示容器
-        'nodeToolBtns':{
-            r:15,
-            data:[
+        'nodeMenu': {
+            data: [
                 {
-                    name: "查看",
+                    name: "查看工作节点",
                     icon: '#icon-view',
-                    func: function (workNode) {
-                        alert("查看当前节点")
+                    func: function (workFlow, workNode) {
+                        workFlow.viewNode(workNode.node);
                     }
-                }, {
-                    name: "移动",
-                    icon: '#icon-move',
-                    func: function (workNode) {
-                        alert("移动当前节点")
-                    }
-                }, {
-                    name: "删除",
+                },
+                {
+                    name: "删除工作节点",
                     icon: '#icon-delete',
-                    func: function (workNode) {
-                        alert("删除当前节点")
+                    func: function (workFlow, workNode) {
+                        workFlow.removeNode(workNode.node);
                     }
                 }, {
-                    name: "连接",
+                    name: "创建工作路径",
                     icon: "#icon-link",
-                    func: function (workNode) {
-                        alert("连接后续节点")
+                    func: function (workFlow, workNode) {
                     }
                 }
             ]
         },
-        'stepToolBtns':{
-            data:[
+        'stepMenu': {
+            data: [
                 [{
                     name: "阶段前移",
                     icon: '#icon-pre',
-                    func: function (workNode) {
-                        alert("查看当前节点")
+                    func: function (workFlow,workStep) {
+                        workFlow.updateStepPos(workStep.step,workStep.step.pos-1);
                     }
                 }, {
                     name: "阶段后移",
                     icon: "#icon-next",
-                    func: function (workNode) {
-                        alert("连接后续节点")
+                    func: function (workFlow,workStep) {
+                        workFlow.updateStepPos(workStep.step,workStep.step.pos+1);
                     }
                 }],
                 [{
                     name: "添加前序阶段",
                     icon: '#icon-pre-2',
-                    func: function (workNode) {
-                        alert("查看当前节点")
+                    func: function (workFlow,workStep) {
+                        let step = {
+                            stepIndex: UUID(),
+                            name: "阶段",
+                            description: "描述",
+                            projectID: PROJECT_ID,
+                            pos:workStep.step.pos,
+                        };
+                        workFlow.addStep(step)
                     }
                 }, {
                     name: "添加后序阶段",
                     icon: "#icon-next-2",
-                    func: function (workNode) {
-                        alert("连接后续节点")
+                    func: function (workFlow,workStep) {
+                        let step = {
+                            stepIndex: UUID(),
+                            name: "阶段",
+                            description: "描述",
+                            projectID: PROJECT_ID,
+                            pos:workStep.step.pos+1,
+                        };
+                        workFlow.addStep(step)
                     }
                 }],
                 [{
-                    name: "新建节点",
+                    name: "新建工作节点",
                     icon: '#icon-add',
-                    func: function (workNode) {
-                        alert("移动当前节点")
+                    func: function (workFlow, workStep) {
+                        workFlow.addNode(workStep.step.stepIndex);
                     }
                 }, {
-                    name: "删除",
+                    name: "删除阶段",
                     icon: '#icon-delete',
-                    func: function (workNode) {
-                        alert("删除当前节点")
+                    func: function (workFlow, workStep) {
+                        workFlow.removeStep(workStep.step.stepIndex)
                     }
                 },],
-                [ {
-                    name: "查看",
+                [{
+                    name: "查看阶段",
                     icon: '#icon-view',
-                    func: function (workNode) {
-                        alert("移动当前节点")
+                    func: function (workFlow, workStep) {
+                        workFlow.viewStep(workStep.step)
                     }
                 },]
 
             ]
         },
-        'pathToolBtn':{
+        'pathMenu': {
             name: "删除工作路径",
             icon: '#icon-delete-2',
-            func: function (workNode) {
-                alert("移动当前节点")
-            }
         },
         beforeAll: function () {
             return true;
@@ -215,6 +218,12 @@ $(document).ready(function () {
         afterViewLink: function () {
 
         },
+        beforeUpdateStepPos:function () {
+
+        },
+        afterUpdateStepPos:function () {
+
+        }
     }
 
     WorkFlow.EVENTS =
@@ -289,16 +298,44 @@ $(document).ready(function () {
              */
             'before.view-link.work.flow': 'beforeViewLink',
             'after.view-link.work.flow': 'afterViewLink',
+            /**
+             * 查看连线触发的事件
+             */
+            'before.update-step-pos.work.flow': 'beforeUpdateStepPos',
+            'after.update-step-pos.work.flow': 'afterUpdateStepPos',
         };
 
     WorkFlow.prototype = {
         constructor: WorkFlow,
         init: function () {
-
-            this.resetView();
-
-            this.bindMouseWheel();
-            this.toolbarBind();
+            this.refreshData();
+            this.initView();
+            this.bindToolListener()
+        },
+        /**
+         * 初始化视图
+         */
+        initView: function () {
+            this.initNodeMenu();
+            this.initStepMenu();
+            this.initPathMenu();
+            this.refreshView();
+        },
+        clearStage: function () {
+            $(this.options.stepsContainer + "," + this.options.edgesContainer + "," + this.options.nodesContainer).empty();
+        },
+        refreshView: function () {
+            this.clearStage();
+            this.getPath();//获取路径
+            this.planPath();//调整节点
+            this.initGrid();//初始化网格
+            this.drawSteps();
+            this.drawNodes();//绘制节点
+            this.drawPath();//绘制工作路径
+            this.refreshNodeMenu();//初始化节点工具菜单
+            this.refreshStepMenu();//初始化阶段工具菜单
+            this.refreshPathMenu();//初始化工作路径的俺就
+            this.bindListener();
         },
         trigger: function (name) {
             var args = Array.prototype.slice.call(arguments, 1);
@@ -314,15 +351,10 @@ $(document).ready(function () {
             this.refreshView();
         },
         /**
-         * 重新绘制工具栏
+         * 根据节点之间的关系得到所有的路径
          */
-        resetToolBar: function () {
-
-        },
-        resetCSS: function () {
-
-        },
         getPath: function () {
+            this.options.stepMap = new Map(Array.from(this.options.stepMap).sort((e1,e2)=>e1[1].pos-e2[1].pos));
             const nodeMap = this.options.nodeMap;
             const stepMap = this.options.stepMap;
             const freeNodeSet = new Set();//自由节点Set
@@ -397,57 +429,23 @@ $(document).ready(function () {
                 } else {
                     stepStartMap.set(stepIndex, 0);//第一个阶段起始点为0
                 }
-                preStepIndex=stepIndex;
+                preStepIndex = stepIndex;
             });
             this.stepStartMap = stepStartMap;
             this.paths = paths;
             this.rowN = paths.length;
         },
-        planNodes: function () {
-            for (let i = 0; i < this.paths.length; i++) {
-                let path = this.paths[i];
-                // this.options.steps.forEach(step=>stepCnt.set(step.stepIndex,0));
-                for (let j = 0, x = 0; j < path.length; j++, x++) {
-                    let node = path[j];
-                    node.y = i;
-                    let left = this.stepStartMap.get(node.nodeIndex);
-                    if (j < left) {
-                        //如果节点没有出现在阶段内，那么把该节点的坐标平移到阶段内，这样后续的该阶段内的节点都不会出现越界的情况
-                        x = left;
-                    }
-                    node.x = x;
-                }
-            }
-        },
-        refreshView: function () {
-            this.getPath();//获取路径
-            this.planNodes();//调整节点
-            this.initGrid();//初始化网格
-            this.drawSteps();
-            this.drawNodes();//绘制节点
-            this.drawPath();//绘制工作路径
-            this.initNodeToolGroup();//初始化节点工具菜单
-            this.initStepToolGroup();//初始化阶段工具菜单
-            this.initPathToolGroup();//初始化工作路径的俺就
-            this.bindListener();
-        },
+        /**
+         * 根据路径，计算整个网格的大小
+         */
         initGrid: function () {
-            this.nodeHorDis = this.options.nodeWidth*3; //节点间距
-            this.nodeVerDis = this.options.nodeHeight*2 //节点垂直间
+            this.nodeHorDis = this.options.nodeWidth * 3; //节点间距
+            this.nodeVerDis = this.options.nodeHeight * 2 //节点垂直间
             this.stepBarHeight = this.options.nodeHeight; //阶段标题高度
-            let width2 = (this.columnN+1) * this.nodeHorDis; //计算实际宽度
-            let height2 = (this.rowN + 2) * this.nodeVerDis; //计算实际高度
-            this.viewbox = [0, 0, width2, height2];
-            this.viewBox = this.viewbox.concat();
-            this.resetViewBox();
-            this.$el.height(height2);
-            console.log("实际宽度", width2, "实际高度", height2)
-            this.svgxc = this.$el.offset().left + this.$el.width() / 2;
-            this.svgyc = this.$el.offset().top + this.$el.height() / 2;
-            console.log('svg的中心屏幕坐标', this.svgxc, this.svgyc)
+            this.refreshViewBox();
             const start = {
                 x: this.nodeHorDis / 2,
-                y: this.nodeVerDis+this.stepBarHeight,
+                y: this.nodeVerDis + this.stepBarHeight,
             };
             //生成网格
             this.grid = new Array(this.rowN);
@@ -460,33 +458,54 @@ $(document).ready(function () {
                     }
                 }
             }
-            this.nodeWidth = 100;
-            this.nodeHeight = 40;
+            this.nodeWidth = this.options.nodeWidth;
+            this.nodeHeight = this.options.nodeHeight;
+        },
+        planPath: function () {
+            //为每一个节点安排坐标
+            for (let i = 0; i < this.paths.length; i++) {
+                //按照每条路径分别处理
+                let path = this.paths[i];
+                for (let j = 0, x = 0; j < path.length; j++, x++) {
+                    //获取节点
+                    let node = path[j];
+                    //如果节点有x坐标，说明之前已经安排过了，不再进行安排
+                    //否则安排节点的y坐标
+                    node.y = i;
+                    //获取节点所在阶段的最左边界
+                    let left = this.stepStartMap.get(node.stepIndex);
+                    if (x < left) {
+                        //如果节点的坐标小于最左边界，那么把节点x调整到边界内
+                        x = left;
+                    }
+                    node.x = x;
+                }
+            }
         },
         drawSteps: function () {
             const stepStartArr = Array.from(this.stepStartMap);
             this.workStepMap = new Map()
-            for(let i = 0;i<stepStartArr.length;i++){
+            for (let i = 0; i < stepStartArr.length; i++) {
                 let stepIndex = stepStartArr[i][0];
                 let start = stepStartArr[i][1];
                 let end;
-                if(i<stepStartArr.length-1){
-                    end = stepStartArr[i+1][1]-1;
-                }else {
-                    end = this.columnN-1;
+                if (i < stepStartArr.length - 1) {
+                    end = stepStartArr[i + 1][1] - 1;
+                } else {
+                    end = this.columnN - 1;
                 }
-                let stepXY  ={
-                    xy1:{
-                        x:this.grid[0][start].x-this.nodeHorDis/8,
-                        y:this.grid[0][start].y-this.nodeVerDis / 2 - this.stepBarHeight
+                let stepXY = {
+                    xy1: {
+                        x: this.grid[0][start].x - this.nodeHorDis / 8,
+                        y: this.grid[0][start].y - this.nodeVerDis / 2 - this.stepBarHeight
                     },
-                    xy2:{
-                        x:this.grid[this.grid.length-1][end].x+this.nodeWidth+this.nodeHorDis/8,
-                        y:this.grid[this.grid.length-1][start].y+this.nodeVerDis
+                    xy2: {
+                        x: this.grid[this.grid.length - 1][end].x + this.nodeWidth + this.nodeHorDis / 8,
+                        y: this.grid[this.grid.length - 1][start].y + this.nodeVerDis
                     }
                 }
                 const workStep = new WorkStep(stepXY.xy1, stepXY.xy2, this.options.stepMap.get(stepIndex), this, this.stepBarHeight);
-                this.workStepMap.set(stepIndex,workStep);
+                this.workStepMap.set(stepIndex, workStep);
             }
         },
         /**
@@ -495,16 +514,16 @@ $(document).ready(function () {
         drawNodes: function () {
             this.workNodeMap = new Map();
             this.options.nodeMap.forEach((node, nodeIndex) => {
-                const workNode = new WorkNode(node, this.grid[node.y][node.x], this.nodeWidth, this.nodeHeight, this);
+                const workNode = new WorkNode(node, this.grid[node.y][node.x], this.nodeWidth, this.nodeHeight, this.options.nodesContainer);
                 this.workNodeMap.set(nodeIndex, workNode);
                 workNode.initNode();
             });
-            this.options.nodeMap.forEach((node,nodeI)=>{
+            this.options.nodeMap.forEach((node, nodeI) => {
                 if (node.nextNodeIndexList != null && node.nextNodeIndexList != undefined && node.nextNodeIndexList.length > 0) {
-                    node.nextNodeIndexList.forEach(nodeJ=>{
+                    node.nextNodeIndexList.forEach(nodeJ => {
                         const workNodeI = this.workNodeMap.get(nodeI);
                         const workNodeJ = this.workNodeMap.get(nodeJ);
-                        workNodeI.nextWorkNodeMap.set(nodeJ,workNodeJ);
+                        workNodeI.nextWorkNodeMap.set(nodeJ, workNodeJ);
                         workNodeJ.preWorkNodeMap.set(nodeI, workNodeI);
                     })
                 }
@@ -514,193 +533,455 @@ $(document).ready(function () {
         /**
          * 绘制工作流路径
          */
-        drawPath:function(){
+        drawPath: function () {
             this.workPathList = [];
-
             //绘制工作流路径
-            this.workNodeMap.forEach((workNodeI,nodeI)=>{
-                workNodeI.nextWorkNodeMap.forEach((workNodeJ,nodeJ)=>{
-                    const path = new WorkPath(workNodeI, workNodeJ,this.options.edgesContainer)
+            this.workNodeMap.forEach((workNodeI, nodeI) => {
+                workNodeI.nextWorkNodeMap.forEach((workNodeJ, nodeJ) => {
+                    const path = new WorkPath(workNodeI, workNodeJ, this.options.edgesContainer)
                     this.workPathList.push(path);
-                    workNodeI.outPathMap.set(nodeJ,path);
+                    workNodeI.outPathMap.set(nodeJ, path);
                 })
             })
 
         },
-        initNodeToolGroup:function(){
-            this.nodeToolID = "#nodeTool";
-            const $nodeToolGroup = $(svg("g",$(this.options.toolContainer), this.nodeToolID));
-            const r =  this.options.nodeHeight/3;
-            let n = this.options.nodeToolBtns.data.length;
-            const R = this.options.nodeWidth/2+r*2;
-            const yo =this.options.nodeHeight/2;
-            let xo= this.options.nodeWidth/2;
-            const radinas=[3/12*Math.PI,1/12*Math.PI,-1/12*Math.PI,-3/12*Math.PI]
-            const posArr =radinas.map(ra=> [R*Math.cos(ra),(R*Math.sin(ra))]);
-            for(let i =0;i<n;i++){
-                const x = xo+posArr[i][0],  y=yo+posArr[i][1];
-                let btnOption = this.options.nodeToolBtns.data[i];
-                const $btnG = $(svg("g",$nodeToolGroup),undefined,{
-                    class:"btn"
+        /**
+         * 初始化工作节点菜单
+         * 初始化的内容包括，
+         *  1.新建dom
+         *  2.设定class
+         *  3.设定filter
+         *  4.按钮的图标
+         */
+        initNodeMenu: function () {
+            this.nodeMenuID = "#nodeMenu";
+            const $nodeToolGroup = $(svg("g", $(this.options.toolContainer), this.nodeMenuID)),
+                n = this.options.nodeMenu.data.length;   //按钮的个数
+            for (let i = 0; i < n; i++) {
+                let btnOption = this.options.nodeMenu.data[i];
+                let workFlow = this;
+                const $btnG = $(svg("g", $nodeToolGroup), undefined, {
+                    class: "btn"
+                }).on("click", function (event) {
+                    btnOption.func(workFlow, workFlow.workNodeMap.get($nodeToolGroup.attr('nodeindex')));
+                    workFlow.nodeMenuClose();
                 })
-                const $btn = $(svg("circle",$btnG,undefined,{
-                    "filter":"url(#btnFeOffset)",
-                    // style:"box-shadow: 10px 10px 5px #888888;",
-                    cx:x,
-                    cy:y,
-                    r:r
+                const $btn = $(svg("circle", $btnG, undefined, {
+                    "filter": "url(#btnFeOffset)",
                 }))
                 const $icon = svg('use', $btnG, undefined, {
                     "xlink:href": btnOption.icon,
-                    "width": r*1.5,
-                    "height": r*1.5,
-                    "x": x-r*1.5/2,
-                    "y": y-r*1.5/2
                 });
                 svg('title', $btnG, undefined, undefined)
                     .appendChild(document.createTextNode(btnOption.name));
                 $btnG.html($btnG.html());
             }
         },
-        initStepToolGroup:function(){
-            this.stepToolID = "#stepTool";
-            const stepToolOption = this.options.stepToolBtns;
-            const $stepToolGroup = $(svg("g",$(this.options.toolContainer), this.stepToolID));
-            const width =  this.stepBarHeight*2/3;//图标的宽度
-            const xStart =width/3,yStart = this.stepBarHeight/2-width/2;
-            for(let i =0;i< stepToolOption.data.length;i++){
+        /**
+         * 更新工作节点的菜单，更新的内容包括
+         * 1.按钮的大小
+         * 2.按钮的相对位置
+         */
+        refreshNodeMenu: function () {
+            const r = this.options.nodeHeight / 3,         //圆形按钮的半径
+                n = this.options.nodeMenu.data.length,   //按钮的个数
+                R = this.options.nodeWidth / 2 + r * 2,        //环型布局的半径
+                yo = this.options.nodeHeight / 2,            //环型布局的圆心
+                xo = this.options.nodeWidth / 2;
+            //计算每一个按钮的位置，目前是写死的，动态拓展的需要调整
+            const rArr = [];//角度数组
+            if ((n & 1) === 1) {
+                //如果个数是奇数
+                rArr.push(0);
+                for (let i = 1; i < n; i += 2) {
+                    rArr.unshift(i / 6 * Math.PI);
+                    rArr.push(-i / 6 * Math.PI);
+                }
+            } else {
+                //如果个数是偶数
+                for (let i = 0; i < n; i += 2) {
+                    rArr.unshift((1 + i) / 12 * Math.PI);
+                    rArr.push(-(1 + i) / 12 * Math.PI);
+                }
+            }
+            const posArr = rArr.map(ra => [R * Math.cos(ra), (R * Math.sin(ra))]);
+            const btnGArr = $(this.nodeMenuID).children();
+            for (let i = 0; i < n; i++) {
+                const x = xo + posArr[i][0], y = yo + posArr[i][1];
+                const $btn = $(btnGArr[i]);
+                $btn.children("circle").attr({
+                    cx: x,
+                    cy: y,
+                    r: r
+                })
+                $btn.children("use").attr({
+                    "width": r * 1.5,
+                    "height": r * 1.5,
+                    "x": x - r * 1.5 / 2,
+                    "y": y - r * 1.5 / 2
+                })
+
+            }
+        },
+        /**
+         * 初始化阶段菜单按钮图标
+         */
+        initStepMenu: function () {
+            this.stepMenuID = "#stepMenu";
+            const stepToolOption = this.options.stepMenu;
+            const $stepToolGroup = $(svg("g", $(this.options.toolContainer), this.stepMenuID));
+            for (let i = 0; i < stepToolOption.data.length; i++) {
                 let btnOptions = stepToolOption.data[i];
+                const $btnGG = $(svg("g", $stepToolGroup))
                 for (let j = 0; j < btnOptions.length; j++) {
-                    const $btnG = $(svg("g",$stepToolGroup))
-                    const $btn = $(svg("rect",$btnG,undefined,{
-                        "filter":"url(#btnFeOffset)",
-                        // style:"box-shadow: 10px 10px 5px #888888;",
-                        width:width,
-                        height:width,
-                        rx:width/4,
-                        ry:width/4,
-                        x:xStart*(j+1)+width*j,
-                        y:yStart+this.stepBarHeight*i,
-                    }))
-                    const $icon = svg('use', $btnG, undefined, {
-                        "xlink:href": btnOptions[j].icon,
-                        "width":width*0.75,
-                        "height":width*0.75,
-                        x:xStart*(j+1)+width*j+width*0.25/2,
-                        y:yStart+this.stepBarHeight*i+width*0.25/2,
+                    const $btnG = $(svg("g", $btnGG, undefined, {
+                        stepindex: undefined
+                    })).on("click", {
+                        workFlow: this,
+                    }, function (event) {
+                        let workFlow = event.data.workFlow;
+                        btnOptions[j].func(workFlow, workFlow.workStepMap.get($stepToolGroup.attr('stepindex')));
+                        workFlow.stepMenuClose();//每次点击以后关闭阶段菜单
                     });
-                    svg('title', $btnG, undefined, undefined)
-                        .appendChild(document.createTextNode(btnOptions[j].name));
+                    const $btn = $(svg("rect", $btnG, undefined, {"filter": "url(#btnFeOffset)"}))
+                    const $icon = svg('use', $btnG, undefined, {"xlink:href": btnOptions[j].icon});
+                    svg('title', $btnG).appendChild(document.createTextNode(btnOptions[j].name));
                     $btnG.html($btnG.html());
                 }
             }
         },
-        initPathToolGroup:function(){
-            this.pathTool = "#pathTool";
-            const pathToolOption = this.options.pathToolBtn;
-            const $pathToolGroup = $(svg("g",$(this.options.toolContainer), this.pathTool));
-            const r =  this.stepBarHeight/3;//图标的半径
-            const xStart =0,yStart = 0;
-            const $btnG = $(svg("g",$pathToolGroup))
-            const $btn = $(svg("circle",$btnG,undefined,{
-                "filter":"url(#btnFeOffset)",
-                cx:xStart,
-                cy:yStart-r,
-                r:r
-            }))
-            const $icon = svg('use', $btnG, undefined, {
-                "xlink:href": pathToolOption.icon,
-                "width": r*1.5,
-                "height": r*1.5,
-                "x": xStart-r*1.5/2,
-                "y": yStart-r-r*1.5/2
-            });
-            svg('title', $btnG, undefined, undefined)
-                .appendChild(document.createTextNode(pathToolOption.name));
+        /**
+         * 绑定菜单按钮对应的事件
+         */
+        bindStepMenuListener: function () {
+
+        },
+        refreshStepMenu: function () {
+            const width = this.stepBarHeight * 2 / 3,//图标的宽度
+                xStart = width / 3,//按钮组的开始坐标
+                yStart = this.stepBarHeight / 2 - width / 2,
+                n = this.options.stepMenu.data.length;
+            const btnGArr = $(this.stepMenuID).children();
+            for (let i = 0; i < n; i++) {
+                let m = this.options.stepMenu.data[i].length;
+                const btnArr = $(btnGArr[i]).children();
+                for (let j = 0; j < m; j++) {
+                    const $btn = $(btnArr[j]);
+                    $btn.children("rect").attr({
+                        width: width,
+                        height: width,
+                        rx: width / 4,
+                        ry: width / 4,
+                        x: xStart * (j + 1) + width * j,
+                        y: yStart + this.stepBarHeight * i,
+                    })
+                    $btn.children("use").attr({
+                        "width": width * 0.75,
+                        "height": width * 0.75,
+                        x: xStart * (j + 1) + width * j + width * 0.25 / 2,
+                        y: yStart + this.stepBarHeight * i + width * 0.25 / 2,
+                    });
+                }
+            }
+
+        },
+
+        /**
+         * 初始化工作路径按钮菜单，主要初始化的功能如下
+         * 1.新建DOM
+         * 2.设置滤镜
+         * 3.设置图标
+         */
+        initPathMenu: function () {
+            this.pathMenu = "#pathMenu";
+            const pathMenuOption = this.options.pathMenu;
+            const $pathMenuGroup = $(svg("g", $(this.options.toolContainer), this.pathMenu));
+            const $btnG = $(svg("g", $pathMenuGroup))
+            const $btn = $(svg("circle", $btnG, undefined, {"filter": "url(#btnFeOffset)"}))
+            const $icon = svg('use', $btnG, undefined, {"xlink:href": pathMenuOption.icon,});
+            svg('title', $btnG).appendChild(document.createTextNode(pathMenuOption.name));
             $btnG.html($btnG.html());
         },
         /**
-         * 绑定事件监听器
+         * 绘制工作路径按钮菜单，主要绘制的内容如下
+         * 1.确定图标的半径
+         * 2.确定菜单的相对位置
+         * 3.确定按钮的
          */
-        bindListener:function(){
-            this.workNodeMap.forEach((workNode,nodeIndex)=>{
-                $(workNode).on("onclick",{nodeIndex:nodeIndex,workFlow:this},function (event) {
-                    event.data.workFlow.clickWorkNode(nodeIndex);
-                })
+        refreshPathMenu: function () {
+            const r = this.stepBarHeight / 3;//图标的半径
+            const xStart = 0, yStart = 0;
+            $(this.pathMenu).find("circle").attr({
+                cx: xStart,
+                cy: yStart - r,
+                r: r
             })
-            this.workStepMap.forEach((workStep,stepIndex)=>{
-                $(workStep).on("onclick",{stepIndex:stepIndex,workFlow:this},function (event) {
+            $(this.pathMenu).find("use").attr({
+                "width": r * 1.5,
+                "height": r * 1.5,
+                "x": xStart - r * 1.5 / 2,
+                "y": yStart - r - r * 1.5 / 2
+            })
+
+        },
+        /**
+         * 绑定界面的工具栏的响应事件
+         * #linked-change-btn 工作路径切换按钮
+         * #step-change-btn 阶段显示切换按钮
+         * #name-change-btn 节点名称显示切换按钮
+         */
+        bindToolListener: function () {
+            let workFlow = this;
+            //关系切换绑定相关单机事件
+            $("#linked-change-btn").bind('click', function () {
+                if (this.checked) {
+                    workFlow.showAllLinked();
+                } else {
+                    workFlow.hideAllLinked();
+                }
+            });
+            //绑定阶段显示按钮事件
+            $("#step-change-btn").on('click',function () {
+                if (this.checked) {
+                    workFlow.showAllSteps();
+                } else {
+                    workFlow.hideAllSteps();
+                }
+            });
+            //绑定创新方法显示按钮事件
+            $("#name-change-btn").on('click',function () {
+                if (this.checked) {
+                    workFlow.showAllNodesApp();
+                } else {
+                    workFlow.hideAllNodesApp();
+                }
+            })
+            let viewMove = false;
+            this.$el.on({
+                mousewheel:function (e) {
+                    if (e.originalEvent.wheelDelta > 0) {
+                        console.log("缩小", workFlow.scale)
+                        //缩小
+                        workFlow.scale -= 0.1;
+                        if (workFlow.scale < 0.1) {
+                            workFlow.scale = 0.1;
+                        }
+                    } else {
+                        console.log("放大", workFlow.scale)
+                        //放大
+                        workFlow.scale += 0.1;
+                    }
+                    workFlow.refreshViewBox();
+                    e = e || window.event;
+                    if(e.preventDefault) {
+                        // Firefox
+                        e.preventDefault();
+                        e.stopPropagation();
+                    } else {
+                        // IE
+                        e.cancelBubble=true;
+                        e.returnValue = false;
+                    }
+                    return false;
+                },
+                mousedown:function(){
+                    viewMove=true;
+                    workFlow.startMoveView();
+                },
+                mouseup:function () {
+                    if(viewMove){
+                        workFlow.stopMoveView();
+                    }
+                },
+                mouseleave:function () {
+                    if(viewMove){
+                        workFlow.stopMoveView();
+                    }
+                },
+                mousemove:function (e) {
+                    //获取svg相对于浏览器的坐标
+                    const svgPos = {
+                        x: workFlow.el.getBoundingClientRect().x,
+                        y: workFlow.el.getBoundingClientRect().y,
+                    };
+                    //获取鼠标在svg内的坐标
+                    workFlow.mousePos = {
+                        x: workFlow.viewBoxX + ((e.originalEvent.x || e.originalEvent.layerX || 0) - svgPos.x) * workFlow.scale,
+                        y: workFlow.viewBoxY + ((e.originalEvent.y || e.originalEvent.layerY || 0) - svgPos.y) * workFlow.scale
+                    }
+                }
+            })
+        },
+        /**
+         * 绑定事件监听器
+         * 1.绑定workNode的onclick事件，mousedown事件，mouseup事件
+         * 2.绑定workStep的onclick事件
+         * 3.绑定path的onclick事件
+         */
+        bindListener: function () {
+            let workFlow = this;
+            this.workNodeMap.forEach((workNode, nodeIndex) => {
+                $(workNode).on({
+                    mousedown: function () {
+                        workFlow.startMoveNode(workNode);
+                    },
+                    mouseup: function () {
+                        workFlow.stopMoveNode(workNode);
+                    },
+                    onclick:function () {
+                        workFlow.clickWorkNode(nodeIndex);
+                    }
+                });
+            })
+            this.workStepMap.forEach((workStep, stepIndex) => {
+                $(workStep).on("onclick", {stepIndex: stepIndex, workFlow: this}, function (event) {
                     event.data.workFlow.clickWorkStep(stepIndex);
                 })
             })
-            this.workPathList.forEach((workPath)=>{
-                $(workPath).on("onclick",{stepIndex:workPath,workFlow:this},function (event) {
+            this.workPathList.forEach((workPath) => {
+                $(workPath).on("onclick", {stepIndex: workPath, workFlow: this}, function (event) {
                     event.data.workFlow.clickWorkPath(workPath);
                 })
             })
         },
-        clickWorkNode:function(nodeIndex){
-            let preNodeIndex = $(this.nodeToolID).attr("nodeindex");//获取之前的节点
-            if(nodeIndex==undefined||preNodeIndex!=undefined&&$(this.nodeToolID).attr('class')==="active"){
+        /**
+         * 开始移动节点
+         */
+        startMoveNode: function (workNode) {
+            workNode.translate(0, 0);
+            let workFlow = this;
+            // $(this.options.stepsContainer)
+            this.$el.on('mousemove', moveNode = function () {
+                const pos = workFlow.getMousePos();
+                const dPos = {
+                    x: pos.x - workNode.x-workNode.width/2,
+                    y: pos.y - workNode.y-workNode.height/2
+                }
+                workNode.translate(dPos.x, dPos.y);
+            });
+        },
+        /**
+         * 停止移动节点
+         * @param workNode
+         */
+        stopMoveNode: function (workNode) {
+            if (workNode.transform) {
+                //如果workNode的transform不为空，说明发生了移动，那么判断当前位置处于哪个阶段内
+                //首先取消鼠标移动事件的绑定函数
+                this.$el.off('mousemove', moveNode);
+                const x = workNode.newX;//首先获取当前节点的最新坐标
+                const y = workNode.newY;
+                //判断当前节点所处的节点
+                this.workStepMap.forEach((workStep, stepIndex) => {
+                    if (x > workStep.xy1.x && y > workStep.xy1.y && y < workStep.xy2.y && x < workStep.xy2.x) {
+                        if (stepIndex === workNode.stepIndex) {
+                            //没有发生改变，那么直接取消移动即可
+                            workNode.transform == undefined;
+                            return;
+                        } else {
+                            console.log("当前节点成功移动到了" + stepIndex);
+                            //工作节点所处的阶段发生改变，更新stepIndex
+                            workNode.node.stepIndex = stepIndex;
+                            //重新绘制
+                            this.refreshView();
+                        }
+                    }
+                });
+            } else {
+                //如果workNode的transfrom为空，说明没有触发长按移动事件，所以这个时候需要触发点按事件
+                this.clickWorkNode(workNode.node.nodeIndex);
+            }
+        },
+        getMousePos: function () {
+            //获取当前鼠标在svg坐标系中的位置
+            return this.mousePos;
+        },
+        clickWorkNode: function (nodeIndex) {
+            let preNodeIndex = $(this.nodeMenuID).attr("nodeindex");//获取之前的节点
+            if (nodeIndex == undefined || preNodeIndex != undefined && $(this.nodeMenuID).attr('class') === "active") {
                 //首先关闭,并且删除
-                $(this.nodeToolID).removeAttr("class").removeAttr("nodeindex",);
-                if(preNodeIndex!==nodeIndex){
+                this.nodeMenuClose();
+                if (preNodeIndex !== nodeIndex) {
                     let workFlow = this;
                     setTimeout(function () {
                         workFlow.clickWorkNode(nodeIndex);
                     }, 10);
                 }
-            }else if(preNodeIndex==undefined&&$(this.nodeToolID).attr('class')!=="active"){
+            } else if (preNodeIndex == undefined && $(this.nodeMenuID).attr('class') !== "active") {
                 //如果之前没有点击过节点并且处于关闭状态
                 const workNode = this.workNodeMap.get(nodeIndex);
-                $(this.nodeToolID).attr({
-                    class:"active",
-                    "nodeindex":nodeIndex,
-                    transform:"translate("+(workNode.x)+", "+(workNode.y)+")",
-                });
+                this.nodeMenuOpen(nodeIndex, workNode.x, workNode.y)
             }
 
         },
-        clickWorkStep:function(stepIndex){
-            let preStepIndex = $(this.stepToolID).attr("stepindex");//获取之前的节点
-            if(stepIndex==undefined||preStepIndex!=undefined&&$(this.stepToolID).attr('class')==="active"){
+        clickWorkStep: function (stepIndex) {
+            let preStepIndex = $(this.stepMenuID).attr("stepindex");//获取之前的节点
+            if (stepIndex == undefined || preStepIndex != undefined && $(this.stepMenuID).attr('class') === "active") {
                 //首先关闭,并且删除
-                $(this.stepToolID).removeAttr("class").removeAttr("stepindex",);
-                if(preStepIndex!==stepIndex){
+                this.stepMenuClose();
+                if (preStepIndex !== stepIndex) {
                     let workFlow = this;
                     setTimeout(function () {
                         workFlow.clickWorkStep(stepIndex);
                     }, 10);
                 }
-            }else if(preStepIndex==undefined&&$(this.stepToolID).attr('class')!=="active"){
+            } else if (preStepIndex == undefined && $(this.stepMenuID).attr('class') !== "active") {
                 //如果之前没有点击过节点并且处于关闭状态
                 const workStep = this.workStepMap.get(stepIndex);
-                $(this.stepToolID).attr({
-                    class:"active",
-                    "stepindex":stepIndex,
-                    transform:"translate("+(workStep.xy2.x)+", "+(workStep.xy1.y)+")",
-                });
+                this.stepMenuOpen(stepIndex, workStep.xy2.x, workStep.xy1.y);
             }
         },
-        clickWorkPath:function(workPath){
-            let pathid = $(this.pathTool).attr("pathid");
-            if(workPath==undefined||pathid!=undefined&&$(this.pathTool).attr('class')==="active"){
+        clickWorkPath: function (workPath) {
+            let pathid = $(this.pathMenu).attr("pathid");
+            if (workPath == undefined || pathid != undefined && $(this.pathMenu).attr('class') === "active") {
                 //首先关闭,并且删除
-                $(this.pathTool).removeAttr("class").removeAttr("pathid",);
-                if(pathid!==(workPath.nodeI+workPath.nodeJ)){
+                this.pathMenuClose();
+                if (pathid !== (workPath.nodeI + workPath.nodeJ)) {
                     let workFlow = this;
                     setTimeout(function () {
                         workFlow.clickWorkPath(workPath);
                     }, 10);
                 }
-            }else if(pathid==undefined&&$(this.pathTool).attr('class')!=="active"){
+            } else if (pathid == undefined && $(this.pathMenu).attr('class') !== "active") {
                 //如果之前没有点击过节点并且处于关闭状态
-                $(this.pathTool).attr({
-                    class:"active",
-                    "pathid":workPath.nodeI+workPath.nodeJ,
-                    transform:"translate("+(workPath.midPos.x)+", "+(workPath.midPos.y)+")",
-                });
+                this.pathMenuOpen(workPath.nodeI + workPath.nodeJ, workPath.midPos.x, workPath.midPos.y)
             }
+        },
+        stepMenuOpen: function (stepindex, x, y) {
+            $(this.stepMenuID).attr({
+                class: "active",
+                "stepindex": stepindex,
+                transform: "translate(" + x + ", " + y + ")",
+            });
+            this.nodeMenuClose();
+            this.pathMenuClose();
+        },
+        stepMenuClose: function () {
+            $(this.stepMenuID).removeAttr("class").removeAttr("stepindex");
+        },
+        nodeMenuOpen: function (nodeindex, x, y) {
+            $(this.nodeMenuID).attr({
+                class: "active",
+                "nodeindex": nodeindex,
+                transform: "translate(" + x + ", " + y + ")",
+            });
+            this.stepMenuClose();
+            this.pathMenuClose();
+        },
+        nodeMenuClose: function () {
+            $(this.nodeMenuID).removeAttr("class").removeAttr("nodeindex",);
+        },
+        pathMenuOpen: function (pathid, x, y) {
+            $(this.pathMenu).attr({
+                class: "active",
+                "pathid": pathid,
+                transform: "translate(" + x + ", " + y + ")",
+            });
+            this.nodeMenuClose();
+            this.stepMenuClose();
+        },
+        pathMenuClose: function () {
+            $(this.pathMenu).removeAttr("class").removeAttr("pathid");
         },
         refreshData: function () {
             //更新数据
@@ -712,78 +993,86 @@ $(document).ready(function () {
         refreshNode: function () {
 
         },
-        editInfo: function () {
 
+        refreshViewBox: function () {
+            //计算舞台高度
+            this.stageHeight = (this.rowN + 2) * this.nodeVerDis;
+            //计算控件高度，为了更好的显示，控件高度不会大于浏览器窗口高度
+            this.height = this.stageHeight<window.innerWidth?this.stageHeight:window.innerHeight;
+            //计算舞台宽度
+            this.stageWidth = (this.columnN + 1) * this.nodeHorDis;
+            //获取控件宽度
+            this.width = this.$el.width();
+            if(this.stageWidth<this.width){
+                //如果舞台宽度小于控件宽度，那么调整舞台宽度
+                this.stageWidth=this.width;
+            }
+            //计算viewBox的高度
+            this.viewBoxHeight = this.height * this.scale;
+            //计算viewBox宽度
+            this.viewBoxWidth = this.width * this.scale;
+            //如果viewbox中心坐标没有初始化，那么初始化中心坐标
+            if (this.viewBoxCX == undefined && this.viewBoxCY == undefined) {
+                this.viewBoxCX = 0 + this.viewBoxWidth / 2;
+                this.viewBoxCY = 0 + this.viewBoxHeight / 2;
+            }
+            //根据中心坐标计算viewbox的左上角起始坐标
+            this.viewBoxX = this.viewBoxCX - this.viewBoxWidth / 2;
+            this.viewBoxY = this.viewBoxCY - this.viewBoxHeight / 2;
+            //防止viewbox的边界超过舞台边界
+            if(this.viewBoxX<0){
+                //防止超过右边界
+                this.viewBoxX =0;
+            }
+            if(this.viewBoxY<0){
+                //防止超过下边界
+                this.viewBoxY = 0;
+            }
+            if(this.viewBoxX+this.viewBoxWidth>this.stageWidth){
+                //防止超过左边界
+                this.viewBoxX = this.stageWidth-this.viewBoxWidth;
+            }
+            if(this.viewBoxY+this.viewBoxHeight>this.stageHeight){
+                //防止超过左边界
+                this.viewBoxY = this.stageHeight-this.viewBoxHeight;
+            }
+            this.viewBox = [
+                this.viewBoxX,
+                this.viewBoxY,
+                this.viewBoxWidth,
+                this.viewBoxHeight
+            ];
+            this.el.setAttribute('viewBox', this.viewBox.join(' '));
+            this.$el.height(this.height);
         },
-        /**
-         * 绑定鼠标滚轮事件函数
-         */
-        bindMouseWheel: function () {
-            //暂时取消缩放函数
-            // this.el.onmousewheel = function (e) {
-            //     if (e.wheelDelta < 0) {
-            //         //缩小
-            //         stage.scale--;
-            //         if (stage.scale < 0) {
-            //             stage.scale = 0;
-            //         }
-            //     } else {
-            //         //放大
-            //         stage.scale++;
-            //         if (stage.scale >= stage.scaleArr.length) {
-            //             stage.scale = stage.scaleArr.length - 1;
-            //         }
-            //     }
-            //     console.log("当前缩放比例", stage.scaleArr[stage.scale])
-            //     // const xc = (stage.viewbox[0] + stage.viewbox[2]) / 2
-            //     // const yc = (stage.viewbox[1] + stage.viewbox[3]) / 2
-            //     $("#scal-value-input").val(stage.scaleArr[stage.scale])
-            //     stage.resetViewBox();
-            //     return false;
-            //     // e.preventDefault();
-            // };
-            // this.$el.bind("mousedown", startViewBoxMove = function (e) {
-            //     $(this).bind("mouseup", cancelMoveViewBox = function (e) {
-            //         //取消绑定的所有函数
-            //         // $(this).unbind("mousedown", moveViewBox);
-            //         $(this).unbind("mouseup", cancelMoveViewBox);
-            //         $(this).unbind("mousemove", moveViewBox);
-            //     })
-            //     var pos = {
-            //         x: stage.mousePos.x,
-            //         y: stage.mousePos.y
-            //     }
-            //     $(this).bind('mousemove', {
-            //         pos: pos
-            //     }, moveViewBox = function (e2) {
-            //         const dx = (stage.mousePos.x - e2.data.pos.x);
-            //         const dy = (stage.mousePos.y - e2.data.pos.y);
-            //         // const dy = 0;
-            //         console.log('x变动', dx, 'y变动', dy)
-            //         pos.x = stage.mousePos.x;
-            //         pos.y = stage.mousePos.y;
-            //         stage.viewBox = [stage.viewBox[0] - dx, stage.viewBox[1] - dy, stage.viewBox[2], stage.viewBox[3]];
-            //         stage.viewbox = stage.viewBox.concat();
-            //         stage.resetViewBox();
-            //     });
-            //     // console.log(this, e)
-            // }).bind("mousemove", {
-            //     stage: this
-            // }, mouseMove = function (e) {
-            //     const stage = e.data.stage;
-            //     //绑定鼠标移动事件
-            //     stage.mousePos = {
-            //         x: (e.clientX - stage.svgxc) * (1 / stage.scaleArr[stage.scale]) + stage.viewboxxc,
-            //         y: (e.clientY - stage.svgyc) * (1 / stage.scaleArr[stage.scale]) + stage.viewboxyc
-            //     };
-            //     // console.log(stage.mousePos)
-            // })
+        startMoveView: function () {
+            let workFlow = this;
+            const prePos = workFlow.getMousePos();//获取鼠标在svg坐标系内的坐标
+            const initViewBoxCX = this.viewBoxCX,initViewBoxCY = this.viewBoxCY;
+            this.$el.on("mousemove", viewMove = function (e) {
+                const curPos = workFlow.getMousePos();//获取鼠标在SVG内的当前的坐标
+                //计算得到鼠标的坐标变化值
+                let dx = curPos.x-prePos.x;
+                let dy = curPos.y-prePos.y;
+                console.log(dx,dy);
+                workFlow.viewBoxCX= initViewBoxCX-dx;
+                workFlow.viewBoxCY= initViewBoxCY-dy;
+
+                workFlow.refreshViewBox()
+            })
+        },
+        stopMoveView: function () {
+            this.$el.off("mousemove",viewMove);
         },
         /**
          * 重设舞台的Viewbox显示区域
          * 内部函数包括计算viewbox的中心
          */
         resetViewBox: function () {
+            let width = this.$el.width();//首先获取svg的宽度
+            const viewBoxWidth = width;
+            const viewBoxHeight = height;
+            this.viewBox = []
             const h = this.viewbox[3] * (1 / this.scaleArr[this.scale]);
             const w = this.viewbox[2] * (1 / this.scaleArr[this.scale]);
             this.viewBox = [
@@ -797,76 +1086,36 @@ $(document).ready(function () {
             console.log('svg的viewbox中心', this.viewboxxc, this.viewboxyc);
             this.el.setAttribute('viewBox', this.viewBox.join(' '));
         },
-        toolbarBind: function () {
-            //关系切换绑定相关单机事件
-            $("#linked-change-btn").bind('click', function () {
-                $(this).trigger('stateChange');
-            }).bind('stateChange', {
-                stage: this
-            }, function (event) {
-                if (this.checked) {
-                    event.data.stage.showAllLinked();
-                } else {
-                    event.data.stage.hideAllLinked();
-                }
-            });
-            $("#step-change-btn").bind('click', function () {
-                $(this).trigger('stateChange');
-            }).bind('stateChange', {
-                stage: this
-            }, function (event) {
-                if (this.checked) {
-                    event.data.stage.showAllSteps();
-                } else {
-                    event.data.stage.hideAllSteps();
-                }
-            });
-            $("#name-change-btn").bind('click', function () {
-                $(this).trigger('stateChange');
-            }).bind('stateChange', {
-                stage: this
-            }, function (event) {
-                if (this.checked) {
-                    event.data.stage.showAllNodesApp();
-                } else {
-                    event.data.stage.hideAllNodesApp();
-                }
-            })
-
-            $("#step-create-btn").bind('click', {object: this}, function (event) {
-                event.data.object.addStep();
-            })
-        },
         /**
          * 隐藏所有的关系
          */
         hideAllLinked: function () {
-            this.$el.find('line').hide();
+            $(this.options.edgesContainer).hide()
         },
         /**
          * 显示所有的关系
          */
         showAllLinked: function () {
-            this.$el.find('line').show();
+            $(this.options.edgesContainer).show();
         },
         /**
          * 隐藏所有的阶段
          */
         hideAllSteps: function () {
-            this.$el.find('#stepsContainer').hide();
+            $(this.options.stepsContainer).hide();
         },
         /**
          * 显示所有的阶段
          */
         showAllSteps: function () {
-            this.$el.find('#stepsContainer').show();
+            $(this.options.stepsContainer).show();
         },
         /**
          * 显示所有阶段的APP
          */
         showAllNodesApp: function () {
             this.workNodeMap.forEach(function (workNode) {
-                workNode.showAppText();
+                workNode.showAppName();
             })
         },
         /**
@@ -874,27 +1123,25 @@ $(document).ready(function () {
          */
         hideAllNodesApp: function () {
             this.workNodeMap.forEach(function (workNode) {
-                workNode.hideAppText();
+                workNode.showNodeName();
             })
         },
         /**
          * 添加阶段
          */
-        addStep: function () {
-            let step = {
-                stepIndex: this.options.steps[this.options.steps.length - 1].stepIndex + 1,
-                name: "阶段",
-                description: "描述",
-                projectID: PROJECT_ID
-            };
+        addStep: function (step) {
             //触发事件
             this.trigger('before.add-step', step)
             //执行函数
-            this.options.steps.push(step);
+            this.options.stepMap.forEach((steppp,stepIndex)=>{
+                if(steppp.pos>=step.pos&&steppp.stepIndex!=step.stepIndex){
+                    steppp.pos++;
+                }
+            })
+            this.options.stepMap.set(step.stepIndex,step);
             //触发事件
             this.trigger('after.add-step', step);
-            //
-            this.refreshGrid();
+            this.refreshView();
         },
 
         /**
@@ -902,30 +1149,27 @@ $(document).ready(function () {
          * @param stepIndex 待删除的阶段索引
          */
         removeStep: function (stepIndex) {
-            let node = this.options.nodes.find(function (node) {
-                node.stepIndex == stepIndex
+            let containNode = false;
+            this.options.nodeMap.forEach((node,nodeIndex)=>{
+                containNode=containNode||node.stepIndex==stepIndex;
             })
-            if (node) {
+
+            if (containNode) {
                 //如果当前阶段存在节点,需要删除当前所有的
                 alert("请删除当前所有的节点在执行操作");
                 return;
             }
-            let step = this.options.steps[stepIndex];
+            let step = this.options.stepMap.get(stepIndex);
             //触发事件
             this.trigger('before.remove-step', step)
             console.log("执行删除阶段函数")
             //执行函数
-            for (let i = 0; i < this.options.steps; i++) {
-                if (this.options.steps[i].stepIndex === stepIndex) {
-                    //执行删除
-                    this.options.steps[i].splice(i, 1);
-                }
-            }
+            this.options.stepMap.delete(stepIndex)
             //完成删除
             //触发事件
             this.trigger('after.remove-step', step)
             //重新绘制
-            this.refreshGrid();
+            this.refreshView();
         },
         /**
          * 查看阶段
@@ -961,16 +1205,18 @@ $(document).ready(function () {
                 projectID: PROJECT_ID
             }
             //触发事件
-            this.trigger('before.add-node', node)
+            this.trigger('before.add-node', node);
+            //添加当前节点
+            this.options.nodeMap.set(node.nodeIndex, node);
             //触发事件
-            this.trigger('after.add-node', node)
+            this.trigger('after.add-node', node);
+            this.refreshView();
         },
         /**
          * 删除节点
          * @param nodeIndex
          */
-        removeNode: function (nodeIndex) {
-            let node = this.options.nodes[nodeIndex];
+        removeNode: function (node) {
             if (node.lockState) {
                 alert("当前节点处于锁定阶段，无法删除");
                 return false;
@@ -979,9 +1225,14 @@ $(document).ready(function () {
                 alert("当前为已完成阶段，无法删除");
                 return false;
             }
+            if (node.nextNodeIndexList.length > 0) {
+                alert("当前节点包含后序节点，无法删除")
+                return false;
+            }
             this.trigger('before.remove-node', node);
-            this.options.nodeMap.delete(nodeIndex);
+            this.options.nodeMap.delete(node.nodeIndex);
             this.trigger('after.remove-node', node);
+            this.refreshView();
         },
         /**
          * 查看节点
@@ -989,7 +1240,10 @@ $(document).ready(function () {
          */
         viewNode: function (node) {
             this.trigger('before.view-node', node);
-
+            $(".work.node").removeAttr("active")
+            $(this.workNodeMap.get(node.nodeIndex).nodeGID).attr({
+                "active": "true"
+            });
             this.trigger('after.view-node', node);
         },
         /**
@@ -997,8 +1251,21 @@ $(document).ready(function () {
          * @param oldStepIndex 旧的阶段索引
          * @param newStepIndex 新的阶段索引
          */
-        updateStepIndexOfNode(oldStepIndex, newStepIndex) {
-
+        updateStepPos(step, newStepPos) {
+            if(newStepPos<0||newStepPos>=this.stepStartMap.size){
+                alert("无法移动")
+                return;
+            }
+            this.trigger('before.update-step-pos', step,newStepPos);
+            const d = step.pos-newStepPos;
+            this.options.stepMap.forEach((step,stepIndex)=>{
+                if(step.pos==newStepPos){
+                    step.pos+=d;
+                }
+            })
+            step.pos=newStepPos;
+            this.trigger('after.update-step-pos', step,newStepPos);
+            this.refreshView();
         }
 
     }
@@ -1038,18 +1305,20 @@ $(document).ready(function () {
      * @param {*} id
      * @param {*} stageDom
      */
-    var WorkStep = function (xy1, xy2, options, stage, stepBarHeight) {
+    var WorkStep = function (xy1, xy2, step, stage, stepBarHeight) {
         this.xy1 = xy1; //起始坐标
         this.xy2 = xy2; //结束坐标
-        this.options = options; //
+        this.step = step; //
         this.barHeight = stepBarHeight;
         this.stage = stage; //主舞台
+        this.newX = 0;
+        this.newY = 0;
         this.initStep();
     }
     WorkStep.prototype = {
         initStep: function () {
             //ID前缀
-            const stepIndexPre = "#step-" + this.options.stepIndex;
+            const stepIndexPre = "#step-" + this.step.stepIndex;
             //新建阶段边框
             this.border = stepIndexPre + "-border";
             svg("rect", $(this.stage.options.stepsContainer), this.border, {
@@ -1092,7 +1361,7 @@ $(document).ready(function () {
                 x: (this.xy1.x + this.xy2.x) / 2,
                 y: this.xy1.y + this.barHeight / 2,
                 "font-size": (this.barHeight / 2).toFixed(2) + "px",
-            })[0].textContent = this.options.name;
+            })[0].textContent = this.step.name;
 
         },
         drawToolBar: function () {
@@ -1107,35 +1376,33 @@ $(document).ready(function () {
             });
             $(this.iconG).html($(this.iconG).html());
         },
-        bindListener:function(){
-            $(this.toolbar).on("click",{workStep:this},function (event) {
+        bindListener: function () {
+            $(this.toolbar).on("click", {workStep: this}, function (event) {
                 $(event.data.workStep).trigger("onclick");
             })
         },
     }
     var CUR_STEP_NODE;
     var CUR_NODE;
-    var WorkNode = function (node, xy, width, height, stage) {
+    var WorkNode = function (node, xy, width, height, container) {
         this.node = node;
         this.x = xy.x; //x坐标
         this.y = xy.y; //y坐标
         this.id = node.nodeIndex;
         this.width = width;//宽
         this.height = height;//长
-        this.r = stage.options.nodeR; //宽
+        // this.r = stage.options.nodeR; //宽
         this.nextWorkNodeMap = new Map(); //下一个节点
         this.preWorkNodeMap = new Map(); //上一个节点
-        this.stage = stage;
+        this.container = container;
         this.outPathMap = new Map();//向外发散的边
         this.menu = {
             r: this.r * 2.5,
             menuArr: [{
                 name: "查看",
                 icon: '#icon-view',
-                func: function (workNode) {
-                    CUR_STEP_NODE = workNode;
-                    CUR_NODE = workNode.node;
-                    viewNode();
+                func: function (workFlow, workNode) {
+                    workFlow.viewNode(workNode.node);
                 }
             }, {
                 name: "移动",
@@ -1173,8 +1440,8 @@ $(document).ready(function () {
             }, {
                 name: "删除",
                 icon: '#icon-delete',
-                func: function (workNode) {
-                    workNode.stage.removeNode(workNode);
+                func: function (workFlow, workNode) {
+
                 }
             }, {
                 name: "链接",
@@ -1209,6 +1476,8 @@ $(document).ready(function () {
             }],
         };
         this.groupDom = "";
+        this.timeoutNameSet = new Set();
+
         this.typeOfCircle = {
             true: 'stepnode finished',
             false: 'stepnode unfinished',
@@ -1232,11 +1501,10 @@ $(document).ready(function () {
         },
         initDom: function () {
             this.nodeGID = "#" + this.node.nodeIndex;
-            const $nodeG = $(svg('g', $(this.stage.options.nodesContainer), this.nodeGID, {class: 'work-node'}));
-            const $trigger = svg('g', $nodeG, undefined, {
+            const $nodeG = $(svg('g', $(this.container), this.nodeGID, {
                 class: 'work node ' + (this.node.isFinished ? 'finished ' : "unFinished") + (this.node.lockState ? "locked" : ""),
-            })
-            const $rect = $(svg('rect', $trigger, undefined, {
+            }));
+            const $rect = $(svg('rect', $nodeG, undefined, {
                 rx: 10,
                 ry: 10,
                 width: this.width,
@@ -1246,18 +1514,29 @@ $(document).ready(function () {
                 'text-anchor': "middle",
                 'font-size': (this.height / 30).toFixed(2) + "em"
             }
-            const name = svg('text', $trigger, undefined, {
+            const name = svg('text', $nodeG, undefined, {
                 class: 'work node name',
             });
             name.textContent = this.node.name;
             $(name).attr(textAttr);
-            const app = svg('text', $trigger, undefined, {
+            const app = svg('text', $nodeG, undefined, {
                 class: 'work node appName',
             });
             app.textContent = this.node.appName;
             $(app).attr(textAttr).hide();//隐藏app
-
-
+        },
+        matrix: function (matrix) {
+            $(this.nodeGID).attr({
+                transform: "matrix(" + matrix.join(",") + ")"
+            });
+        },
+        translate: function (x, y) {
+            this.transform = "translate(" + x + "," + y + ")";
+            $(this.nodeGID).attr({
+                transform: this.transform
+            });
+            this.newX = this.x + x;
+            this.newY = this.y + y;
         },
         refreshNode: function () {
             $('rect', this.nodeGID).attr({
@@ -1273,20 +1552,63 @@ $(document).ready(function () {
             $('.name', this.nodeGID)[0].textContent = this.node.name;
             $('.appName', this.nodeGID)[0].textContent = this.node.appName;
         },
-        click:function(){
-            console.log("点击了节点",this)
-            $(this).trigger("onclick");
+        showAppName: function () {
+            $(this.nodeGID).find(".name").hide();//隐藏app
+            $(this.nodeGID).find(".appName").show();//隐藏app
+        },
+        showNodeName: function () {
+            $(this.nodeGID).find(".appName").hide();//隐藏app
+            $(this.nodeGID).find(".name").show();//隐藏app
+        },
+        /**
+         * 设置节点处于按压状态的函数
+         */
+        appendPressState: function () {
+            $(this.nodeGID).attr("pressed", true);
+            $(this.container).append( $(this.nodeGID));
+        },
+        removePressState:function(){
+            $(this.nodeGID).attr("pressed", false);
         },
         /**
          * 绑定相关事件
          */
         bindListener: function () {
-            $(this.nodeGID).on('click',{workNode:this},function(event){
-                console.log("点击了节点",event.data.workNode.node.nodeIndex)
-                $(event.data.workNode).trigger("onclick");
-            })
-        },
+            let workNode = this;
+            let isDown = false;
+            let isMove = false;
+            $(this.nodeGID).on({
+                "mousedown": function () {
+                    //设置按下时间为2秒
+                    isDown =true;
+                    nodeMove = setTimeout(function () {
+                        workNode.appendPressState();
+                        isMove=true;
+                        $(workNode).trigger("mousedown");
+                    }, 1000);
+                },
+                "mouseup": function () {
+                    if(isDown||isMove){
+                        clearTimeout(nodeMove);
+                        workNode.removePressState();
+                    }
+                    if(isMove){
+                        $(workNode).trigger("mouseup");
+                    }else if(isDown){
+                        $(workNode).trigger("onclick");
+                    }
+                    isDown=false;
+                    isMove=false;
+                },
+                mouseleave:function () {
+                    if(isDown&&!isMove){
+                        clearTimeout(nodeMove);
+                        workNode.removePressState();
+                    }
 
+                }
+            });
+        },
     };
 
 
@@ -1298,18 +1620,18 @@ $(document).ready(function () {
      * @param dArr 路径的绘制数组
      * @constructor
      */
-    var WorkPath = function (workNodeI, workNodeJ,containerID) {
+    var WorkPath = function (workNodeI, workNodeJ, containerID) {
         this.workNodeI = workNodeI;
         this.workNodeJ = workNodeJ;
-        this.nodeI= this.workNodeI.node.nodeIndex;
-        this.nodeJ=  this.workNodeJ.node.nodeIndex;
-        this.midPos ={};
-        this.$container =$(containerID)
+        this.nodeI = this.workNodeI.node.nodeIndex;
+        this.nodeJ = this.workNodeJ.node.nodeIndex;
+        this.midPos = {};
+        this.$container = $(containerID)
         this.initDom();
     }
     WorkPath.prototype = {
         initDom: function () {
-            const path = svg("path",  this.$container, undefined, {
+            const path = svg("path", this.$container, undefined, {
                 nodeI: this.nodeI,
                 nodeJ: this.nodeJ,
                 class: this.getPathClass(),
@@ -1324,29 +1646,29 @@ $(document).ready(function () {
                 d: this.getPathClass()
             })
         },
-        bindListener:function () {
-            $('[nodei="' + this.nodeI + '"][nodej="' + this.nodeJ + '"]').on("click",{workPath:this},function (event) {
+        bindListener: function () {
+            $('[nodei="' + this.nodeI + '"][nodej="' + this.nodeJ + '"]').on("click", {workPath: this}, function (event) {
                 console.log("点击了边")
                 $(event.data.workPath).trigger("onclick");
             })
         },
-        getPathClass:function(){
-            return  pathClass = "work path " + ( this.workNodeJ.node.isFinished ? "finished" : "unFinished");
+        getPathClass: function () {
+            return pathClass = "work path " + (this.workNodeJ.node.isFinished ? "finished" : "unFinished");
         },
-        getPathD:function(){
-            let x1 = this.workNodeI.x+ this.workNodeI.width/2,
-                y1=this.workNodeI.y+  this.workNodeI.height/2,
-                x2=this.workNodeJ.x+ this.workNodeJ.width/2,
-                y2=this.workNodeJ.y+  this.workNodeI.height/2;
-            this.midPos={
-                x:(x2+x1)/2,
-                y:(y2+y1)/2,
+        getPathD: function () {
+            let x1 = this.workNodeI.x + this.workNodeI.width / 2,
+                y1 = this.workNodeI.y + this.workNodeI.height / 2,
+                x2 = this.workNodeJ.x + this.workNodeJ.width / 2,
+                y2 = this.workNodeJ.y + this.workNodeI.height / 2;
+            this.midPos = {
+                x: (x2 + x1) / 2,
+                y: (y2 + y1) / 2,
             }
-            return [this.getSVGPath("M", x = x1, y =  y1),
-                this.getSVGPath("L", x = x2 , y =  y2)];//定义路径数组;
+            return [this.getSVGPath("M", x = x1, y = y1),
+                this.getSVGPath("L", x = x2, y = y2)];//定义路径数组;
         },
-        getSVGPath:function (op, x1, y1, x2, y2, x, y) {
-            return "" + op  + (x1 ? x1 : "") + " " + (y1 ? y1 : "") + " " + (x2 ? x2 : "") + " " + (y2 ? y2 : "") + " " + (x ? x : "") + " " + (y ? y : "");
+        getSVGPath: function (op, x1, y1, x2, y2, x, y) {
+            return "" + op + (x1 ? x1 : "") + " " + (y1 ? y1 : "") + " " + (x2 ? x2 : "") + " " + (y2 ? y2 : "") + " " + (x ? x : "") + " " + (y ? y : "");
         }
 
     }
@@ -1435,7 +1757,6 @@ $(document).ready(function () {
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.log("出现错误")
-
         }
 
     })

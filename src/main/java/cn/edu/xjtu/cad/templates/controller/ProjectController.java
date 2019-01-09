@@ -1,7 +1,7 @@
 package cn.edu.xjtu.cad.templates.controller;
 
 import cn.edu.xjtu.cad.templates.annotation.CurUser;
-import cn.edu.xjtu.cad.templates.annotation.CurUsername;
+import cn.edu.xjtu.cad.templates.annotation.CurUserID;
 import cn.edu.xjtu.cad.templates.annotation.SystemControllerLog;
 import cn.edu.xjtu.cad.templates.model.Result;
 import cn.edu.xjtu.cad.templates.model.log.LogType;
@@ -16,6 +16,7 @@ import cn.edu.xjtu.cad.templates.model.project.ProjectRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -38,26 +39,21 @@ public class ProjectController {
 
     /**
      * 获取当前用户所出的所有项目
-     *
      * @return 返回项目列表JSON格式
      */
     @RequestMapping(value = "/owned", method = RequestMethod.GET)
-    public List<Project> getOwnedProjectListByUsername(@CurUsername String curUsername) {
-        List<Project> projectList = projectMapper.getOwnedProjectListByUsernameWithRole(curUsername, ProjectRoleType.CREATOR);
-        return projectList;
+    public List<Project> getOwnedProjectList(@CurUser User user) {
+        return projectService.getOwnedProjectList(user);
     }
 
     @RequestMapping(value = "/joined", method = RequestMethod.GET)
-    public List<Project> getJoinedProjectListByUsername(@CurUsername String curUsername) {
-        List<Project> projectList = projectMapper.getOwnedProjectListByUsernameWithRole(curUsername, ProjectRoleType.APPLY);
-        projectList.addAll(projectMapper.getOwnedProjectListByUsernameWithRole(curUsername, ProjectRoleType.MEMBER));
-        return projectList;
+    public List<Project> getJoinedProjectList(@CurUser User user) {
+        return projectService.getJoinedProjectList(user);
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public List<Project> getAllProjectListByUsername(@CurUsername String curUsername) {
-        List<Project> projectList = projectMapper.getProjectListByUserName(curUsername);
-        return projectList;
+    public List<Project> getAllProjectList(@CurUser User user) {
+        return projectService.getAllProjectList(user);
     }
 
     /**
@@ -66,11 +62,14 @@ public class ProjectController {
      * @param projectID 项目ID
      * @return 返回该项目，JSON格式
      */
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public Project getProjectByProjectID(int projectID) {
-//        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");
+    @RequestMapping(value = "", method = RequestMethod.GET,params = "projectID")
+    public Project getProjectByProjectID(long projectID) {
         return projectService.getProjectByID(projectID);
+    }
 
+    @RequestMapping(value = "",method = RequestMethod.GET,params = "code")
+    public Project getProjectByCode(String code){
+        return projectService.getProjectByCode(code);
     }
 
     /**
@@ -80,35 +79,33 @@ public class ProjectController {
      * @return 返回是否创建成功，True or False
      */
     @SystemControllerLog(
-            content = "创建了项目,项目名${name},项目描述${description},项目的标签${tags}",
+            content = "创建了项目,项目名${projectName},项目描述${description},项目的标签${tags}",
             logType = LogType.PROJECT,
             methodType = MethodType.ADD)
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public boolean createProject(Project project,@CurUsername String curUsername) {
-        projectService.wrapProject(project, curUsername);
-        return true;
+    public long createProject(@CurUserID long userID,Project project) {
+        return projectService.createProject(project, userID);
     }
 
     /**
      * 修改项目名
      *
-     * @param name      新项目名
+     * @param projectName      新项目名
      * @param projectID 项目的ID
      * @return 返回是否修改成功， True or False
      */
     @SystemControllerLog(
-            content = "将项目名修改为${name}",
+            content = "将项目名修改为${projectName}",
             logType = LogType.PROJECT,
             methodType = MethodType.UPDATE)
-    @RequestMapping(value = "/name", method = RequestMethod.PUT)
-    public int updateProjectName(int projectID, String name) {
-//        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");
+    @RequestMapping(value = "/projectName", method = RequestMethod.PUT)
+    public int updateProjectName(long projectID, String projectName) {
         int res = 0;
         Project project = projectMapper.getProjectByID(projectID);
         if (project == null) {
             res = 1;
         } else {
-            project.setName(name);
+            project.setName(projectName);
             projectMapper.updateProjectInfo(project);
         }
         return 0;
@@ -125,8 +122,7 @@ public class ProjectController {
             logType = LogType.PROJECT,
             methodType = MethodType.UPDATE)
     @RequestMapping(value = "/description", method = RequestMethod.PUT)
-    public int updateProjectDes(int projectID, String description) {
-//        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");
+    public int updateProjectDes(long projectID, String description) {
         int res = 0;
         Project project = projectMapper.getProjectByID(projectID);
         if (project == null) {
@@ -147,8 +143,7 @@ public class ProjectController {
      */
     @SystemControllerLog(content = "将项目标签修改为${tags}", logType = LogType.PROJECT, methodType = MethodType.UPDATE)
     @RequestMapping(value = "/tags", method = RequestMethod.PUT)
-    public int updateProjectTags(int projectID, String tags) {
-//        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");
+    public int updateProjectTags(long projectID, String tags) {
         int res = 0;
         Project project = projectMapper.getProjectByID(projectID);
         if (project == null) {
@@ -162,14 +157,14 @@ public class ProjectController {
 
     @SystemControllerLog(content = "将项目删除", logType = LogType.PROJECT, methodType = MethodType.DELETE)
     @RequestMapping(value = "", method = RequestMethod.DELETE)
-    public boolean deleteProject(int projectID) {
+    public boolean deleteProject(long projectID) {
 //        String curUsername = ((Map<String, String>) req.getSession().getAttribute("userInfo")).get("username");
         projectMapper.deleteProject(projectID);
         return true;
     }
 
     @RequestMapping(value = "role/userList", method = RequestMethod.GET)
-    public List<ProjectRole> getProjectRoleByID(int projectID) {
+    public List<ProjectRole> getProjectRoleByID(long projectID) {
         return projectRoleMapper.getRoleOfProjectExcept(projectID, ProjectRoleType.CREATOR.toString());
     }
 
@@ -184,23 +179,24 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "role/member", method = RequestMethod.GET)
-    public ProjectRole getProjectRole(int projectID, String username) {
-        return projectRoleMapper.getMemberRoleOfProject(projectID, username);
+    public ProjectRole getProjectRole(long projectID, long userID) {
+        return projectRoleMapper.getMemberRoleOfProject(projectID, userID);
     }
 
     /**
      * 修改用户的项目内的权限
      * @param member 当前用户
      * @param projectID 项目ID
-     * @param username 待修改权限的用户名
+     * @param userID 待修改权限的用户名
      * @param projectRole 新的项目权限
      * @return
      */
-    @SystemControllerLog(content = "将用户${username}的权限修改为${projectRole}", logType = LogType.USER, methodType = MethodType.UPDATE)
+    @SystemControllerLog(content = "将用户${userID}的权限修改为${projectRole}",
+            logType = LogType.USER,
+            methodType = MethodType.UPDATE)
     @RequestMapping(value = "role", method = RequestMethod.PUT)
-    public Result updateProjectRole(@CurUser User member, int projectID, String username, ProjectRoleType projectRole) {
-        return projectService.updateRoleOfMemberInProject(member,projectID,username,projectRole);
-
+    public Result updateProjectRole(@CurUser User member, long projectID, long userID, ProjectRoleType projectRole) {
+        return projectService.updateRoleOfMemberInProject(member,projectID,userID,projectRole);
     }
 
 //    @SystemControllerLog(content = "将用户${username}的用户权限修改为${memberRole}",logType = LogType.USER,methodType = MethodType.UPDATE)
@@ -214,18 +210,18 @@ public class ProjectController {
 //        return true;
 //    }
 
-    @SystemControllerLog(content = "邀请用户${username}加入项目", logType = LogType.USER, methodType = MethodType.ADD)
+    @SystemControllerLog(content = "邀请用户${userID}加入项目", logType = LogType.USER, methodType = MethodType.ADD)
     @RequestMapping(value = "role", method = RequestMethod.POST)
-    public boolean addProjectRole(@CurUser User member,int projectID, String username) {
-        ProjectRole projectRole  = new ProjectRole(projectID,username,ProjectRoleType.MEMBER);
+    public boolean addProjectRole(@CurUser User curUser,long projectID,long  userID) {
+        ProjectRole projectRole  = new ProjectRole(projectID,userID,ProjectRoleType.MEMBER);
         projectRoleMapper.addProjectRole(projectRole);
         return true;
     }
 
-    @SystemControllerLog(content = "将用户${username}移除出项目", logType = LogType.USER, methodType = MethodType.ADD)
+    @SystemControllerLog(content = "将用户${userID}移除出项目", logType = LogType.USER, methodType = MethodType.ADD)
     @RequestMapping(value = "role", method = RequestMethod.DELETE)
-    public boolean deleteProjectRole(int projectID, String username) {
-        projectRoleMapper.deleteProjectRole(projectID, username);
+    public boolean deleteProjectRole(long projectID, long userID) {
+        projectRoleMapper.deleteProjectRole(projectID, userID);
         return true;
     }
 

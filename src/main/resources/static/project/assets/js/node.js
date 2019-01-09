@@ -239,8 +239,6 @@ var NODE_JS = {
             type: "POST",
             data: node,
             success: function (data) {
-                stage.option.nodes.push(node);
-                stage.resetView();
             }
         })
     },
@@ -249,7 +247,7 @@ var NODE_JS = {
             url: "/templates/api/project/node",
             type: "DELETE",
             data: {
-                id: PROJECT_ID,
+                projectID: PROJECT_ID,
                 nodeIndex: node.nodeIndex,
             },
             success: function (data) {
