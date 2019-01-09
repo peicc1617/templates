@@ -27,23 +27,23 @@
         SELECT * FROM project_role where projectID = #{projectID} AND userID = #{userID}
     </select>
 
-    <select id="getRoleOfProject">
+    <select id="getRoleOfProject" resultType="cn.edu.xjtu.cad.templates.model.project.ProjectRole">
         SELECT * FROM project_role where projectID = #{projectID}
     </select>
 
-    <select id="getRoleOfProjectExcept">
+    <select id="getRoleOfProjectExcept" resultType="cn.edu.xjtu.cad.templates.model.project.ProjectRole">
         SELECT * FROM project_role where projectID = #{projectID} AND projectRole not in (#{roles})
     </select>
 
-    <select id="getRoleOfProjectIn">
+    <select id="getRoleOfProjectIn" resultType="cn.edu.xjtu.cad.templates.model.project.ProjectRole">
         SELECT * FROM project_role where projectID = #{projectID} AND projectRole in (#{roles})
     </select>
 
-    <select id="getUserIDListInProjectByProjectRoleType">
+    <select id="getUserIDListInProjectByProjectRoleType" resultType="java.lang.Long">
         SELECT userID FROM project_role where projectID = #{projectID} AND projectRole = #{role}
     </select>
 
-    <select id="getRoleOfMemberInProject">
+    <select id="getRoleOfMemberInProject" resultType="cn.edu.xjtu.cad.templates.model.project.ProjectRole">
         SELECT * FROM project_role where projectID = #{id} AND userID = #{name}
     </select>
     <update id="updateProjectRole">

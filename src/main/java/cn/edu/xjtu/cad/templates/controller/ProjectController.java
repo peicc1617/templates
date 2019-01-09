@@ -79,7 +79,7 @@ public class ProjectController {
      * @return 返回是否创建成功，True or False
      */
     @SystemControllerLog(
-            content = "创建了项目,项目名${projectName},项目描述${description},项目的标签${tags}",
+            content = "创建了项目,项目名${projectName},项目描述${projectDesc},项目的标签${projectTags}",
             logType = LogType.PROJECT,
             methodType = MethodType.ADD)
     @RequestMapping(value = "", method = RequestMethod.POST)
@@ -105,7 +105,7 @@ public class ProjectController {
         if (project == null) {
             res = 1;
         } else {
-            project.setName(projectName);
+            project.setProjectName(projectName);
             projectMapper.updateProjectInfo(project);
         }
         return 0;
@@ -114,21 +114,21 @@ public class ProjectController {
     /**
      * 更新项目描述
      *
-     * @param description 项目描述
+     * @param projectDesc 项目描述
      * @param projectID   项目的ID
      * @return 返回是否修改成功，True or False
      */
-    @SystemControllerLog(content = "将项目描述修改为${description}",
+    @SystemControllerLog(content = "将项目描述修改为${projectDesc}",
             logType = LogType.PROJECT,
             methodType = MethodType.UPDATE)
     @RequestMapping(value = "/description", method = RequestMethod.PUT)
-    public int updateProjectDes(long projectID, String description) {
+    public int updateProjectDes(long projectID, String projectDesc) {
         int res = 0;
         Project project = projectMapper.getProjectByID(projectID);
         if (project == null) {
             res = 1;
         } else {
-            project.setDescription(description);
+            project.setProjectDesc(projectDesc);
             projectMapper.updateProjectInfo(project);
         }
         return 0;
@@ -137,19 +137,19 @@ public class ProjectController {
     /**
      * 修改项目的标签
      *
-     * @param tags      项目的新标签
+     * @param projectTags      项目的新标签
      * @param projectID 项目的ID
      * @return 返回是否修改成功， true or false
      */
-    @SystemControllerLog(content = "将项目标签修改为${tags}", logType = LogType.PROJECT, methodType = MethodType.UPDATE)
+    @SystemControllerLog(content = "将项目标签修改为${projectTags}", logType = LogType.PROJECT, methodType = MethodType.UPDATE)
     @RequestMapping(value = "/tags", method = RequestMethod.PUT)
-    public int updateProjectTags(long projectID, String tags) {
+    public int updateProjectTags(long projectID, String projectTags) {
         int res = 0;
         Project project = projectMapper.getProjectByID(projectID);
         if (project == null) {
             res = 1;
         } else {
-            project.setTags(tags);
+            project.setProjectTags(projectTags);
             projectMapper.updateProjectInfo(project);
         }
         return res;
@@ -199,16 +199,6 @@ public class ProjectController {
         return projectService.updateRoleOfMemberInProject(member,projectID,userID,projectRole);
     }
 
-//    @SystemControllerLog(content = "将用户${username}的用户权限修改为${memberRole}",logType = LogType.USER,methodType = MethodType.UPDATE)
-//    @RequestMapping(value = "role/member",method = RequestMethod.PUT)
-//    public boolean updateProjectMemberRole(int projectID,String username,int memberRole){
-//        ProjectRole role = projectRoleMapper.getRoleOfMemberInProject(projectID,username);
-//        if(role!=null){
-//            role.setMemberRole(memberRole);
-//            projectRoleMapper.updateProjectRole(role);
-//        }
-//        return true;
-//    }
 
     @SystemControllerLog(content = "邀请用户${userID}加入项目", logType = LogType.USER, methodType = MethodType.ADD)
     @RequestMapping(value = "role", method = RequestMethod.POST)

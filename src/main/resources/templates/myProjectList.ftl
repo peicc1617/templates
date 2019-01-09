@@ -150,26 +150,21 @@
                                                      <div class="media-body">
                                                          <div>
                                                              <h3 class="media-heading">
-                                                                 <a href="#" class="blue"><b>${project.name}</b></a>
+                                                                 <a href="#" class="blue"><b>${project.projectName}</b></a>
                                                              </h3>
                                                          </div>
 
                                                          <p>
-                                                          <#if project.description?? && project.description!="">
-                                                              ${project.description}
-                                                          <#else>
-                                                              该项目没有描述
+                                                          <#if project.projectDesc?? && project.projectDesc!="">
+                                                              ${project.projectDesc}
                                                           </#if>
                                                          </p>
                                                          <p>
-                                                              <#if project.tags?? && project.tags!="">
-                                                                 <#list project.tags?split(";") as s>
+                                                              <#if project.projectTags?? && project.projectTags!="">
+                                                                 <#list project.projectTags?split(",") as s>
                                                                <a href="#"><code>${s}</code></a>
                                                                  </#list>
-                                                              <#else>
-                                                                    该项目没有标签
                                                               </#if>
-
                                                          </p>
                                                          <div>
                                                              <p>
@@ -193,7 +188,7 @@
                                                                      <i class="ace-icon fa fa-external-link blue"></i>
                                                                  </a>
                                                              </div>
-                                                             <a class="search-btn-action btn btn-sm btn-block btn-info" href="${project.id}/view.html">管理项目</a>
+                                                             <a class="search-btn-action btn btn-sm btn-block btn-info" href="${project.projectID}/view.html">进入</a>
                                                          </div>
                                                      </div>
                                                  </div>
@@ -217,12 +212,12 @@
                                                             <div class="media-body">
                                                                 <div>
                                                                     <h4 class="media-heading">
-                                                                        <a href="#" class="blue">${project.name}</a>
+                                                                        <a href="#" class="blue">${project.projectName}</a>
                                                                     </h4>
                                                                 </div>
                                                                 <p>
-                                                                  <#if project.description?? && project.description!="">
-                                                                      ${project.description}
+                                                                  <#if project.projectDesc?? && project.projectDesc!="">
+                                                                      ${project.projectDesc}
                                                                   <#else>
                                                                       该项目没有描述
                                                                   </#if>
@@ -245,7 +240,7 @@
                                                                         </a>
                                                                     </div>
                                                                     <a class="search-btn-action btn btn-sm btn-block btn-info"
-                                                                       href="${project.id}/view.html">管理项目</a>
+                                                                       href="${project.projectID}/view.html">管理项目</a>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -267,12 +262,12 @@
                                                            <div class="media-body">
                                                                <div>
                                                                    <h4 class="media-heading">
-                                                                       <a href="#" class="blue">${project.name}</a>
+                                                                       <a href="#" class="blue">${project.projectName}</a>
                                                                    </h4>
                                                                </div>
                                                                <p>
-                                                                     <#if project.description?? && project.description!="">
-                                                                         ${project.description}
+                                                                     <#if project.projectDesc?? && project.projectDesc!="">
+                                                                         ${project.projectDesc}
                                                                      <#else>
                                                                           该项目没有描述
                                                                      </#if>
@@ -451,9 +446,23 @@
     });
 
     function searchProject() {
-        
+        const val = $("#project-input").val();
+        let data ={};
+        if (parseFloat(val).toString() == "NaN") {
+            data['invitationCode']=val;
+        } else {
+            data['projectID']=val;
+        }
+        $.ajax({
+            url:"/templates/api/project/",
+            type:"get",
+            data:data,
+            success:function (data) {
+                console.log(data);
+            }
+        })
     }
-    
+
     function joinProject() {
         
     }

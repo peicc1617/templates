@@ -26,7 +26,7 @@ public interface ProjectMapper {
 
     List<Project> getProjectListByProjectIDList(List<Long> projectIDList);
 
-    Project getProjectByCode(String code);
+    Project getProjectByCode(String invitationCode);
     /**
      * 新建项目
      * @param project 项目内容
@@ -39,7 +39,7 @@ public interface ProjectMapper {
      * @param project 项目信息
      * @return
      */
-    void updateProjectInfo( Project project);
+    void updateProjectInfo(Project project);
 
     /**
      * 根据ID删除项目

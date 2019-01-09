@@ -9,12 +9,12 @@ public class Project {
     /**
      * 项目id
      */
-    private long id;
+    private long projectID;
 
     /**
      * 项目名称
      */
-    private String name;
+    private String projectName;
 
     /**
      * 项目的创建时间
@@ -25,72 +25,83 @@ public class Project {
      */
     private Date editTime;
 
-
     /**
-     * 项目的查看次数
+     * 项目的基本描述
      */
-    private int times;
-
-    /**
-     * 模板的基本描述
-     */
-    private String description;
-    /**
-     * 融合度
-     */
-    private String amalgamation;
-
-    /**
-     * 集成度
-     */
-    private String integration;
+    private String projectDesc;
 
     /**
      * 项目标签
      */
-    private String tags;
+    private String projectTags;
 
     /**
      * 项目是否公开
      */
     private boolean open;
 
-    private boolean code;
+    /**
+     * 项目邀请码
+     */
+    private boolean invitationCode;
 
+    /**
+     * 创建者ID
+     */
     private long creatorID;
 
     private int num;
 
+    /**
+     * 参考模板ID
+     */
     private long referID;
 
     private Map<String,Step> stepMap = new LinkedHashMap<>();
     private Map<String,Node> nodeMap = new HashMap<>();
     private List<Edge> edges = new ArrayList<>();
     private List<ProjectRole> members = new ArrayList<>();
+
     public Project() {
+
     }
 
-
-    public Project(String name, String description, String tags) {
-        this.name = name;
-        this.description = description;
-        this.tags = tags;
+    public Project(String projectName, String projectDesc, String projectTags) {
+        this.projectName = projectName;
+        this.projectDesc = projectDesc;
+        this.projectTags = projectTags;
     }
 
-    public long getId() {
-        return id;
+    public long getProjectID() {
+        return projectID;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setProjectID(long projectID) {
+        this.projectID = projectID;
     }
 
-    public String getName() {
-        return name;
+    public String getProjectName() {
+        return projectName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getProjectDesc() {
+        return projectDesc;
+    }
+
+    public void setProjectDesc(String projectDesc) {
+        this.projectDesc = projectDesc;
+    }
+
+    public String getProjectTags() {
+        return projectTags;
+    }
+
+    public void setProjectTags(String projectTags) {
+        this.projectTags = projectTags;
     }
 
     public int getNum() {
@@ -102,47 +113,6 @@ public class Project {
     }
 
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getTimes() {
-        return times;
-    }
-
-    public void setTimes(int times) {
-        this.times = times;
-    }
-
-    public String getAmalgamation() {
-        return amalgamation;
-    }
-
-    public void setAmalgamation(String amalgamation) {
-        this.amalgamation = amalgamation;
-    }
-
-    public String getIntegration() {
-        return integration;
-    }
-
-    public void setIntegration(String integration) {
-        this.integration = integration;
-    }
-
-
-
-    public String getTags() {
-        return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
-    }
 
     public long getCreatorID() {
         return creatorID;
@@ -216,11 +186,11 @@ public class Project {
         this.open = open;
     }
 
-    public boolean isCode() {
-        return code;
+    public boolean isInvitationCode() {
+        return invitationCode;
     }
 
-    public void setCode(boolean code) {
-        this.code = code;
+    public void setInvitationCode(boolean invitationCode) {
+        this.invitationCode = invitationCode;
     }
 }

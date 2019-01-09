@@ -91,7 +91,7 @@
                                     <label class="col-sm-3 control-label no-padding-right"
                                            for="project-name">工程名</label>
                                     <div class="col-sm-9">
-                                        <input type="text" id="project-name" name="name" required placeholder="请填写工程名"
+                                        <input type="text" id="project-name" name="projectName" required placeholder="请填写工程名"
                                                class="col-xs-10 col-sm-5">
                                         <span class="help-inline col-xs-12 col-sm-7">
 												<label class="middle">
@@ -122,7 +122,7 @@
                                     <label class="col-sm-3 control-label no-padding-right"
                                            for="project-description">工程描述</label>
                                     <div class="col-sm-9">
-                                        <textarea name="description" id="project-description"
+                                        <textarea name="projectDesc" id="project-description"
                                                   class="autosize-transition form-control"
                                                   style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 52px;"></textarea>
                                     </div>
@@ -132,14 +132,14 @@
                                            for="project-tags">描述关键词</label>
                                     <div class="col-sm-9">
                                         <div class="inline">
-                                            <input type="text" name="tags" id="project-tags" value=""
+                                            <input type="text" name="projectTags" id="project-tags" value=""
                                                    placeholder="输入标签 ..."/>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label no-padding-right"
-                                           for="project-refer">参照模板</label>
+                                           for="project-refer">模板选择</label>
 
                                     <div class="col-sm-9">
                                         <input type="text" class="col-xs-10 col-sm-5" id="project-refer" value="无"
@@ -149,27 +149,27 @@
                                         <span class="help-inline col-xs-12 col-sm-7">
 												<label class="middle">
 													<input class="ace" type="checkbox" id="project-refer-check">
-													<span class="lbl">参考历史模板</span>
+													<span class="lbl">模板</span>
 												</label>
 											</span>
                                     </div>
                                 </div>
 
-                                <div class="clearfix form-actions">
-                                    <div class="col-md-offset-3 col-md-9">
-                                        <button class="btn btn-info" onclick="addProject()">
-                                            <i class="ace-icon fa fa-check bigger-110"></i>
-                                            新建
-                                        </button>
 
-                                        <button class="btn" type="reset">
-                                            <i class="ace-icon fa fa-undo bigger-110"></i>
-                                            重置
-                                        </button>
-                                    </div>
-                                </div>
                             </form>
+                            <div class="clearfix ">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <button class="btn btn-info" onclick="addProject()">
+                                        <i class="ace-icon fa fa-check bigger-110"></i>
+                                        新建
+                                    </button>
 
+                                    <button class="btn" type="reset">
+                                        <i class="ace-icon fa fa-undo bigger-110"></i>
+                                        重置
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
 
@@ -195,7 +195,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                     &times;
                 </button>
-                <h4 class="modal-title" id="refer-choose-modal-label">选择参照模板</h4>
+                <h4 class="modal-title" id="refer-choose-modal-label">选择模板</h4>
             </div>
             <div class="modal-body transparent">
                 <table id="refer-table"
@@ -313,26 +313,6 @@
         });
     })
 
-    function descriptionFormatter(value, row, index) {
-        return "<small>" + value + "</small>"
-    }
-
-    function recommendFormatter() {
-        return "<a class=\"blue\" href=\"#\"><i class=\"ace-icon fa fa-search-plus bigger-130\"></i></a>";
-    }
-
-    function caseFormatter() {
-        return "<a class=\"blue\" href=\"#\"><i class=\"ace-icon fa fa-search-plus bigger-130\"></i></a>";
-    }
-
-    function viewFormatter() {
-        return "<a class=\"blue\" href=\"#\"><i class=\"ace-icon fa fa-search-plus bigger-130\"></i></a>";
-    }
-
-    function detailFormatter(index, row) {
-        return "<p>" + row.description + "</p>";
-    }
-
     function selectRefer(e) {
         var row = $("#refer-table").bootstrapTable("getSelections")[0];
         if (row) {
@@ -343,6 +323,11 @@
     }
 
     function addProject() {
+        let name =$("#project-name").val();
+        if(name===undefined||name==null||name.trim()===""){
+            alert("请输出工程名");
+            return;
+        }
         const formData = new FormData(document.getElementById("project-form"));
         fetch('/templates/api/project', {
             method: "post",

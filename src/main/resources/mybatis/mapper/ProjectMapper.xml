@@ -3,16 +3,18 @@
 <!--命名空间应该是对应接口的包名+接口名 -->
 <mapper namespace="cn.edu.xjtu.cad.templates.dao.ProjectMapper">
     <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
-    <insert id="addProject" parameterType="cn.edu.xjtu.cad.templates.model.project.Project" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO project (projectName,description,tags) VALUES (
-        #{projectName},
-        #{description},
-        #{tags}
-        )
+    <insert id="addProject" parameterType="cn.edu.xjtu.cad.templates.model.project.Project" useGeneratedKeys="true"
+            keyProperty="projectID">
+        INSERT INTO project (projectName, projectDesc, projectTags) VALUES
+            (#{projectName},
+             #{projectDesc},
+             #{projectTags})
     </insert>
 
     <select id="getAllProjectListByUserID" resultType="cn.edu.xjtu.cad.templates.model.project.Project">
-        SELECT * FROM project,project_role WHERE project.projectID = project_role.projectID AND project_role.userID=#{userID}
+        SELECT *
+        FROM project, project_role
+        WHERE project.projectID = project_role.projectID AND project_role.userID = #{userID}
     </select>
 
     <select id="getProjectListByProjectIDList" resultType="cn.edu.xjtu.cad.templates.model.project.Project">
@@ -29,21 +31,28 @@
         </choose>
         )
     </select>
-    
+
     <select id="getProjectByID" resultType="cn.edu.xjtu.cad.templates.model.project.Project">
-        SELECT * from project  where projectID = #{projectID}
+        SELECT *
+        from project
+        where projectID = #{projectID}
     </select>
 
     <select id="getProjectByCode" resultType="cn.edu.xjtu.cad.templates.model.project.Project">
-        SELECT  * FROM project WHERE  invitationCode = #{invitationCode}
+        SELECT *
+        FROM project
+        WHERE invitationCode = #{invitationCode}
     </select>
 
     <update id="updateProjectInfo">
-        UPDATE project set projectName = #{projectName},description = #{description},tags = #{tags} where projectID = #{id}
+        UPDATE project
+        set name = #{name}, description = #{description}, tags = #{tags}
+        where projectID = #{id}
     </update>
 
     <delete id="deleteProject">
-        DELETE FROM project where projectID = #{projectID}
+        DELETE FROM project
+        where projectID = #{projectID}
     </delete>
 
 </mapper>

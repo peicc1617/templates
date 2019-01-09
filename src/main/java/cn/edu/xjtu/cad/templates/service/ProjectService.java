@@ -102,6 +102,8 @@ public class ProjectService {
     public Project getProjectByID(long projectID){
         //查询项目的基础信息
         Project project = projectMapper.getProjectByID(projectID);
+        if(project==null)
+            return null;
         //获取项目创建者
         project.setCreatorID(projectRoleMapper.getUserIDListInProjectByProjectRoleType(projectID,ProjectRoleType.CREATOR).get(0));
         //获取项目的阶段
@@ -132,7 +134,7 @@ public class ProjectService {
     @Transactional(propagation = Propagation.SUPPORTS)
     public long addProject(Project project) {
         projectMapper.addProject(project);
-        long projectID = project.getId();
+        long projectID = project.getProjectID();
         //新建项目权限
         ProjectRole projectRole = new ProjectRole(projectID,project.getCreatorID(),ProjectRoleType.CREATOR);
         projectRoleMapper.addProjectRole(projectRole);

@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.jws.WebParam;
 
 
 @Controller
@@ -47,6 +46,8 @@ public class ViewController {
         addProjectList(model, user);
         return "publicProjectList";
     }
+
+
     /**
      * 查看项目
      *

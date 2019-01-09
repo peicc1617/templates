@@ -61,9 +61,9 @@
                 <#if ownedProjectList ??>
                     <#list ownedProjectList as project>
                           <li class="">
-                              <a href="/templates/project/${project.id}/view.html">
+                              <a href="/templates/project/${project.projectID}/view.html">
                                   <i class="menu-icon fa fa-caret-right"></i>
-                                  ${project.name}
+                                  ${project.projectName}
                               </a>
                           </li>
                     </#list>
@@ -98,9 +98,9 @@
                 <#if joinedProjectList ??>
                      <#list joinedProjectList as project>
                           <li class="">
-                              <a href="/templates/project/${project.id}/view.html">
+                              <a href="/templates/project/${project.projectID}/view.html">
                                   <i class="menu-icon fa fa-caret-right"></i>
-                                  ${project.name}
+                                  ${project.projectName}
                               </a>
                           </li>
                      </#list>
@@ -134,15 +134,15 @@
                 <#if applyProjectList ??>
                      <#list applyProjectList as project>
                           <li class="">
-                              <a href="/templates/project/${project.id}/view.html">
+                              <a href="/templates/project/${project.projectID}/view.html">
                                   <i class="menu-icon fa fa-caret-right"></i>
-                                  ${project.name}
+                                  ${project.projectName}
                               </a>
                           </li>
                      </#list>
                 <#else >
                      <li class="">
-                         <a href="elements.html">
+                         <a href="#">
                              <i class="menu-icon fa fa-caret-right"></i>
                              无
                          </a>
