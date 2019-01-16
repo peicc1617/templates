@@ -1,29 +1,9 @@
 var stage;
 var SVG_DOM = document.getElementsByTagNameNS('http://www.w3.org/2000/svg', 'svg')[1];
 $(document).ready(function () {
-    //定义一些全局变量
-    //div的宽度
-    DIV_WIDTH = 800;
-    //div的高度
-    DIV_HEIGHT = 500;
-    //起始节点x坐标
-    BEGIN_X = 200;
-    //起始节点y左边
-    BEGIN_Y = DIV_HEIGHT / 2;
 
-    //圆形节点的直径
-    NODE_D = 50;
-    //节点之间的x间隔
-    NODE_WIDTH_SPACE = 0;
-    //节点之间的y间隔
-    NODE_HEIGHT_SPACE = NODE_D * 2;
-    //节点数组
-    NODE_ARRAY = [];
-    //网格
-    GRID = [];
     //当前选中的节点
     CUR_NODE = {};
-
     SVG_DOM.setAttribute('width', '100%');
 
     var WorkFlow = function (el, options) {
@@ -196,6 +176,12 @@ $(document).ready(function () {
         afterRefreshStep: function (step) {
 
         },
+        beforeViewNode:function(step){
+
+        },
+        afterViewNode:function(step){
+
+        },
         beforeViewStep: function (step) {
         },
         afterViewStep: function (step) {
@@ -256,8 +242,8 @@ $(document).ready(function () {
             /**
              * 查看节点触发的事件
              */
-            'before.view-node.work.flow': 'beforeRefreshNode',
-            'after.view-node.work.flow': 'afterRefreshNode',
+            'before.view-node.work.flow': 'beforeViewNode',
+            'after.view-node.work.flow': 'afterViewNode',
             /**
              * 添加新的阶段触发的事件
              */
@@ -1001,11 +987,14 @@ $(document).ready(function () {
             this.height = this.stageHeight<window.innerWidth?this.stageHeight:window.innerHeight;
             //计算舞台宽度
             this.stageWidth = (this.columnN + 1) * this.nodeHorDis;
-            //获取控件宽度
+            //获取svg控件宽度
             this.width = this.$el.width();
+            let startX = 0;
             if(this.stageWidth<this.width){
-                //如果舞台宽度小于控件宽度，那么调整舞台宽度
-                this.stageWidth=this.width;
+                //如果舞台宽度小于控件宽度，那么调整舞台显示宽度为svg的宽度
+                //并且为了保证布局在中心部分显示，所以需要调整viewBox的x1,y1
+                startX=(this.stageWidth-this.width)/2
+                    this.stageWidth=this.width;
             }
             //计算viewBox的高度
             this.viewBoxHeight = this.height * this.scale;
@@ -1013,29 +1002,29 @@ $(document).ready(function () {
             this.viewBoxWidth = this.width * this.scale;
             //如果viewbox中心坐标没有初始化，那么初始化中心坐标
             if (this.viewBoxCX == undefined && this.viewBoxCY == undefined) {
-                this.viewBoxCX = 0 + this.viewBoxWidth / 2;
+                this.viewBoxCX = startX + this.viewBoxWidth / 2;
                 this.viewBoxCY = 0 + this.viewBoxHeight / 2;
             }
             //根据中心坐标计算viewbox的左上角起始坐标
             this.viewBoxX = this.viewBoxCX - this.viewBoxWidth / 2;
             this.viewBoxY = this.viewBoxCY - this.viewBoxHeight / 2;
             //防止viewbox的边界超过舞台边界
-            if(this.viewBoxX<0){
-                //防止超过右边界
-                this.viewBoxX =0;
-            }
-            if(this.viewBoxY<0){
-                //防止超过下边界
-                this.viewBoxY = 0;
-            }
-            if(this.viewBoxX+this.viewBoxWidth>this.stageWidth){
-                //防止超过左边界
-                this.viewBoxX = this.stageWidth-this.viewBoxWidth;
-            }
-            if(this.viewBoxY+this.viewBoxHeight>this.stageHeight){
-                //防止超过左边界
-                this.viewBoxY = this.stageHeight-this.viewBoxHeight;
-            }
+            // if(this.viewBoxX<0){
+            //     //防止超过右边界
+            //     this.viewBoxX =0;
+            // }
+            // if(this.viewBoxY<0){
+            //     //防止超过下边界
+            //     this.viewBoxY = 0;
+            // }
+            // if(this.viewBoxX+this.viewBoxWidth>this.stageWidth){
+            //     //防止超过左边界
+            //     this.viewBoxX = this.stageWidth-this.viewBoxWidth;
+            // }
+            // if(this.viewBoxY+this.viewBoxHeight>this.stageHeight){
+            //     //防止超过左边界
+            //     this.viewBoxY = this.stageHeight-this.viewBoxHeight;
+            // }
             this.viewBox = [
                 this.viewBoxX,
                 this.viewBoxY,
@@ -1046,6 +1035,7 @@ $(document).ready(function () {
             this.$el.height(this.height);
         },
         startMoveView: function () {
+            console.log("开始")
             let workFlow = this;
             const prePos = workFlow.getMousePos();//获取鼠标在svg坐标系内的坐标
             const initViewBoxCX = this.viewBoxCX,initViewBoxCY = this.viewBoxCY;
@@ -1057,7 +1047,6 @@ $(document).ready(function () {
                 console.log(dx,dy);
                 workFlow.viewBoxCX= initViewBoxCX-dx;
                 workFlow.viewBoxCY= initViewBoxCY-dy;
-
                 workFlow.refreshViewBox()
             })
         },
@@ -1180,6 +1169,7 @@ $(document).ready(function () {
             this.trigger('before.view-step', step)
             //执行函数
             console.log("当前查看的阶段", step)
+            $(".work.node").removeAttr("active")
             //触发事件
             this.trigger('after.view-step', step)
         },
@@ -1225,7 +1215,7 @@ $(document).ready(function () {
                 alert("当前为已完成阶段，无法删除");
                 return false;
             }
-            if (node.nextNodeIndexList.length > 0) {
+            if (node.nextNodeIndexList!=null && node.nextNodeIndexList.length > 0) {
                 alert("当前节点包含后序节点，无法删除")
                 return false;
             }
@@ -1745,20 +1735,25 @@ $(document).ready(function () {
         },
         async: false,
         success: function (data) {
-            workOptions['nodeMap'] = new Map();
-            workOptions['stepMap'] = new Map();
-            for (let nodeIndex in data.nodeMap) {
-                workOptions['nodeMap'].set(nodeIndex, data.nodeMap[nodeIndex]);
+            switch (data.code) {
+                case 1:
+                    data=data.data;
+                    workOptions['nodeMap'] = new Map();
+                    workOptions['stepMap'] = new Map();
+                    for (let nodeIndex in data.nodeMap) {
+                        workOptions['nodeMap'].set(nodeIndex, data.nodeMap[nodeIndex]);
+                    }
+                    for (let stepIndex in data.stepMap) {
+                        workOptions['stepMap'].set(stepIndex, data.stepMap[stepIndex]);
+                    }
+                    $(SVG_DOM).workFlow(workOptions);
+                    break;
             }
-            for (let stepIndex in data.stepMap) {
-                workOptions['stepMap'].set(stepIndex, data.stepMap[stepIndex]);
-            }
-            $(SVG_DOM).workFlow(workOptions);
+
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.log("出现错误")
         }
-
     })
 })
 

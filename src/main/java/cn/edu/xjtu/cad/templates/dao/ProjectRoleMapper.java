@@ -29,5 +29,4 @@ public interface ProjectRoleMapper {
 
     long updateProjectRole(@Param("projectID")long projectID,@Param("userID") long userID,@Param("newRole") ProjectRoleType role);
 
-
 }

@@ -44,15 +44,18 @@
         WHERE invitationCode = #{invitationCode}
     </select>
 
+    <select id="getOpenProject" resultType="cn.edu.xjtu.cad.templates.model.project.Project">
+        SELECT * FROM project WHERE openState = 1;
+    </select>
+
     <update id="updateProjectInfo">
         UPDATE project
-        set name = #{name}, description = #{description}, tags = #{tags}
-        where projectID = #{id}
+        set projectName = #{projectName}, projectDesc = #{projectDesc}, projectTags = #{projectTags}
+        where projectID = #{projectID}
     </update>
 
     <delete id="deleteProject">
-        DELETE FROM project
-        where projectID = #{projectID}
+        DELETE FROM project WHERE projectID = #{projectID}
     </delete>
 
 </mapper>

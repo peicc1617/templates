@@ -38,7 +38,7 @@ public class Project {
     /**
      * 项目是否公开
      */
-    private boolean open;
+    private boolean openState;
 
     /**
      * 项目邀请码
@@ -178,12 +178,12 @@ public class Project {
         this.createTime = createTime;
     }
 
-    public boolean isOpen() {
-        return open;
+    public boolean isOpenState() {
+        return openState;
     }
 
-    public void setOpen(boolean open) {
-        this.open = open;
+    public void setOpenState(boolean openState) {
+        this.openState = openState;
     }
 
     public boolean isInvitationCode() {

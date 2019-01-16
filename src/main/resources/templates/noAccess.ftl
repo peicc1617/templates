@@ -76,108 +76,69 @@
             </div>
 
             <div class="page-content">
-                <div class="page-header">
-                    <h1>
-                        新建创新方法模板
-                    </h1>
-                </div>
                 <div class="row">
                     <div class="col-xs-12">
-                        <div class="row">
+                        <!-- PAGE CONTENT BEGINS -->
 
-                            <form id="project-form" class="form-horizontal" role="form">
-                                <input type="text" name="_method" value="POST" style="display:none">
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label no-padding-right"
-                                           for="project-name">工程名</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" id="project-name" name="projectName" required placeholder="请填写工程名"
-                                               class="col-xs-10 col-sm-5">
-                                        <span class="help-inline col-xs-12 col-sm-7">
-												<label class="middle">
-													<input class="ace" type="checkbox" name="open" value="true">
-													<span class="lbl">公开项目</span>
-												</label>
-                                                <span class="help-button" data-rel="popover" data-trigger="hover"
-                                                      data-placement="right" data-content="公开项目所有人都能查看，可以在项目信息中更改项目公开状态"
-                                                      title="">?</span>
+                        <div class="error-container">
+                            <div class="well">
+                                <h1 class="grey lighter smaller">
+											<span class="blue bigger-125">
+												<i class="ace-icon fa fa-sitemap"></i>
+												404
 											</span>
+                                    无权访问
+                                </h1>
 
-                                    </div>
+                                <hr>
+                                <h3 class="lighter smaller">您无权访问该项目</h3>
 
+                                <div>
+                                    <#--<form class="form-search">-->
+												<#--<span class="input-icon align-middle">-->
+													<#--<i class="ace-icon fa fa-search"></i>-->
+													<#--<input type="text" class="search-query" placeholder="Give it a search...">-->
+												<#--</span>-->
+                                        <#--<button class="btn btn-sm" type="button">Go!</button>-->
+                                    <#--</form>-->
+
+                                    <div class="space"></div>
+                                    <h4 class="smaller">可以通过以下方式解决</h4>
+
+                                    <ul class="list-unstyled spaced inline bigger-110 margin-15">
+                                        <li>
+                                            <i class="ace-icon fa fa-hand-o-right blue"></i>
+                                            访问其他项目
+                                        </li>
+
+                                        <li>
+                                            <i class="ace-icon fa fa-hand-o-right blue"></i>
+                                            申请加入项目
+                                        </li>
+
+                                    </ul>
                                 </div>
 
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label no-padding-right"
-                                           for="project-creator">创建者 </label>
+                                <hr>
+                                <div class="space"></div>
 
-                                    <div class="col-sm-9">
-                                        <input readonly="" type="text" class="col-xs-10 col-sm-5"
-                                               value=" ${Session["userInfo"]["nickName"]}">
-                                    </div>
+                                <div class="center">
+                                    <a href="javascript:history.back()" class="btn btn-grey">
+                                        <i class="ace-icon fa fa-arrow-left"></i>
+                                        Go Back
+                                    </a>
 
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label no-padding-right"
-                                           for="project-description">工程描述</label>
-                                    <div class="col-sm-9">
-                                        <textarea name="projectDesc" id="project-description"
-                                                  class="autosize-transition form-control"
-                                                  style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 52px;"></textarea>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label no-padding-right"
-                                           for="project-tags">描述关键词</label>
-                                    <div class="col-sm-9">
-                                        <div class="inline">
-                                            <input type="text" name="projectTags" id="project-tags" value=""
-                                                   placeholder="输入标签 ..."/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label no-padding-right"
-                                           for="project-refer">模板选择</label>
-
-                                    <div class="col-sm-9">
-                                        <input type="text" class="col-xs-10 col-sm-5" id="project-refer" value="无"
-                                               disabled="disabled" readonly="true">
-                                        <input type="text" class="col-xs-10 col-sm-5" hidden id="project-refer-hidden"
-                                               name="referID" value="0">
-                                        <span class="help-inline col-xs-12 col-sm-7">
-												<label class="middle">
-													<input class="ace" type="checkbox" id="project-refer-check">
-													<span class="lbl">模板</span>
-												</label>
-											</span>
-                                    </div>
-                                </div>
-
-
-                            </form>
-                            <div class="clearfix ">
-                                <div class="col-md-offset-3 col-md-9">
-                                    <button class="btn btn-info" onclick="addProject()">
-                                        <i class="ace-icon fa fa-check bigger-110"></i>
-                                        新建
-                                    </button>
-
-                                    <button class="btn" type="reset">
-                                        <i class="ace-icon fa fa-undo bigger-110"></i>
-                                        重置
-                                    </button>
+                                    <a href="#" class="btn btn-primary">
+                                        <i class="ace-icon fa fa-tachometer"></i>
+                                        Dashboard
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
 
-                        </div>
-                    </div>
-
+                        <!-- PAGE CONTENT ENDS -->
+                    </div><!-- /.col -->
                 </div>
-
             </div><!-- /.page-content -->
         </div>
     </div><!-- /.main-content -->

@@ -1,5 +1,4 @@
 $(document).ready(function(){
-
     $("#cur-step-name-href").editable({
         type: 'text',
         title: '修改阶段名称',
@@ -10,7 +9,6 @@ $(document).ready(function(){
                 return '不能为空';
             }
         },
-
     })
 
     $("#cur-step-description-href").editable({
@@ -25,7 +23,6 @@ $(document).ready(function(){
         },
     })
 });
-
 const STEP_JS = {
     /**
      * 查看阶段
@@ -33,18 +30,15 @@ const STEP_JS = {
      */
     afterViewStep:function (step) {
         CUR_STEP = step;
-        $("#stepInfoRow").attr("style", "display:display");
-        $("#nodeInfoRow").attr("style", "display:none");
-
+        $("#stepInfoRow").show();
+        $("#nodeInfoRow").hide();
         //节点的名称
-        $("#cur-step-name-href").html(step.name);
+        $("#cur-step-name-href").editable("setValue",step.name);
         //节点的描述
-        $("#cur-step-description-href").html(step.description);
+        $("#cur-step-description-href").editable("setValue",step.description);
         $("#cur-step-summary").html(step.summary)
-
         let resultChart = echarts.init(document.getElementById('cur-step-result-static'));
         let activityChart = echarts.init(document.getElementById('cur-step-activity-static'));
-
         resultStaticFill(resultChart,0);
         activityStaticFill(activityChart,0);
     },
@@ -55,12 +49,11 @@ const STEP_JS = {
      */
     beforeAddStep:function (step) {
         $.ajax({
-            url:"/templates/api/project/step/",
+            url:"/step/"+step.stepIndex,
             method:"POST",
             data:step,
             async:false,
             success:function (data) {
-
                 return true;
             },
             error:function () {
@@ -92,12 +85,7 @@ const STEP_JS = {
 }
 
 function resultStaticFill($echart,stepIndex){
-    option = {
-        title: {
-            top: 30,
-            text: '当前阶段创新方法统计',
-            left: 'center',
-        },
+    let option =  {
         tooltip : {
             trigger: 'axis',
             axisPointer : {            // 坐标轴指示器，坐标轴触发有效
@@ -105,7 +93,7 @@ function resultStaticFill($echart,stepIndex){
             }
         },
         legend: {
-            data: ['未绑定', '已绑定','待修改','已接受',]
+            data: ['计划时间', '实际时间']
         },
         grid: {
             left: '3%',
@@ -114,62 +102,95 @@ function resultStaticFill($echart,stepIndex){
             containLabel: true
         },
         xAxis:  {
-            type: 'value'
+            type: 'time'
         },
         yAxis: {
             type: 'category',
-            data: ['方法1','方法2','方法3','方法4']
+            data: ['周一','周二','周三']
         },
         series: [
             {
-                name: '未绑定',
+                name: '计划开始时间',
                 type: 'bar',
-                stack: '总量',
+                stack: '1',
                 label: {
                     normal: {
                         show: true,
                         position: 'insideRight'
                     }
                 },
-                data: [320, 302, 301, 334]
+                itemStyle: {
+                    normal: {
+                        barBorderColor: 'rgba(0,0,0,0)',
+                        color: 'rgba(0,0,0,0)'
+                    },
+                    emphasis: {
+                        barBorderColor: 'rgba(0,0,0,0)',
+                        color: 'rgba(0,0,0,0)'
+                    }
+                },
+                data: [new Date("2018/11/2"),
+                    new Date("2018/11/15"),
+                    new Date("2018/11/15"),
+                ]
             },
             {
-                name: '已绑定',
+                name: '计划时间',
                 type: 'bar',
-                stack: '总量',
+                stack: '1',
                 label: {
                     normal: {
                         show: true,
                         position: 'insideRight'
                     }
                 },
-                data: [120, 132, 101, 134]
+                data: [ new Date("2018/11/12"),
+                    new Date("2018/11/20"),
+                    new Date("2018/11/25")]
             },
             {
-                name: '待修改',
+                name: '计划完成时间',
                 type: 'bar',
-                stack: '总量',
+                stack: '2',
                 label: {
                     normal: {
                         show: true,
                         position: 'insideRight'
                     }
                 },
-                data: [220, 182, 191, 234]
+                itemStyle: {
+                    normal: {
+                        barBorderColor: 'rgba(0,0,0,0)',
+                        color: 'rgba(0,0,0,0)'
+                    },
+                    emphasis: {
+                        barBorderColor: 'rgba(0,0,0,0)',
+                        color: 'rgba(0,0,0,0)'
+                    }
+                },
+                data: [ new Date("2018/11/2"),
+                    new Date("2018/11/15"),
+                    new Date("2018/11/15")]
             },
             {
-                name: '已接受',
+                name: '实际时间',
                 type: 'bar',
-                stack: '总量',
+                stack: '2',
                 label: {
                     normal: {
                         show: true,
                         position: 'insideRight'
                     }
                 },
-                data: [150, 212, 201, 154]
+                data: [ new Date("2018/11/6"),
+                    new Date("2018/11/20"),
+                    new Date("2018/11/27")]
             },
-
+            {
+                name:'平均温度',
+                type:'line',
+                data:[new Date(),new Date(),new Date()]
+            }
         ]
     };
     // 基于准备好的dom，初始化echarts实例
@@ -193,11 +214,11 @@ function getVirtulData(year) {
 
 function dateRange() {
     let date = new Date();
-    return [date.getFullYear()+'-'+ (date.getMonth()+12-6)%12+'-01',date.getFullYear()+'-'+date.getMonth()+'-'+date.getDay()]
+    return [moment().subtract(3,"M").format("YYYY-MM-DD"),moment().add(1,"M").format("YYYY-MM-DD")]
 }
 function activityStaticFill($echart,stepIndex){
     let data = getVirtulData(2018);
-    option = {
+    let option = {
         title: {
             top: 30,
             text: '当前阶段活跃度',
@@ -209,7 +230,7 @@ function activityStaticFill($echart,stepIndex){
         legend: {
             top: '30',
             left: '100',
-            data:['步数', 'Top 12'],
+            data:['活跃度', 'Top 12'],
             textStyle: {
                 color: '#fff'
             }
@@ -293,17 +314,12 @@ function updateStepHref(params) {
     if (params.value === 'abc') {
         return d.reject('error message'); //returning error via deferred object
     } else {
-        data = {
-            projectID:PROJECT_ID,
-            stepIndex:CUR_STEP.stepIndex
-        }
         data[params.name] = params.value
         //async saving data in js model
         $.ajax({
-            url: '/templates/api/project/step/'+params.name,
+            url: 'step/'+CUR_STEP.stepIndex+'/'+params.name,
             type: 'PUT',
             async: true,
-            data: data,
             success: function () {
                 CUR_STEP[params.name] = params.value;
                 stage.refreshGrid();

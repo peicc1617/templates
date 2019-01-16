@@ -35,20 +35,14 @@ public class CurUserResolver implements HandlerMethodArgumentResolver {
     @Override
     public User resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
         long userID= Integer.valueOf(((Map<String,String>)nativeWebRequest.getAttribute("userInfo", NativeWebRequest.SCOPE_SESSION)).get("id"));
-        User user = new User(userID);
         //获取用户的权限
-        List<ProjectRole> projectRoleList = userMapper.getProjectRole(userID);
-        Map<ProjectRoleType,Set<Long>> projectRoleTypeLongMap = new HashMap<>();
-        for (ProjectRoleType projectRoleType : ProjectRoleType.values()) {
-            projectRoleTypeLongMap.put(projectRoleType,new HashSet<>());
-        }
-        projectRoleList.forEach(projectRole -> projectRoleTypeLongMap.get(projectRole.getProjectRole()).add(projectRole.getProjectID()));
+        Map<Long,ProjectRoleType> projectRoleTypeMap = userMapper.getProjectRole(userID)
+                .stream()
+                .collect(Collectors.toMap(ProjectRole::getProjectID,ProjectRole::getProjectRole));
         List<NodeRole> nodeRoleList = userMapper.getNodeRole(userID);
-        Map<NodeRoleType,Set<String[]>> nodeRoleTypeSetMap = new HashMap<>();
-        for (NodeRoleType nodeRoleType : NodeRoleType.values()) {
-            nodeRoleTypeSetMap.put(nodeRoleType,new HashSet<>());
-        }
-        nodeRoleList.forEach(nodeRole -> nodeRoleTypeSetMap.get(nodeRole.getNodeRole()).add(new String[]{nodeRole.getProjectID()+"",nodeRole.getNodeIndex()}));
-        return new User(userID,projectRoleTypeLongMap,nodeRoleTypeSetMap);
+        Map<String,NodeRoleType> nodeRoleTypeMap = userMapper.getNodeRole(userID)
+                .stream()
+                .collect(Collectors.toMap(role->role.getProjectID()+";"+role.getNodeIndex(),NodeRole::getNodeRole));
+        return new User(userID,projectRoleTypeMap,nodeRoleTypeMap);
     }
 }

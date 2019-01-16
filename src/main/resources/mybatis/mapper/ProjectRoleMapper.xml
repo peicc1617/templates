@@ -47,7 +47,7 @@
         SELECT * FROM project_role where projectID = #{id} AND userID = #{name}
     </select>
     <update id="updateProjectRole">
-        UPDATE project_role SET projectRole = #{newRole}WHERE projectID = #{projectID} AND userID =#{userID}
+        UPDATE project_role SET projectRole = #{newRole} WHERE projectID = #{projectID} AND userID =#{userID}
     </update>
 
     <update id="updateNodeRole">

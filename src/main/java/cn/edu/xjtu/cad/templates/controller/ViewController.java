@@ -2,15 +2,23 @@ package cn.edu.xjtu.cad.templates.controller;
 
 import cn.edu.xjtu.cad.templates.annotation.CurUser;
 import cn.edu.xjtu.cad.templates.model.project.Project;
+import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
 import cn.edu.xjtu.cad.templates.model.project.User;
 import cn.edu.xjtu.cad.templates.service.ProjectService;
 import cn.edu.xjtu.cad.templates.service.ReferService;
+import cn.edu.xjtu.cad.templates.util.Color;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.jws.WebParam;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -32,7 +40,7 @@ public class ViewController {
     public String viewNewProject(Model model, @CurUser User user) {
         addProjectList(model, user);
         addReferList(model);
-        return "/newProject";
+        return "newProject";
     }
 
     @RequestMapping("/project/my.html")
@@ -60,8 +68,9 @@ public class ViewController {
     public String viewProject(Model model, @CurUser User user,
                               @PathVariable long projectID) {
         addProjectList(model, user);
-        addProject(model, projectID);
-        return "/project";
+        String ret = addProject(model,user,projectID);
+        if(ret!=null) return ret;
+        return "project";
     }
 
     /**
@@ -76,8 +85,9 @@ public class ViewController {
     public String viewProjectInfo(Model model, @CurUser User user,
                                   @PathVariable long projectID) {
         addProjectList(model, user);
-        addProject(model, projectID);
-        return "/project";
+        String ret = addProject(model,user,projectID);
+        if(ret!=null) return ret;
+        return "projectInfo";
     }
 
     /**
@@ -92,8 +102,9 @@ public class ViewController {
     public String viewProjectUser(Model model, @CurUser User user,
                                   @PathVariable long projectID) {
         addProjectList(model, user);
-        addProject(model, projectID);
-        return "/project";
+        String ret = addProject(model,user,projectID);
+        if(ret!=null) return ret;
+        return "projectUser";
     }
 
     /**
@@ -108,8 +119,9 @@ public class ViewController {
     public String viewProjectReport(Model model, @CurUser User user,
                                     @PathVariable long projectID) {
         addProjectList(model, user);
-        addProject(model, projectID);
-        return "/project";
+        String ret = addProject(model,user,projectID);
+        if(ret!=null) return ret;
+        return "projectReport";
     }
 
 
@@ -127,9 +139,20 @@ public class ViewController {
         model.addAttribute("applyProjectList", projectService.getApplyProjectList(user));
     }
 
-    private void addProject(Model model, long projectID) {
+    private String addProject(Model model,@CurUser User user,long projectID){
         Project project = projectService.getProjectByID(projectID);
-        model.addAttribute("project", project);
+        if(project==null)
+            return "noProject";
+        switch (user.getProjectRoleTypeMap().get(projectID)){
+            case SUPER_MANAGER:
+            case MEMBER:
+            case CREATOR:
+                model.addAttribute("project", project);
+                break;
+            default:
+                return "noAccess";
+        }
+        return null;
     }
 
     private void addReferList(Model model) {
@@ -139,4 +162,5 @@ public class ViewController {
     private void addUserInfo(@CurUser User user,Model model){
         model.addAttribute("curUser",user);
     }
+
 }

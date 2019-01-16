@@ -12,28 +12,11 @@
     <link rel="stylesheet" href="/webresources/ace-master/assets/font-awesome/4.5.0/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-rtl.min.css"/>
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-skins.min.css"/>
-    <link rel="stylesheet" href="css/step.css">
     <link rel="stylesheet" href="/webresources/bootstrap/bootstrap-table/bootstrap-table.css">
-
     <link rel="stylesheet" href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css">
-    <link rel="stylesheet" href="css/step.css">
-    <script src="js/projectID.js"></script>
-
     <script>
-        //首先获取ID
-        function getQueryString(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-            var r = window.location.search.substr(1).match(reg);
-            if (r != null) return unescape(r[2]);
-            return null;
-        }
+        PROJECT_ID = ${project.projectID};
 
-        PROJECT_ID = parseInt(getQueryString("projectID"));
-        //解析projectID，
-        if (isNaN(PROJECT_ID)) {
-            //如果解析出错误
-            alert("参数错误");//后续跳转
-        }
         var ANALYSIS_MSG = {
             projectID: PROJECT_ID,
             type: 0,
@@ -92,7 +75,7 @@
 </head>
 <body class="no-skin">
 <div id="navbar" class="navbar navbar-default          ace-save-state navbar-fixed-top">
-    <script src="assets/js/nav-bar.js"></script>
+    <script src="/webresources/common/js/nav-bar.js"></script>
 </div>
 <div class="main-container ace-save-state" id="main-container">
     <script type="text/javascript">
@@ -101,56 +84,7 @@
         } catch (e) {
         }
     </script>
-    <div id="sidebar" class="sidebar                  responsive     ace-save-state sidebar-fixed" data-sidebar="true"
-         data-sidebar-scroll="true"
-         data-sidebar-hover="true">
-        <script type="text/javascript">
-            try {
-                ace.settings.loadState('sidebar')
-            } catch (e) {
-            }
-        </script>
-
-        <div class="sidebar-shortcuts" id="sidebar-shortcuts">
-            <div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
-                <button class="btn btn-success">
-                    <i class="ace-icon fa fa-signal"></i>
-                </button>
-
-                <button class="btn btn-info">
-                    <i class="ace-icon fa fa-pencil"></i>
-                </button>
-
-                <button class="btn btn-warning">
-                    <i class="ace-icon fa fa-users"></i>
-                </button>
-
-                <button class="btn btn-danger">
-                    <i class="ace-icon fa fa-cogs"></i>
-                </button>
-            </div>
-
-            <div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
-                <span class="btn btn-success"></span>
-
-                <span class="btn btn-info"></span>
-
-                <span class="btn btn-warning"></span>
-
-                <span class="btn btn-danger"></span>
-            </div>
-        </div>
-        <!-- /.sidebar-shortcuts -->
-        <ul class="nav nav-list" id="sideList">
-        </ul>
-        <!-- /.nav-list -->
-
-        <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
-            <i id="sidebar-toggle-icon" class="ace-save-state ace-icon fa fa-angle-double-left"
-               data-icon1="ace-icon fa fa-angle-double-left"
-               data-icon2="ace-icon fa fa-angle-double-right"></i>
-        </div>
-    </div>
+    <#include "/common/navList.ftl">
     <div class="main-content">
 
         <div class="main-content-inner">
@@ -169,30 +103,7 @@
             </div>
 
             <div class="page-content">
-                <div class="page-header">
-                    <h1>
-                        柔性模板
-                        <small>
-                            <i class="ace-icon fa fa-angle-double-right"></i>
-                            <strong id="project_name"></strong>
-                            <div class="pull-right">
-                 <span class="btn btn-sm " onclick="javascript:location ='/templates/project/project.html?projectID='+PROJECT_ID">
-															进入项目
-															<i class="ace-icon fa fa-signal"></i>
-														</span>
-                                <span class="btn btn-primary btn-sm tooltip-primary" onclick="javascript:location ='/templates/project/info.html?projectID='+PROJECT_ID">
-															项目信息
-															<i class="ace-icon fa fa-lightbulb-o"></i>
-														</span>
-                                <span class="btn btn-purple btn-sm tooltip-purple" onclick="javascript:location ='/templates/project/report.html?projectID='+PROJECT_ID">
-															导出报告
-															<i class="ace-icon fa fa-print"></i>
-														</span>
-                            </div>
-                        </small>
-                    </h1>
-                </div>
-                <!-- /.ace-settings-box -->
+                <#include "/common/projectTitle.ftl">
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="row">
@@ -279,40 +190,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="pricing-span">
-                                        <div class="widget-box pricing-box-small widget-color-blue">
-                                            <div class="widget-header">
-                                                <h5 class="widget-title bigger lighter">管理员</h5>
-                                            </div>
-
-                                            <div class="widget-body">
-                                                <div class="widget-main no-padding">
-                                                    <ul class="list-unstyled list-striped pricing-table">
-                                                        <li><i class="ace-icon fa fa-times red"></i></li>
-                                                        <li><i class="ace-icon fa fa-check green"></i> 可配置
-                                                        </li>
-
-                                                        <li><i class="ace-icon fa fa-check green"></i> 可配置
-                                                        </li>
-                                                        <li><i class="ace-icon fa fa-check green"></i> 可配置
-                                                        </li>
-                                                        <li><i class="ace-icon fa fa-check green"></i></li>
-
-                                                        <li>
-                                                            <i class="ace-icon fa fa-check green"></i>
-                                                        </li>
-                                                    </ul>
-
-                                                </div>
-
-                                                <div>
-                                                    <a href="#" class="btn btn-block btn-sm btn-primary">
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
 
                                     <div class="pricing-span">
                                         <div class="widget-box pricing-box-small widget-color-green">
@@ -323,7 +200,7 @@
                                             <div class="widget-body">
                                                 <div class="widget-main no-padding">
                                                     <ul class="list-unstyled list-striped pricing-table">
-                                                        <li><i class="ace-icon fa fa-check green"></i></li>
+                                                        <li><i class="ace-icon fa fa-times red"></i></li>
                                                         <li><i class="ace-icon fa fa-check green"></i></li>
                                                         <li><i class="ace-icon fa fa-check green"></i></li>
                                                         <li><i class="ace-icon fa fa-check green"></i></li>
@@ -393,13 +270,13 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 <table id="user-list-table" data-height="400"
-                                       data-url="/CAI-templates/user/list">
+                                       data-url="/templates/user/list">
                                     <thead>
                                     <tr>
-                                        <th data-field="username">用户名</th>
-                                        <th data-field="personName">用户昵称</th>
+                                        <th data-field="id">用户编号</th>
+                                        <th data-field="nickName">用户昵称</th>
                                         <th data-field="jobNumber">工号</th>
-                                        <th data-field="telphone">电话</th>
+                                        <th data-field="phoneNumber">电话</th>
                                         <th data-field="email">邮箱</th>
                                         <th data-field="op" data-formatter="opFormatter">操作</th>
                                     </tr>
@@ -428,12 +305,9 @@
         <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
         <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
         <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
-        <script src="assets/js/nav-list.js"></script>
-
         <script>
             let PROJECT_USERNAME = new Set();
             $(document).ready(function () {
-
                 $('#user-new-modal').on('show.bs.modal',
                     function() {
                         $("#user-list-table").bootstrapTable('refresh');
@@ -445,11 +319,15 @@
                         visible: false
                     }, {
                         field: 'userID',
-                        title: '用户名',
+                        title: '用户编号',
                         formatter:function (value) {
                             PROJECT_USERNAME.add(value);
                             return value;
                         }
+                    }, {
+                        field: 'nickName',
+                        title: '姓名',
+
                     }, {
                         field: 'projectRole',
                         title: '项目内角色',
@@ -459,7 +337,7 @@
                             source: function () {
                                 var result = [];
                                 $.ajax({
-                                    url: '/templates/api/project/role/map',
+                                    url: '/templates/api/project/projectRoleType.json',
                                     async: false,
                                     type: "get",
                                     success: function (data, status) {
@@ -478,21 +356,20 @@
                         formatter:function (value,row,index) {
                             $button = $("<button></button>").attr({
                                 'class': 'btn btn-xs btn-danger',
-                                'onclick':'removeFromProject("'+row.username+'")'
+                                'onclick':'removeFromProject("'+row.userID+'")'
                             });
                             return $button.append('<i class="ace-icon fa fa-trash-o bigger-120"></i>')[0].outerHTML;
                         }
                     }],
-                    url: "/templates/api/project/role/userList?projectID=" + PROJECT_ID,
+                    url: "/templates/api/project/${project.projectID}/role/userList",
                     method: "GET",
                     onEditableSave(field, row, oldValue, $el) {
-                        let url = "/templates/api/project/role";
+                        let url = "/templates/api/project/${project.projectID}/role";
                         if (field == "memberRole") {
                             url += "/member";
                         }
                         let data = {
-                            projectID: PROJECT_ID,
-                            username: row.username,
+                            userID: row.userID,
                         }
                         data[field] = row[field];
                         $.ajax({
@@ -514,51 +391,48 @@
             });
 
             function opFormatter(value, row, index) {
-                const username = row.username;
+                const userID = row.id;
                 $button = $("<a></a>").attr({
-                    username: row.username,
+                    user: row.id,
                 });
-                if (!PROJECT_USERNAME.has(username)) {
-
+                if (!PROJECT_USERNAME.has(userID)) {
                     $button.attr({
                         'class': 'blue',
-                        'onclick':'addToProject("'+row.username+'")'
+                        'onclick':'addToProject("'+row.id+'")'
                     }).append("<i class=\"ace-icon glyphicon glyphicon-plus bigger-120\"></i>")
                     $div = $("<div></div>").addClass("action-buttons").append($button);
                     return $div[0].outerHTML;
                 }
             }
 
-            function addToProject(username) {
+            function addToProject(userID) {
                 $.ajax({
-                    url: '/templates/api/project/role',
+                    url: '/templates/api/project/${project.projectID}/role',
                     'type': 'POST',
                     'data': {
-                        projectID: PROJECT_ID,
-                        username: username,
+                        userID: userID,
                         projectRole: 3,
                         memberRole: 0
                     },
                     success: function (data) {
                         alert("添加成功")
-                        PROJECT_USERNAME.add(username);
+                        PROJECT_USERNAME.add(userID);
                         $("#project-role-table").bootstrapTable('refresh')
                         $("#user-list-table").bootstrapTable("refresh");
                     }
                 })
             }
 
-            function removeFromProject (username) {
+            function removeFromProject (userID) {
                 $.ajax({
-                    url: '/templates/api/project/role',
+                    url: '/templates/api/project/${project.projectID}/role',
                     'type': 'DELETE',
                     'data': {
-                        projectID: PROJECT_ID,
-                        username: username,
+                        userID: userID,
                     },
                     success: function (data) {
                         alert("删除成功")
-                        PROJECT_USERNAME.delete(username);
+                        PROJECT_USERNAME.delete(userID);
                         $("#project-role-table").bootstrapTable('refresh')
                     }
                 })

@@ -69,11 +69,39 @@ public class Node {
      */
     private Date editTime;
 
+    /**
+     * 节点绑定的APP名称
+     */
     private String appName;
+
     private String appPath;
 
     private String appIcon;
+
+    /**
+     * 节点绑定的模板
+     */
     private int templateProjectID;
+
+    /**
+     * 计划开始时间
+     */
+    private Date planStartTime;
+
+    /**
+     * 实际开始时间
+     */
+    private Date startTime;
+
+    /**
+     * 计划完成时间
+     */
+    private Date planFinishedTime;
+
+    /**
+     * 实际完成时间
+     */
+    private Date finishedTime;
 
     private boolean lockState;
 
@@ -236,5 +264,37 @@ public class Node {
 
     public void setAppIcon(String appIcon) {
         this.appIcon = appIcon;
+    }
+
+    public Date getPlanStartTime() {
+        return planStartTime;
+    }
+
+    public void setPlanStartTime(Date planStartTime) {
+        this.planStartTime = planStartTime;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getPlanFinishedTime() {
+        return planFinishedTime;
+    }
+
+    public void setPlanFinishedTime(Date planFinishedTime) {
+        this.planFinishedTime = planFinishedTime;
+    }
+
+    public Date getFinishedTime() {
+        return finishedTime;
+    }
+
+    public void setFinishedTime(Date finishedTime) {
+        this.finishedTime = finishedTime;
     }
 }

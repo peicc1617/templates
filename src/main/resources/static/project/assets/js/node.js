@@ -130,7 +130,7 @@ function updateView() {
             // $("#btn-group-app-result").css('display','none');
             $("#app-result-btn").addClass("disabled")
             $("#app-name").text("").removeClass("label-success").attr("onclick");
-            $("#cur-node-app-img").attr("src","assets/img/app.png");
+            $("#cur-node-app-img").attr("src","/templates/project/assets/img/app.png");
 
 
         }

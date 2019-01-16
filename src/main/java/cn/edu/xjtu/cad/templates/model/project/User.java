@@ -1,6 +1,7 @@
 package cn.edu.xjtu.cad.templates.model.project;
 
 import cn.edu.xjtu.cad.templates.model.project.node.Node;
+import cn.edu.xjtu.cad.templates.model.project.node.NodeRole;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeRoleType;
 
 import java.util.Map;
@@ -17,8 +18,8 @@ public class User {
     private long userID;
 
 
-    private Map<ProjectRoleType,Set<Long>> projectRoleTypeSetMap;
-    private Map<NodeRoleType,Set<String[]>> nodeRoleTypeSetMap;
+    private Map<Long,ProjectRoleType> projectRoleTypeMap;
+    private Map<String, NodeRoleType> nodeRoleTypeMap;
 
     public User() {
     }
@@ -27,26 +28,26 @@ public class User {
         this.userID = userID;
     }
 
-    public User(long userID, Map<ProjectRoleType, Set<Long>> projectRoleTypeSetMap, Map<NodeRoleType, Set<String[]>> nodeRoleTypeSetMap) {
+    public User(long userID, Map<Long,ProjectRoleType>projectRoleTypeMap , Map<String, NodeRoleType> nodeRoleTypeMap) {
         this.userID = userID;
-        this.projectRoleTypeSetMap = projectRoleTypeSetMap;
-        this.nodeRoleTypeSetMap = nodeRoleTypeSetMap;
+        this.projectRoleTypeMap = projectRoleTypeMap;
+        this.nodeRoleTypeMap = nodeRoleTypeMap;
     }
 
-    public Map<ProjectRoleType, Set<Long>> getProjectRoleTypeSetMap() {
-        return projectRoleTypeSetMap;
+    public Map<Long, ProjectRoleType> getProjectRoleTypeMap() {
+        return projectRoleTypeMap;
     }
 
-    public void setProjectRoleTypeSetMap(Map<ProjectRoleType, Set<Long>> projectRoleTypeSetMap) {
-        this.projectRoleTypeSetMap = projectRoleTypeSetMap;
+    public void setProjectRoleTypeMap(Map<Long, ProjectRoleType> projectRoleTypeMap) {
+        this.projectRoleTypeMap = projectRoleTypeMap;
     }
 
-    public Map<NodeRoleType, Set<String[]>> getNodeRoleTypeSetMap() {
-        return nodeRoleTypeSetMap;
+    public Map<String, NodeRoleType> getNodeRoleTypeMap() {
+        return nodeRoleTypeMap;
     }
 
-    public void setNodeRoleTypeSetMap(Map<NodeRoleType, Set<String[]>> nodeRoleTypeSetMap) {
-        this.nodeRoleTypeSetMap = nodeRoleTypeSetMap;
+    public void setNodeRoleTypeMap(Map<String, NodeRoleType> nodeRoleTypeMap) {
+        this.nodeRoleTypeMap = nodeRoleTypeMap;
     }
 
     public long getUserID() {

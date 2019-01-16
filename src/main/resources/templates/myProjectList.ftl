@@ -330,20 +330,77 @@
                         <div class="input-group">
                             <input id="project-input" type="text" class="form-control search-query" placeholder="输入项目编号/邀请码">
                             <span class="input-group-btn">
-                            <button type="button" class="btn btn-purple btn-sm" id="search-project-id" onclick="searchProject()">
-                                <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
-                                查询
-                            </button>
-                        </span>
+                                <button type="button" class="btn btn-purple btn-sm" id="search-project-id" onclick="searchProject()">
+                                    <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                                    查询
+                                </button>
+                            </span>
                         </div>
                         <div class="hr"></div>
+                        <div id="project-show-alert" class="alert alert-warning" style="display: none">
+                            <button type="button" class="close" data-dismiss="alert">
+                                <i class="ace-icon fa fa-times"></i>
+                            </button>
+                            <strong>未查询到记录</strong>
+                            <span id="project-show-alert-msg"></span>
+                            <br>
+                        </div>
+                        <div id="project-show" class="profile-user-info profile-user-info-striped" style="display: none">
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">项目名称</div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable editable-click" id="project-name-show"></span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">项目描述 </div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable editable-click" id="project-desc-show">项目描述</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">项目标签 </div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable editable-click" id="project-tags-show"></span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 创建时间 </div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable editable-click" id="project-create-time-show"></span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">修改时间</div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable editable-click" id="project-edit-time-show"></span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">创建者</div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable editable-click" id="project-creator-show"></span>
+                                </div>
+                            </div>
+                        </div>
                 </div>
 
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary" id="join-project-btn" onclick="joinProject()">加入</button>
+                <button type="button" class="btn btn-primary" id="join-project-btn" onclick="joinProject()" style="display: none">加入</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -450,21 +507,49 @@
         let data ={};
         if (parseFloat(val).toString() == "NaN") {
             data['invitationCode']=val;
+            $("#join-project-btn").text("加入")
         } else {
             data['projectID']=val;
+            $("#join-project-btn").text("申请加入")
         }
         $.ajax({
-            url:"/templates/api/project/",
+            url:"/templates/api/project/info",
             type:"get",
             data:data,
             success:function (data) {
-                console.log(data);
+                switch (data.code) {
+                    case 1:
+                        showProject(data.data);
+                        break;
+                    case 70001:
+                        showWarning("项目未公开");
+                        break;
+                    case 50001:
+                        showWarning("项目不存在");
+                        break;
+                }
             }
         })
     }
-
+    
+    function showProject(project) {
+        $("#project-show").show()
+        $("#project-show-alert").hide();
+        $("#project-name-show").text(project['projectName']);
+        $("#project-desc-show").text(project['projectDesc']);
+        $("#project-tags-show").text(project['projectTags']);
+        $("#project-create-time-show").text(new Date(project['createTime']).toLocaleString());
+        $("#project-edit-time-show").text(new Date(project['editTime']).toLocaleString());
+        $("#project-creator-show").text(project['creator']);
+        $("#join-project-btn").show();
+    }
+    function showWarning(msg){
+        $("#join-project-btn").hide();
+        $("#project-show").hide()
+        $("#project-show-alert").show();
+        $("#project-show-alert-msg").text(msg);
+    }
     function joinProject() {
-        
     }
 </script>
 </body>
