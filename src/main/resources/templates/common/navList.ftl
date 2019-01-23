@@ -1,6 +1,10 @@
-<div id="sidebar" class="sidebar                  responsive                    ace-save-state" data-sidebar="true" data-sidebar-scroll="true" data-sidebar-hover="true">
+<div id="sidebar" class="sidebar                  responsive                    ace-save-state" data-sidebar="true"
+     data-sidebar-scroll="true" data-sidebar-hover="true">
     <script type="text/javascript">
-        try{ace.settings.loadState('sidebar')}catch(e){}
+        try {
+            ace.settings.loadState('sidebar')
+        } catch (e) {
+        }
     </script>
 
     <div class="sidebar-shortcuts" id="sidebar-shortcuts">
@@ -32,10 +36,14 @@
             <span class="btn btn-danger"></span>
         </div>
     </div><!-- /.sidebar-shortcuts -->
-
+    <#if project??>
+        <#assign curProjectID=project.projectID/>
+    <#else >
+        <#assign curProjectID=-1/>
+    </#if>
     <ul class="nav nav-list">
         <li>
-            <a href="/templates/project/my.html" >
+            <a href="/templates/project/my.html">
                 <i class="menu-icon fa fa-tachometer"></i>
                 <span class="menu-text">我的模板项目</span>
             </a>
@@ -49,7 +57,7 @@
                      <#if ownedProjectList ??>
                          ${ownedProjectList?size}
                      <#else>
-                            0
+                         0
                      </#if>
                  </span>
                 </span>
@@ -58,22 +66,22 @@
 
             <b class="arrow"></b>
             <ul class="submenu">
-                <#if ownedProjectList ??>
+                <#if ownedProjectList?? && ownedProjectList?size!=0>
                     <#list ownedProjectList as project>
-                          <li class="">
-                              <a href="/templates/project/${project.projectID}/view.html">
-                                  <i class="menu-icon fa fa-caret-right"></i>
-                                  ${project.projectName}
-                              </a>
-                          </li>
+                        <li class="<#if project.projectID==curProjectID>active</#if>">
+                            <a href="/templates/project/${project.projectID}/view.html">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                ${project.projectName}
+                            </a>
+                        </li>
                     </#list>
                 <#else >
-                     <li class="">
-                         <a href="elements.html">
-                             <i class="menu-icon fa fa-caret-right"></i>
-                             无
-                         </a>
-                     </li>
+                    <li class="">
+                        <a href="elements.html">
+                            <i class="menu-icon fa fa-caret-right"></i>
+                            无
+                        </a>
+                    </li>
                 </#if>
             </ul>
         </li>
@@ -86,7 +94,7 @@
                      <#if joinedProjectList ??>
                          ${joinedProjectList?size}
                      <#else>
-                            0
+                         0
                      </#if>
                  </span>
                 </span>
@@ -95,22 +103,22 @@
 
             <b class="arrow"></b>
             <ul class="submenu">
-                <#if joinedProjectList ??>
-                     <#list joinedProjectList as project>
-                          <li class="">
-                              <a href="/templates/project/${project.projectID}/view.html">
-                                  <i class="menu-icon fa fa-caret-right"></i>
-                                  ${project.projectName}
-                              </a>
-                          </li>
-                     </#list>
+                <#if joinedProjectList?? && joinedProjectList?size!=0>
+                    <#list joinedProjectList as project>
+                        <li class="<#if project.projectID==curProjectID>active</#if>">
+                        <a href="/templates/project/${project.projectID}/view.html">
+                            <i class="menu-icon fa fa-caret-right"></i>
+                            ${project.projectName}
+                        </a>
+                        </li>
+                    </#list>
                 <#else >
-                     <li class="">
-                         <a href="#">
-                             <i class="menu-icon fa fa-caret-right"></i>
-                             无
-                         </a>
-                     </li>
+                    <li class="">
+                        <a href="#">
+                            <i class="menu-icon fa fa-caret-right"></i>
+                            无
+                        </a>
+                    </li>
                 </#if>
             </ul>
         </li>
@@ -123,7 +131,7 @@
                      <#if applyProjectList ??>
                          ${applyProjectList?size}
                      <#else>
-                            0
+                         0
                      </#if>
                     </span>
                 </span>
@@ -131,28 +139,33 @@
             </a>
             <b class="arrow"></b>
             <ul class="submenu">
-                <#if applyProjectList ??>
-                     <#list applyProjectList as project>
-                          <li class="">
-                              <a href="/templates/project/${project.projectID}/view.html">
-                                  <i class="menu-icon fa fa-caret-right"></i>
-                                  ${project.projectName}
-                              </a>
-                          </li>
-                     </#list>
+                <#if applyProjectList ?? && applyProjectList?size!=0>
+                    <#list applyProjectList as project >
+                        <li class="<#if project.projectID==curProjectID>active</#if>">
+                            <a href="/templates/project/${project.projectID}/view.html">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                ${project.projectName}
+                            </a>
+                        </li>
+                    </#list>
                 <#else >
-                     <li class="">
-                         <a href="#">
-                             <i class="menu-icon fa fa-caret-right"></i>
-                             无
-                         </a>
-                     </li>
+                    <li class="">
+                        <a href="#">
+                            <i class="menu-icon fa fa-caret-right"></i>
+                            无
+                        </a>
+                    </li>
                 </#if>
             </ul>
         </li>
     </ul><!-- /.nav-list -->
 
     <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
-        <i id="sidebar-toggle-icon" class="ace-icon fa fa-angle-double-left ace-save-state" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
+        <i id="sidebar-toggle-icon" class="ace-icon fa fa-angle-double-left ace-save-state"
+           data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
     </div>
+    <script>
+
+    </script>
+
 </div>

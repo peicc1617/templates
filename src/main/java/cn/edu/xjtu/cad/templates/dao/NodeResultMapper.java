@@ -36,8 +36,8 @@ public interface NodeResultMapper {
 
     /**
      * 更新多个节点结果
-     * @param nodeResultList
+     * @param nodeResult
      * @return 成功更新的行数
      */
-    long updateNodeResultList(List<NodeResult> nodeResultList);
+    long updateNodeResult(NodeResult nodeResult);
 }

@@ -1,6 +1,9 @@
 package cn.edu.xjtu.cad.templates.model;
 
 
+import cn.edu.xjtu.cad.templates.aop.MyException;
+import com.sun.xml.internal.txw2.output.ResultFactory;
+
 public class Result<T> {
     private Integer code;
 
@@ -31,6 +34,11 @@ public class Result<T> {
     public static Result failure(ResultCode resultCode) {
         Result result = new Result();
         result.setResultCode(resultCode);
+        return result;
+    }
+
+    public static Result failure(MyException ex){
+        Result result = new Result(ex.getCode(),ex.getMsg());
         return result;
     }
 

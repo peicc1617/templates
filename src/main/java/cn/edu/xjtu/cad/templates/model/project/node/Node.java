@@ -1,8 +1,6 @@
 package cn.edu.xjtu.cad.templates.model.project.node;
 
 
-import cn.edu.xjtu.cad.templates.model.project.User;
-
 import java.util.*;
 
 /**
@@ -14,16 +12,16 @@ public class Node {
 
     }
 
-    public Node( String stepIndex, String name) {
+    public Node( String stepIndex, String nodeName) {
         this.stepIndex = stepIndex;
         this.nodeIndex = UUID.randomUUID().toString();
-        this.name = name;
+        this.nodeName = nodeName;
     }
 
-    public Node(long projectID, String stepIndex, String nodeIndex, String name) {
+    public Node(long projectID, String stepIndex, String nodeIndex, String nodeName) {
         this.projectID = projectID;
         this.nodeIndex = nodeIndex;
-        this.name = name;
+        this.nodeName = nodeName;
         this.stepIndex = stepIndex;
     }
 
@@ -38,7 +36,7 @@ public class Node {
     /**
      * 节点的名称
      */
-    private String name;
+    private String nodeName;
     /**
      * 当前节点的状态
      */
@@ -47,7 +45,7 @@ public class Node {
     /**
      * 节点描述
      */
-    private String description;
+    private String nodeDesc;
 
     /**
      * 阶段目标
@@ -141,13 +139,6 @@ public class Node {
         this.projectID = projectID;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public boolean isState() {
         return state;
@@ -157,13 +148,6 @@ public class Node {
         this.state = state;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public String getGoal() {
         return goal;
@@ -296,5 +280,21 @@ public class Node {
 
     public void setFinishedTime(Date finishedTime) {
         this.finishedTime = finishedTime;
+    }
+
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
+    }
+
+    public String getNodeDesc() {
+        return nodeDesc;
+    }
+
+    public void setNodeDesc(String nodeDesc) {
+        this.nodeDesc = nodeDesc;
     }
 }

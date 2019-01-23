@@ -3,8 +3,7 @@ package cn.edu.xjtu.cad.templates.service;
 import cn.edu.xjtu.cad.templates.annotation.CurUser;
 import cn.edu.xjtu.cad.templates.dao.NodeMapper;
 import cn.edu.xjtu.cad.templates.dao.NodeResultMapper;
-import cn.edu.xjtu.cad.templates.model.project.User;
-import cn.edu.xjtu.cad.templates.model.project.node.Node;
+import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,9 @@ public class NodeService {
     }
 
     public boolean updateNodeResultList(@CurUser User user,List<NodeResult> nodeResultList){
-        nodeResultMapper.updateNodeResultList(nodeResultList);
+        for (NodeResult nodeResult : nodeResultList) {
+            nodeResultMapper.updateNodeResult(nodeResult);
+        }
         return true;
     }
 

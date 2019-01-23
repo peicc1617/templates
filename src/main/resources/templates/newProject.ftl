@@ -95,7 +95,7 @@
                                                class="col-xs-10 col-sm-5">
                                         <span class="help-inline col-xs-12 col-sm-7">
 												<label class="middle">
-													<input class="ace" type="checkbox" name="open" value="true">
+													<input class="ace" type="checkbox" name="openState" value="true">
 													<span class="lbl">公开项目</span>
 												</label>
                                                 <span class="help-button" data-rel="popover" data-trigger="hover"

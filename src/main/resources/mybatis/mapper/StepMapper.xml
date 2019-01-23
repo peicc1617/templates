@@ -5,23 +5,23 @@
     <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
     <resultMap type="cn.edu.xjtu.cad.templates.model.project.Step" id="step"/>
     <insert id="addAllSteps" parameterType="java.util.List">
-        INSERT INTO project_step (projectID,stepIndex,name,description,summary,pos) VALUES
+        INSERT INTO project_step (projectID,stepIndex,stepName,stepDesc,summary,pos) VALUES
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.projectID},
             #{item.stepIndex},
-            #{item.name},
-            #{item.description},
+            #{item.stepName},
+            #{item.stepDesc},
             #{item.summary},
             #{item.pos})
         </foreach>
     </insert>
 
     <insert id="addStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">
-        INSERT INTO project_step  (projectID,stepIndex,name,description,summary,pos) VALUES
+        INSERT INTO project_step (projectID,stepIndex,stepName,stepDesc,summary,pos) VALUES
             (#{projectID},
             #{stepIndex},
-            #{name},
-            #{description},
+            #{stepName},
+            #{stepDesc},
             #{summary},
             #{pos})
     </insert>
@@ -35,23 +35,13 @@
     </select>
 
     <select id="getStep" resultType="cn.edu.xjtu.cad.templates.model.project.Step">
-        SELECT * FROM project_step WHERE projectID = #{projectID} ORDER by pos
+        SELECT * FROM project_step WHERE projectID = #{projectID}  AND stepIndex = #{stepIndex} ORDER by pos
     </select>
 
     <update id="updateStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">
         UPDATE project_step SET
-        name = #{name},description = #{description},summary = #{summary}
-        WHERE projectID = #{projectID} AND stepIndex =#{stepIndex}
+        stepName = #{stepName},stepDesc = #{stepDesc},summary = #{summary}
+        WHERE projectID = #{projectID} AND stepIndex = #{stepIndex}
     </update>
-
-    <!--<select id="getStepsOfProject" resultType="java.util.List" parameterType="int">-->
-      <!--SELECT * FROM project_step-->
-      <!--WHERE projectID = #{projectID}-->
-    <!--</select>-->
-
-    <!--<select id="getStep" resultType="cn.edu.xjtu.cad.templates.model.project.Step" parameterType="int">-->
-        <!--SELECT * FROM project_step-->
-        <!--WHERE projectID = #{projectID} AND stepIndex = #{stepIndex}-->
-    <!--</select>-->
 
 </mapper>

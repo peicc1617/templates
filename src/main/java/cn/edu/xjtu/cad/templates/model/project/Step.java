@@ -9,16 +9,16 @@ public class Step {
     public Step() {
     }
 
-    public Step( String name) {
+    public Step(String stepName) {
         this.stepIndex = UUID.randomUUID().toString();
-        this.name = name;
+        this.stepName = stepName;
     }
 
-    public Step(long projectID, String stepIndex, String name, String description) {
+    public Step(long projectID, String stepIndex, String stepName, String stepDesc) {
         this.projectID = projectID;
         this.stepIndex= stepIndex;
-        this.name = name;
-        this.description = description;
+        this.stepName = stepName;
+        this.stepDesc = stepDesc;
     }
 
     /**
@@ -34,12 +34,12 @@ public class Step {
     /**
      * 阶段的名称
      */
-    private String name;
+    private String stepName;
 
     /**
      * 阶段的描述
      */
-    private String description;
+    private String stepDesc;
     /**
      * 阶段的创建时间
      */
@@ -75,20 +75,20 @@ public class Step {
         this.projectID = projectID;
     }
 
-    public String getName() {
-        return name;
+    public String getStepName() {
+        return stepName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setStepName(String stepName) {
+        this.stepName = stepName;
     }
 
-    public String getDescription() {
-        return description;
+    public String getStepDesc() {
+        return stepDesc;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setStepDesc(String stepDesc) {
+        this.stepDesc = stepDesc;
     }
 
     public Date getCreateTime() {

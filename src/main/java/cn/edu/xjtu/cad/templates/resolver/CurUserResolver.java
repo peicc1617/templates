@@ -4,7 +4,7 @@ import cn.edu.xjtu.cad.templates.annotation.CurUser;
 import cn.edu.xjtu.cad.templates.dao.UserMapper;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRole;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
-import cn.edu.xjtu.cad.templates.model.project.User;
+import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeRole;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeRoleType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +43,6 @@ public class CurUserResolver implements HandlerMethodArgumentResolver {
         Map<String,NodeRoleType> nodeRoleTypeMap = userMapper.getNodeRole(userID)
                 .stream()
                 .collect(Collectors.toMap(role->role.getProjectID()+";"+role.getNodeIndex(),NodeRole::getNodeRole));
-        return new User(userID,projectRoleTypeMap,nodeRoleTypeMap);
+        return null;
     }
 }

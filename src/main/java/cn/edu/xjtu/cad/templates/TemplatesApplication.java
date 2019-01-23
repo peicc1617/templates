@@ -12,7 +12,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "cn.edu.xjtu.cad.templates.service",
         "cn.edu.xjtu.cad.templates.aop",
         "cn.edu.xjtu.cad.templates.config",
-        "cn.edu.xjtu.cad.templates.resolver"})
+        "cn.edu.xjtu.cad.templates.resolver",
+        "cn.edu.xjtu.cad.templates.advice"})
 @MapperScan("cn.edu.xjtu.cad.templates.dao")
 public class TemplatesApplication {
 

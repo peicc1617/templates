@@ -16,6 +16,30 @@
     <link rel="stylesheet" href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css">
     <link rel="stylesheet" href="/templates/project/assets/css/step.css">
     <script>
+        //定义API接口
+        const API ={
+            projectDetail:"/templates/api/project/${project.projectID}/detail",
+            stepURL:"/templates/api/project/${project.projectID}/step/{}",
+            addStep:"/templates/api/project/${project.projectID}/step",
+            deleteStep:"/templates/api/project/${project.projectID}/step",
+            editStep:"/templates/api/project/${project.projectID}/step/",
+            editStepSummary:"/templates/api/project/${project.projectID}/step/summary",
+            addNode:"/templates/api/project/${project.projectID}/node",
+            deleteNode:"/templates/api/project/${project.projectID}/node",
+            editNode:"/templates/api/project/${project.projectID}/node/",
+            editNodeSummary:"/templates/api/project/${project.projectID}/node/summary",
+            nodeTemplate:"/templates/api/project/${project.projectID}/node/template",
+            nodeState:"/templates/api/project/${project.projectID}/node/state",
+            nodeLock:"/templates/api/project/${project.projectID}/node/lock",
+            nodeAPP:"/templates/api/project/${project.projectID}/node/app",
+            ownedProject:"/templates/api/project/owned",
+            projectManage:"/projectManager/api/v1/project",
+            nodeResult:"/templates/api/project/${project.projectID}/node/result",
+            nodeResultBinding:"/templates/api/project/${project.projectID}/node/result/binding",
+            appProjectBinding:"/projectManager/api/v2/project/",
+            nodeResultDisable:"/templates/api/project/${project.projectID}/node/result/list/disable",
+            nodeResultOutDate:"/templates/api/project/${project.projectID}/node/result/list/outDate",
+        };
         PROJECT_ID = ${project.projectID}
         //解析projectID，
         if(isNaN(PROJECT_ID)){
@@ -30,10 +54,10 @@
             li: []
         }
         const STATE_DIV = {
-            "0": {
-                button: {
-                    style: "btn-light",
-                    text: "待绑定",
+            "${NodeResultState.UN_BIND}": {
+                span: {
+                    style: "label arrowed",
+                    text: "未绑定数据",
                 },
             },
             "1": {
@@ -571,12 +595,7 @@
                                                 模板
                                             </a>
                                         </li>
-
-
-
-
                                     </ul>
-
                                     <div class="tab-content no-border padding-24">
                                         <div id="tool-tab" class="tab-pane active">
                                             <div class="row">
@@ -667,34 +686,34 @@
                                                                 <br>
                                                             </div>
                                                             <div class="widget-main padding-16">
-                                                                <div class="clearfix">
-                                                                    <div class="grid3 center">
-                                                                        <div class="easy-pie-chart percentage" data-percent="45" data-color="#CA5952" style="height: 72px; width: 72px; line-height: 71px; color: rgb(202, 89, 82);">
-                                                                            <span class="percent" id="cur-node-result-cnt">45</span>
-                                                                            <canvas height="72" width="72" ></canvas></div>
-                                                                        <div class="space-2"></div>
-                                                                        成员数
-                                                                    </div>
+                                                                <#--<div class="clearfix">-->
+                                                                    <#--<div class="grid3 center">-->
+                                                                        <#--<div class="easy-pie-chart percentage" data-percent="45" data-color="#CA5952" style="height: 72px; width: 72px; line-height: 71px; color: rgb(202, 89, 82);">-->
+                                                                            <#--<span class="percent" id="cur-node-result-cnt">45</span>-->
+                                                                            <#--<canvas height="72" width="72" ></canvas></div>-->
+                                                                        <#--<div class="space-2"></div>-->
+                                                                        <#--成员数-->
+                                                                    <#--</div>-->
 
-                                                                    <div class="grid3 center">
-                                                                        <div class="center easy-pie-chart percentage" data-percent="90" data-color="#59A84B" style="height: 72px; width: 72px; line-height: 71px; color: rgb(89, 168, 75);">
-                                                                            <span class="percent" id="cur-node-finished-cnt">90</span>%
-                                                                            <canvas height="72" width="72"></canvas></div>
+                                                                    <#--<div class="grid3 center">-->
+                                                                        <#--<div class="center easy-pie-chart percentage" data-percent="90" data-color="#59A84B" style="height: 72px; width: 72px; line-height: 71px; color: rgb(89, 168, 75);">-->
+                                                                            <#--<span class="percent" id="cur-node-finished-cnt">90</span>%-->
+                                                                            <#--<canvas height="72" width="72"></canvas></div>-->
 
-                                                                        <div class="space-2"></div>
-                                                                        完成数
-                                                                    </div>
+                                                                        <#--<div class="space-2"></div>-->
+                                                                        <#--完成数-->
+                                                                    <#--</div>-->
 
-                                                                    <div class="grid3 center">
-                                                                        <div class="center easy-pie-chart percentage" data-percent="80" data-color="#9585BF" style="height: 72px; width: 72px; line-height: 71px; color: rgb(149, 133, 191);">
-                                                                            <span class="percent" id="cur-node-pending-cnt">80</span>%
-                                                                            <canvas height="72" width="72"></canvas></div>
+                                                                    <#--<div class="grid3 center">-->
+                                                                        <#--<div class="center easy-pie-chart percentage" data-percent="80" data-color="#9585BF" style="height: 72px; width: 72px; line-height: 71px; color: rgb(149, 133, 191);">-->
+                                                                            <#--<span class="percent" id="cur-node-pending-cnt">80</span>%-->
+                                                                            <#--<canvas height="72" width="72"></canvas></div>-->
 
-                                                                        <div class="space-2"></div>
-                                                                        任务比
-                                                                    </div>
-                                                                </div>
-                                                                <div class="hr hr-16"></div>
+                                                                        <#--<div class="space-2"></div>-->
+                                                                        <#--任务比-->
+                                                                    <#--</div>-->
+                                                                <#--</div>-->
+                                                                <#--<div class="hr hr-16"></div>-->
                                                                 <table id="cur-node-result-table"></table>
 
                                                             </div>
@@ -970,7 +989,7 @@
                                                             进入当前模板
                                                         </button>
                                                         <button class="btn btn-success" type="button"
-                                                                onclick="bangdingTemplate()">
+                                                                onclick="bindingTemplate()">
                                                             链接模板
                                                         </button>
                                                         <button class="btn btn-primary" type="button"
@@ -1019,7 +1038,7 @@
                             <tr>
                                 <th data-field="projectName">项目名</th>
                                 <th data-field="createTime" data-formatter="timeFormatter">创建时间</th>
-                                <th data-field="editTime" data-formatter="timeFormatter">创建时间</th>
+                                <th data-field="editTime" data-formatter="timeFormatter">修改时间</th>
                                 <th data-field="memo">备注</th>
                                 <th data-field="op" data-formatter="toolProjectPreView">操作</th>
                             </tr>
@@ -1057,57 +1076,6 @@
         </div>
         <!-- /.modal -->
     </div>
-    <div class="modal fade bs-example-modal-lg " id="cur-node-info-view-modal" tabindex="-1" role="dialog"
-         aria-labelledby="tool-result-view-label"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                        &times;
-                    </button>
-                    <h4 class="modal-title" id="node-info-view-modal-label">结果预览</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label no-padding-right" for="node-name">节点名称</label>
-                                <div class="col-sm-9">
-                                    <input type="text" id="node-name" name="name" required=""
-                                           class="col-xs-10 col-sm-5">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label no-padding-right"
-                                       for="node-description">节点描述</label>
-                                <div class="col-sm-9">
-                                        <textarea name="description" id="node-description"
-                                                  class="autosize-transition form-control"
-                                                  style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 52px;"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label no-padding-right" for="node-goal">节点目标</label>
-                                <div class="col-sm-9">
-                                        <textarea name="goal" id="node-goal" class="autosize-transition form-control"
-                                                  style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 52px;"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" onclick="saveCurStepInfo()" class="btn btn-primary">保存
-                    </button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                    </button>
-                </div>
-            </div>
-            <!-- /.modal-content -->
-        </div>
-        <!-- /.modal -->
-    </div>
 
     <!-- 应用商店模态框（Modal） -->
     <div class="modal fade" id="store-modal" tabindex="-1" role="dialog"
@@ -1129,167 +1097,7 @@
                                 <div class="row search-page" id="search-page-1">
                                     <div class="col-xs-12">
                                         <div class="row">
-                                            <div class="col-xs-12 col-sm-3">
-                                                <div class="search-area well well-sm">
-
-                                                    <div class="hr hr-dotted"></div>
-
-                                                    <h4 class="blue smaller">
-                                                        <i class="fa fa-tags"></i>
-                                                        类别
-                                                    </h4>
-
-                                                    <div class="tree-container ace-scroll"
-                                                         style="position: relative;">
-                                                        <div class="scroll-track"
-                                                             style="display: none;">
-                                                            <div class="scroll-bar"></div>
-                                                        </div>
-                                                        <div class="scroll-content" style="">
-                                                            <ul id="cat-tree"
-                                                                class="tree tree-unselectable"
-                                                                role="tree">
-                                                                <li class="tree-branch hide"
-                                                                    data-template="treebranch"
-                                                                    role="treeitem"
-                                                                    aria-expanded="false">
-                                                                    <div class="tree-branch-header">
-																							<span class="tree-branch-name">
-																								<i class="icon-folder ace-icon tree-plus"></i>
-																								<span class="tree-label"></span>
-																							</span>
-                                                                    </div>
-                                                                    <ul class="tree-branch-children"
-                                                                        role="group"></ul>
-                                                                    <div class="tree-loader hidden"
-                                                                         role="alert">
-                                                                        <div class="tree-loading">
-                                                                            <i class="ace-icon fa fa-refresh fa-spin blue"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-                                                                <li class="tree-item hide"
-                                                                    data-template="treeitem"
-                                                                    role="treeitem">
-																						<span class="tree-item-name">
-																							<i class="icon-item ace-icon fa fa-times"></i>
-																							<span class="tree-label"></span>
-																						</span>
-                                                                </li>
-                                                                <li class="tree-branch" role="treeitem"
-                                                                    aria-expanded="false">
-                                                                    <div class="tree-branch-header">
-																							<span class="tree-branch-name">
-																								<i class="icon-folder ace-icon tree-plus"></i>
-																								<span class="tree-label">知识工程</span>
-																							</span>
-                                                                    </div>
-                                                                    <ul class="tree-branch-children"
-                                                                        role="group"></ul>
-                                                                    <div class="tree-loader hidden"
-                                                                         role="alert">
-                                                                        <div class="tree-loading">
-                                                                            <i class="ace-icon fa fa-refresh fa-spin blue"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-                                                                <li class="tree-branch" role="treeitem"
-                                                                    aria-expanded="false">
-                                                                    <div class="tree-branch-header">
-																							<span class="tree-branch-name">
-																								<i class="icon-folder ace-icon tree-plus"></i>
-																								<span class="tree-label">TRIZ</span>
-																							</span>
-                                                                    </div>
-                                                                    <ul class="tree-branch-children"
-                                                                        role="group"></ul>
-                                                                    <div class="tree-loader hidden"
-                                                                         role="alert">
-                                                                        <div class="tree-loading">
-                                                                            <i class="ace-icon fa fa-refresh fa-spin blue"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-
-                                                                <li class="tree-branch" role="treeitem"
-                                                                    aria-expanded="false">
-                                                                    <div class="tree-branch-header">
-																							<span class="tree-branch-name">
-																								<i class="icon-folder ace-icon tree-plus"></i>
-																								<span class="tree-label">质量分析</span>
-																							</span>
-                                                                    </div>
-                                                                    <ul class="tree-branch-children"
-                                                                        role="group"></ul>
-                                                                    <div class="tree-loader hidden"
-                                                                         role="alert">
-                                                                        <div class="tree-loading">
-                                                                            <i class="ace-icon fa fa-refresh fa-spin blue"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-
-                                                                <li class="tree-branch" role="treeitem"
-                                                                    aria-expanded="false">
-                                                                    <div class="tree-branch-header">
-																							<span class="tree-branch-name">
-																								<i class="icon-folder ace-icon tree-plus"></i>
-																								<span class="tree-label">企业管理</span>
-																							</span>
-                                                                    </div>
-                                                                    <ul class="tree-branch-children"
-                                                                        role="group"></ul>
-                                                                    <div class="tree-loader hidden"
-                                                                         role="alert">
-                                                                        <div class="tree-loading">
-                                                                            <i class="ace-icon fa fa-refresh fa-spin blue"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-
-                                                                <li class="tree-branch" role="treeitem"
-                                                                    aria-expanded="false">
-                                                                    <div class="tree-branch-header">
-																							<span class="tree-branch-name">
-																								<i class="icon-folder ace-icon tree-plus"></i>
-																								<span class="tree-label">产品设计</span>
-																							</span>
-                                                                    </div>
-                                                                    <ul class="tree-branch-children"
-                                                                        role="group"></ul>
-                                                                    <div class="tree-loader hidden"
-                                                                         role="alert">
-                                                                        <div class="tree-loading">
-                                                                            <i class="ace-icon fa fa-refresh fa-spin blue"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-                                                                <li class="tree-branch" role="treeitem"
-                                                                    aria-expanded="false">
-                                                                    <div class="tree-branch-header">
-																							<span class="tree-branch-name">
-																								<i class="icon-folder ace-icon tree-plus"></i>
-																								<span class="tree-label">创新思维</span>
-																							</span>
-                                                                    </div>
-                                                                    <ul class="tree-branch-children"
-                                                                        role="group"></ul>
-                                                                    <div class="tree-loader hidden"
-                                                                         role="alert">
-                                                                        <div class="tree-loading">
-                                                                            <i class="ace-icon fa fa-refresh fa-spin blue"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="hr hr-dotted"></div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-xs-12 col-sm-9">
+                                            <div class="col-xs-12">
                                                 <div class="row">
                                                     <table
                                                             id="app-store-table"
@@ -1302,8 +1110,7 @@
                                                             data-page-size="10"
                                                             data-toggle="table"
                                                             data-smart-display="true"
-                                                            data-url="/templates/project/json/data.json"
-                                                    >
+                                                            data-url="/templates/project/json/data.json">
                                                         <thead>
                                                         <tr>
                                                             <th data-field="row"
@@ -1367,9 +1174,7 @@
                 container: 'body'
             });
         });
-
     </script>
-
 </div>
 </div>
 </body>

@@ -1,11 +1,13 @@
 package cn.edu.xjtu.cad.templates.controller;
 
 import cn.edu.xjtu.cad.templates.annotation.SystemControllerLog;
+import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.dao.StepMapper;
 import cn.edu.xjtu.cad.templates.model.log.LogType;
 import cn.edu.xjtu.cad.templates.model.log.MethodType;
 import cn.edu.xjtu.cad.templates.model.project.Step;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,15 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/project/step")
+@RequestMapping("/api/project/{projectID}/step")
 public class StepController {
+
     @Autowired
-    HttpServletRequest req;
+    User user;
 
     @Autowired
     StepMapper stepMapper;
 
-    @SystemControllerLog(content = "新建阶段，阶段名${projectName},阶段描述${description}",logType = LogType.STEP,methodType = MethodType.ADD)
+    @SystemControllerLog(content = "新建阶段，阶段名${stepName},阶段描述${stepDesc}",logType = LogType.STEP,methodType = MethodType.ADD)
     @RequestMapping(value = "",method = RequestMethod.POST)
     public boolean addStep(Step step){
         stepMapper.addStep(step);
@@ -30,36 +33,36 @@ public class StepController {
 
     @SystemControllerLog(content = "删除阶段${stepIndex}",logType = LogType.STEP,methodType = MethodType.DELETE)
     @RequestMapping(value = "",method = RequestMethod.DELETE)
-    public boolean deleteStep(long projectID,String stepIndex){
+    public boolean deleteStep(@PathVariable long projectID,String stepIndex){
         stepMapper.deleteStep(projectID,stepIndex);
         return true;
     }
 
-    @SystemControllerLog(content = "将阶段${stepIndex}的名称修改为${projectName}",logType = LogType.STEP,methodType = MethodType.UPDATE)
-    @RequestMapping(value = "name",method = RequestMethod.PUT)
-    public boolean updateStepName(long projectID,String stepIndex,String name){
+    @SystemControllerLog(content = "将阶段${stepIndex}的名称修改为${stepName}",logType = LogType.STEP,methodType = MethodType.UPDATE)
+    @RequestMapping(value = "/stepName",method = RequestMethod.PUT)
+    public boolean updateStepName(@PathVariable long projectID,String stepIndex,String stepName){
         Step step = stepMapper.getStep(projectID,stepIndex);
         if(step!=null){
-            step.setName(name);
+            step.setStepName(stepName);
             stepMapper.updateStep(step);
         }
         return true;
     }
 
-    @SystemControllerLog(content = "将阶段${stepIndex}的描述修改为${description}",logType = LogType.STEP,methodType = MethodType.UPDATE)
-    @RequestMapping(value = "description",method = RequestMethod.PUT)
-    public boolean updateStepDes(long projectID,String stepIndex,String description){
+    @SystemControllerLog(content = "将阶段${stepIndex}的描述修改为${stepDesc}",logType = LogType.STEP,methodType = MethodType.UPDATE)
+    @RequestMapping(value = "/stepDesc",method = RequestMethod.PUT)
+    public boolean updateStepDes(@PathVariable long projectID,String stepIndex,String stepDesc){
         Step step = stepMapper.getStep(projectID,stepIndex);
         if(step!=null){
-            step.setDescription(description);
+            step.setStepDesc(stepDesc);
             stepMapper.updateStep(step);
         }
         return true;
     }
 
     @SystemControllerLog(content = "将阶段${stepIndex}的总结修改为${summary}",logType = LogType.STEP,methodType = MethodType.UPDATE)
-    @RequestMapping(value = "summary",method = RequestMethod.PUT)
-    public boolean updateStep(long projectID,String stepIndex,String summary){
+    @RequestMapping(value = "/summary",method = RequestMethod.PUT)
+    public boolean updateStep(@PathVariable long projectID,String stepIndex,String summary){
         Step step = stepMapper.getStep(projectID,stepIndex);
         if(step!=null){
             step.setSummary(summary);

@@ -43,7 +43,7 @@ public class Project {
     /**
      * 项目邀请码
      */
-    private boolean invitationCode;
+    private String invitationCode;
 
     /**
      * 创建者ID
@@ -57,6 +57,7 @@ public class Project {
      */
     private long referID;
 
+    private ProjectRoleType projectRole;
     private Map<String,Step> stepMap = new LinkedHashMap<>();
     private Map<String,Node> nodeMap = new HashMap<>();
     private List<Edge> edges = new ArrayList<>();
@@ -186,11 +187,19 @@ public class Project {
         this.openState = openState;
     }
 
-    public boolean isInvitationCode() {
+    public String getInvitationCode() {
         return invitationCode;
     }
 
-    public void setInvitationCode(boolean invitationCode) {
+    public void setInvitationCode(String invitationCode) {
         this.invitationCode = invitationCode;
+    }
+
+    public ProjectRoleType getProjectRole() {
+        return projectRole;
+    }
+
+    public void setProjectRole(ProjectRoleType projectRole) {
+        this.projectRole = projectRole;
     }
 }

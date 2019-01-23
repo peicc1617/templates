@@ -2,6 +2,8 @@ package cn.edu.xjtu.cad.templates.service;
 
 import cn.edu.xjtu.cad.templates.annotation.CurUser;
 import cn.edu.xjtu.cad.templates.annotation.UserRoleFilter;
+import cn.edu.xjtu.cad.templates.aop.MyException;
+import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.dao.*;
 import cn.edu.xjtu.cad.templates.model.Result;
 import cn.edu.xjtu.cad.templates.model.ResultCode;
@@ -47,58 +49,39 @@ public class ProjectService {
     @Autowired
     NodeRoleMapper nodeRoleMapper;
 
-    public List<Project> getMyProjectList(User user) {
-        return projectMapper.getAllProjectListByUserID(user.getUserID());
-    }
 
     public List<Project> getOwnedProjectList(User user) {
-        List<Long> projectIDList = getProjectIDList(user,false,ProjectRoleType.CREATOR);
-        return getProjectListByProjectIDList(projectIDList);
+        return projectMapper.getProjectListByUserAndRole(user.getUserID(),ProjectRoleType.CREATOR);
+    }
+    public List<Project> getMyProjectList(long userID) {
+        return projectMapper.getAllProjectListByUserID(userID);
     }
 
-    public List<Project> getJoinedProjectList(User user) {
-        return getProjectListByProjectIDList(getProjectIDList(user,false,ProjectRoleType.MEMBER,ProjectRoleType.SUPER_MANAGER));
+
+    public List<Project> getOpenProjectList(long userID) {
+        List<Project> publicProjectList = projectMapper.getOpenProject(userID);
+        for (Project project : publicProjectList) {
+            project.setProjectRole(projectRoleMapper.getProjectRoleType(project.getProjectID(),userID));
+        }
+        return publicProjectList;
     }
 
-
-
-    public List<Project> getApplyProjectList(User user) {
-        return getProjectListByProjectIDList(getProjectIDList(user,false,ProjectRoleType.APPLY));
-    }
-
-    public List<Project> getOpenProjectList() {
-        return projectMapper.getOpenProject();
-    }
-    private List<Long> getProjectIDList(User user,boolean and, ProjectRoleType... projectRoleTypes) {
-        return user.getProjectRoleTypeMap()
-                .entrySet()
-                .stream()
-                .filter(e -> {
-                    boolean flag = and;
-                    for (ProjectRoleType projectRoleType : projectRoleTypes) {
-                        if(and) flag= flag && e.getValue()==projectRoleType;
-                        else flag = flag || e.getValue()==projectRoleType;
-                    }
-                    return flag;
-                })
-                .map(e -> e.getKey()).collect(Collectors.toList());
-    }
-
-    public Result newProject(Project project,long userID,long referID){
+    public long newProject(Project project, long userID, long referID) throws MyException {
         long projectID = 0;
         project.setCreatorID(userID);
-        if(referID>0){
-            projectID = createProject(project,referID);
-        }else {
+        project.setInvitationCode(generateInvitationCode());
+        if (referID > 0) {
+            projectID = createProject(project, referID);
+        } else {
             projectID = createProject(project);
         }
-        if(projectID>0){
-            return Result.success(projectID);
-        }else {
-            return Result.failure(ResultCode.DATA_ALREADY_EXISTED);
+        if (projectID == 0) {
+            throw new MyException(ResultCode.DATA_ALREADY_EXISTED);
         }
+        return projectID;
     }
-    public long createProject(Project project,long referID) {
+
+    public long createProject(Project project, long referID) {
         //获取柔性模板信息
         Refer refer = referMapper.getReferByID(referID);
         List<Step> stepList = JSONArray.parseArray(refer.getSteps(), Step.class);
@@ -123,6 +106,10 @@ public class ProjectService {
         return addProject(project);
     }
 
+    /**
+     * @param projectID
+     * @return
+     */
     public Project getProjectByID(long projectID) {
         //查询项目的基础信息
         Project project = projectMapper.getProjectByID(projectID);
@@ -192,50 +179,42 @@ public class ProjectService {
     /**
      * 更新项目内的用户权限
      *
-     * @param user         当前用户
+     * @param user           当前用户
      * @param projectID      项目ID
      * @param userID         待修改的用户名
      * @param newProjectRole 新权限
      * @return
      */
     @UserRoleFilter(allowedProjectRoleTypes = {ProjectRoleType.CREATOR, ProjectRoleType.SUPER_MANAGER})
-    public Result updateRoleOfMemberInProject(User user, long projectID, long userID, ProjectRoleType newProjectRole) {
-        switch (user.getProjectRoleTypeMap().get(projectID)){
+    public void updateRoleOfMemberInProject(User user, long projectID, long userID, ProjectRoleType newProjectRole) throws MyException {
+        switch (user.getProjectRoleType()) {
             case SUPER_MANAGER:
-                if(newProjectRole!=ProjectRoleType.CREATOR&&newProjectRole!=ProjectRoleType.SUPER_MANAGER){
+                if (newProjectRole != ProjectRoleType.CREATOR && newProjectRole != ProjectRoleType.SUPER_MANAGER) {
                     break;
                 }
             case APPLY:
             case MEMBER:
-                return Result.failure(ResultCode.PERMISSION_NO_ACCESS);
+                throw  new MyException(ResultCode.PERMISSION_NO_ACCESS);
         }
-        projectRoleMapper.updateProjectRole(projectID,userID,newProjectRole);
-        return Result.success();
+        projectRoleMapper.updateProjectRole(projectID, userID, newProjectRole);
     }
 
     public List<Project> getProjectListByProjectIDList(List<Long> projectIDList) {
         return projectMapper.getProjectListByProjectIDList(projectIDList);
     }
 
+
     public Project getProjectByCode(String code) {
         return projectMapper.getProjectByCode(code);
     }
 
-    public Result getOwnedProjectListResult(User user) {
-        List<Project> projects = getMyProjectList(user);
-        return Result.success(projects);
-    }
-
-    public Result getJoinedProjectListResult(User user) {
-        return Result.success(getJoinedProjectList(user));
-    }
 
     public Result getMyProjectListResult(User user) {
-        return Result.success(getMyProjectList(user));
+        return Result.success(getMyProjectList(user.getUserID()));
     }
 
-    public Result getOpenProjectListResult() {
-        return Result.success(getOpenProjectList());
+    public Result getOpenProjectListResult(long userID) {
+        return Result.success(getOpenProjectList(userID));
     }
 
 
@@ -248,82 +227,187 @@ public class ProjectService {
         return Result.success(project);
     }
 
-    public Result getProjectInfoByIDResult(User user, long projectID) {
+
+    public void updateProjectInfo(@CurUser User user, long projectID, String projectName, String projectDesc, String projectTags) throws MyException {
         Project project = projectMapper.getProjectByID(projectID);
         if (project == null) {
-            return Result.failure(ResultCode.RESULE_DATA_NONE);
-        }
-        switch (user.getProjectRoleTypeMap().get(projectID)) {
-            case CREATOR:
-            case MEMBER:
-            case SUPER_MANAGER:
-                break;
-            default:
-                if (!project.isOpenState()) {
-                    return Result.failure(ResultCode.PERMISSION_NO_ACCESS);
-                }
-        }
-        return Result.success(project);
-    }
-
-    public Result getProjectInfoByCodeResult(String invitationCode) {
-        Project project = projectMapper.getProjectByCode(invitationCode);
-        if (project == null) {
-            return Result.failure(ResultCode.RESULE_DATA_NONE);
-        }
-        return Result.success(project);
-    }
-
-    public Result updateProjectInfo(@CurUser User user, long projectID, String projectName, String projectDesc, String projectTags) {
-        Project project = projectMapper.getProjectByID(projectID);
-        if(project==null){
-            return Result.failure(ResultCode.RESULE_DATA_NONE);
+            throw  new MyException(ResultCode.RESUTL_DATA_NONE);
         }
         boolean flag = false;
-        if(projectName!=null){
-            flag=true;
+        if (projectName != null) {
+            flag = true;
             project.setProjectName(projectName);
         }
-        if(projectDesc!=null){
-            flag=true;
+        if (projectDesc != null) {
+            flag = true;
             project.setProjectDesc(projectDesc);
         }
-        if(projectTags!=null){
-            flag=true;
+        if (projectTags != null) {
+            flag = true;
             project.setProjectTags(projectTags);
         }
         projectMapper.updateProjectInfo(project);
-        if(flag){
-            return Result.success();
-        }else {
-            return Result.failure(ResultCode.PARAM_NOT_COMPLETE);
+        if (!flag) {
+            throw  new MyException(ResultCode.PARAM_NOT_COMPLETE);
         }
     }
 
-    public Result deleteProject(@CurUser User user,long projectID) {
+
+    public void deleteProject(@CurUser User user, long projectID) {
         projectMapper.deleteProject(projectID);
-        return Result.success();
     }
 
-    public Result getUserListInProject(User user, long projectID) {
+    /**
+     * 获取项目内的成员
+     *
+     * @param user
+     * @param projectID
+     * @return
+     */
+    public List<ProjectRole> getUserListInProject(User user, long projectID) {
         List<ProjectRole> projectRoleList = projectRoleMapper.getRoleOfProject(projectID);
         for (int i = 0; i < projectRoleList.size(); i++) {
-            if(projectRoleList.get(i).getUserID()==user.getUserID()){
+            if (projectRoleList.get(i).getUserID() == user.getUserID()) {
                 projectRoleList.remove(i);
                 break;
             }
         }
-        return Result.success(projectRoleList);
+        //对结果根据在项目内的权限进行排序
+        projectRoleList.sort(Comparator.comparing(ProjectRole::getProjectRole));
+        return projectRoleList;
     }
 
-    public Result appendUser2Project(User curUser, long projectID, long userID) {
-        ProjectRole projectRole  = new ProjectRole(projectID,userID,ProjectRoleType.MEMBER);
-        projectRoleMapper.addProjectRole(projectRole);
-        return Result.success();
+    /**
+     * 添加用户到项目内
+     * @param curUserProjectRoleType         操作用户
+     * @param projectID       项目ID
+     * @param userID          被操作用户ID
+     * @param projectRoleType 新用户的Type
+     * @return
+     */
+    public void appendUser2Project(ProjectRoleType curUserProjectRoleType, long projectID, long userID, ProjectRoleType projectRoleType) throws MyException {
+        if (projectRoleType == null
+                || projectRoleType == ProjectRoleType.CREATOR
+                || projectRoleType == ProjectRoleType.SUPER_MANAGER
+                || curUserProjectRoleType == null
+                || curUserProjectRoleType == ProjectRoleType.APPLY
+                || curUserProjectRoleType == ProjectRoleType.MEMBER) {
+            throw  new MyException(ResultCode.PERMISSION_NO_ACCESS);
+        }
+//        组织新的权限
+        ProjectRole newProjectRole = new ProjectRole(projectID, userID, projectRoleType);
+//        获取旧权限
+        ProjectRoleType oldProjectRole = projectRoleMapper.getProjectRoleType(projectID, userID);
+        if (oldProjectRole != null) {
+            throw  new MyException(ResultCode.DATA_ALREADY_EXISTED);
+        }
+        projectRoleMapper.addProjectRole(newProjectRole);
     }
 
-    public Result deleteUserFromProject(User user,long projectID,long userID){
+    /**
+     * 从项目内移除用户
+     *
+     * @param user      操作用户
+     * @param projectID 项目ID
+     * @param userID    被操作用户ID
+     * @return
+     */
+    public void deleteUserFromProject(User user, long projectID, long userID) throws MyException {
+        if(user.getUserID()==userID){
+            if(user.getProjectRoleType()==ProjectRoleType.CREATOR){
+                //创建者自己不可以退出
+                throw new MyException(ResultCode.PERMISSION_NO_ACCESS);
+            }
+        }else {
+            ProjectRoleType type1 = user.getProjectRoleType();
+            ProjectRoleType type2 = projectRoleMapper.getProjectRoleType(projectID,userID);
+            if(type1==ProjectRoleType.CREATOR||(type1==ProjectRoleType.SUPER_MANAGER&&(type2!=ProjectRoleType.CREATOR&&type2!=ProjectRoleType.SUPER_MANAGER))){
+            }else {
+                throw new MyException(ResultCode.PERMISSION_NO_ACCESS);
+            }
+        }
         projectRoleMapper.deleteProjectRole(projectID,userID);
-        return Result.success();
     }
+
+    /**
+     * 根据ID获取项目信息
+     *
+     * @param projectID
+     * @return
+     */
+    public Project getProjectInfoByProjectID(long userID, long projectID) throws MyException {
+        //首先获取用户信息
+        Project project = projectMapper.getProjectByID(projectID);
+        if(project==null){
+            throw new MyException(ResultCode.RESUTL_DATA_NONE);
+        }
+        ProjectRoleType projectRoleType= projectRoleMapper.getProjectRoleType(projectID,userID);
+        if(!project.isOpenState()&&(projectRoleType==null||projectRoleType==ProjectRoleType.APPLY)){
+            throw new MyException(ResultCode.PERMISSION_NO_ACCESS);
+        }
+        project.setProjectRole(projectRoleType);
+        return project;
+    }
+
+    /**
+     * 根据项目邀请码获获取项目信息
+     *
+     * @param invitationCode
+     * @return
+     */
+    public Project getProjectInfoByCode(long userID,String invitationCode) throws MyException {
+        Project project = projectMapper.getProjectByCode(invitationCode);
+        if (project == null)
+            throw  new MyException(ResultCode.RESUTL_DATA_NONE);
+        ProjectRoleType projectRole = projectRoleMapper.getProjectRoleType(project.getProjectID(),userID);
+        if(projectRole!=null){
+            project.setProjectRole(projectRole);
+        }
+        return  project;
+    }
+
+    /**
+     * 根据邀请码加入项目
+     *
+     * @param userID         当前用户ID
+     * @param invitationCode 邀请码
+     * @return
+     */
+    public void joinProjectByCode(long userID, String invitationCode) throws MyException {
+        Project project = getProjectByCode(invitationCode);
+        if (project == null)
+            //如果根据code没有找到项目，那么返回错误信息
+           throw  new MyException(ResultCode.RESUTL_DATA_NONE);
+        //将用户添加到项目内，这里因为使用的是邀请码，所以直接成为普通用户
+        appendUser2Project(ProjectRoleType.SUPER_MANAGER, project.getProjectID(), userID, ProjectRoleType.MEMBER);
+    }
+
+    /**
+     * 申请加入项目
+     *
+     * @param userID    当前用户ID
+     * @param projectID 申请的项目ID
+     * @return
+     */
+    public void applyToProject(long userID, long projectID) throws MyException {
+        Project project = getProjectByID( projectID);
+        if (project == null)
+            //如果根据用户ID没有找到项目，那么返回错误信息
+            throw  new MyException(ResultCode.RESUTL_DATA_NONE);
+        appendUser2Project(ProjectRoleType.SUPER_MANAGER, projectID, userID, ProjectRoleType.APPLY);
+    }
+
+    private String generateInvitationCode(){
+        return UUID.randomUUID().toString();
+    }
+
+    public String updateProjectInCode(User user,long projectID) throws MyException {
+        String newIncode = generateInvitationCode();
+        long lineN = projectMapper.updateProjectInCode(projectID,newIncode);
+        if(lineN==0){
+            throw  new MyException(ResultCode.RESUTL_DATA_NONE);
+        }
+        return newIncode;
+    }
+
 }

@@ -2,27 +2,47 @@ $(document).ready(function(){
     $("#cur-step-name-href").editable({
         type: 'text',
         title: '修改阶段名称',
-        name:'name',
+        name:'stepName',
         url: updateStepHref,
-        validate: function (value) { //字段验证
-            if (!$.trim(value)) {
-                return '不能为空';
-            }
-        },
-    })
+        validate: validateEmpty,
+    });
 
     $("#cur-step-description-href").editable({
         type: 'textarea',
         title: '修改阶段描述',
-        name:'description',
+        name:'stepDesc',
         url: updateStepHref,
-        validate: function (value) { //字段验证
-            if (!$.trim(value)) {
-                return '不能为空';
-            }
-        },
+        validate: validateEmpty,
     })
 });
+function updateStepHref(params) {
+    var d = new $.Deferred();
+    const data = {
+        stepIndex:CUR_STEP.stepIndex
+    };
+    if (params.value === 'abc') {
+        return d.reject('error message'); //returning error via deferred object
+    } else {
+        data[params.name] = params.value;
+        //async saving data in js model
+        $.ajax({
+            url: API.editStep+params.name,
+            type: 'PUT',
+            async: true,
+            data:data,
+            success: function () {
+                CUR_STEP[params.name] = params.value;
+                d.resolve();
+            }
+        });
+        return d.promise();
+    }
+}
+function validateEmpty(v){
+    if (!$.trim(v)) {
+        return '不能为空';
+    }
+}
 const STEP_JS = {
     /**
      * 查看阶段
@@ -33,9 +53,9 @@ const STEP_JS = {
         $("#stepInfoRow").show();
         $("#nodeInfoRow").hide();
         //节点的名称
-        $("#cur-step-name-href").editable("setValue",step.name);
+        $("#cur-step-name-href").editable("setValue",step.stepName);
         //节点的描述
-        $("#cur-step-description-href").editable("setValue",step.description);
+        $("#cur-step-description-href").editable("setValue",step.stepDesc);
         $("#cur-step-summary").html(step.summary)
         let resultChart = echarts.init(document.getElementById('cur-step-result-static'));
         let activityChart = echarts.init(document.getElementById('cur-step-activity-static'));
@@ -49,7 +69,7 @@ const STEP_JS = {
      */
     beforeAddStep:function (step) {
         $.ajax({
-            url:"/step/"+step.stepIndex,
+            url:API.addStep ,
             method:"POST",
             data:step,
             async:false,
@@ -67,13 +87,12 @@ const STEP_JS = {
      */
     beforeRemoveStep:function (step) {
         $.ajax({
-            url:"/templates/api/project/step/",
+            url:API.deleteStep,
             method:"DELETE",
-            data:{
-                projectID:PROJECT_ID,
-                stepIndex:step.stepIndex,
-            },
             async:false,
+            data:{
+                stepIndex: step.stepIndex
+            },
             success:function (data) {
                 return true;
             },
@@ -309,39 +328,17 @@ function activityStaticFill($echart,stepIndex){
  * @param params
  * @returns {*}
  */
-function updateStepHref(params) {
-    var d = new $.Deferred();
-    if (params.value === 'abc') {
-        return d.reject('error message'); //returning error via deferred object
-    } else {
-        data[params.name] = params.value
-        //async saving data in js model
-        $.ajax({
-            url: 'step/'+CUR_STEP.stepIndex+'/'+params.name,
-            type: 'PUT',
-            async: true,
-            success: function () {
-                CUR_STEP[params.name] = params.value;
-                stage.refreshGrid();
-                d.resolve();
-            }
-
-        })
-        return d.promise();
-    }
-}
 
 /**
  * 保存阶段总结的函数
  */
 function saveStepSummary() {
-    let summary = $("#stepSummary").html()
+    let summary = $("#cur-step-summary").html()
     $.ajax({
-        url: '/templates/api/project/step/summary',
+        url: API.editStepSummary,
         type: 'PUT',
         async: true,
         data: {
-            projectID:PROJECT_ID,
             stepIndex:CUR_STEP.stepIndex,
             summary:summary
         },

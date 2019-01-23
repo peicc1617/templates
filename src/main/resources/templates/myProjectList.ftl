@@ -93,213 +93,217 @@
                                        data-target="#join-project-modal">加入模板项目</a>
                                     <a class="btn btn-sm btn-info" href="public.html">浏览公开项目</a>
                                 </p>
-                                <div class="tabbable">
-                                    <ul class="nav nav-tabs" id="myTab">
-                                        <li class="active">
-                                            <a data-toggle="tab" href="#owned" aria-expanded="true">
-                                                我创建的
-                                                <span class="badge badge-success">
-                                                     <#if ownedProjectList ??>
-                                                         ${ownedProjectList?size}
-                                                     <#else>
-                                                            0
-                                                     </#if>
-                                                </span>
-                                            </a>
-                                        </li>
+                                <table id="project-table">
 
-                                        <li class="">
-                                            <a data-toggle="tab" href="#joined" aria-expanded="false">
-                                                我加入的
-                                                <span class="badge badge-primary">
-                                                     <#if joinedProjectList ??>
-                                                         ${joinedProjectList?size}
-                                                     <#else>
-                                                            0
-                                                     </#if>
-                                                </span>
-                                            </a>
-                                        </li>
-                                        <li class="">
-                                            <a data-toggle="tab" href="#apply" aria-expanded="false">
-                                                我申请的
-                                                <span class="badge badge-warning">
-                                                     <#if applyProjectList ??>
-                                                         ${applyProjectList?size}
-                                                     <#else>
-                                                            0
-                                                     </#if>
-                                                </span>
-                                            </a>
-                                        </li>
-                                    </ul>
+                                </table>
+                                <#--<div class="tabbable">-->
+                                    <#--<ul class="nav nav-tabs" id="myTab">-->
+                                        <#--<li class="active">-->
+                                            <#--<a data-toggle="tab" href="#owned" aria-expanded="true">-->
+                                                <#--我创建的-->
+                                                <#--<span class="badge badge-success">-->
+                                                     <#--<#if ownedProjectList ??>-->
+                                                         <#--${ownedProjectList?size}-->
+                                                     <#--<#else>-->
+                                                            <#--0-->
+                                                     <#--</#if>-->
+                                                <#--</span>-->
+                                            <#--</a>-->
+                                        <#--</li>-->
 
-                                    <div class="tab-content">
-                                        <div id="owned" class="tab-pane fade active in">
-                                             <#if ownedProjectList ?? && ownedProjectList?size == 0 >
-                                              <div class="alert alert-warning">
-                                                  <button type="button" class="close" data-dismiss="alert">
-                                                      <i class="ace-icon fa fa-times"></i>
-                                                  </button>
-                                                  暂时没有创建项目
-                                                  <br>
-                                              </div>
-                                             <#else>
-                                                 <#list ownedProjectList as project>
-                                                 <div class="media search-media">
-                                                     <div class="media-body">
-                                                         <div>
-                                                             <h3 class="media-heading">
-                                                                 <a href="#" class="blue"><b>${project.projectName}</b></a>
-                                                             </h3>
-                                                         </div>
+                                        <#--<li class="">-->
+                                            <#--<a data-toggle="tab" href="#joined" aria-expanded="false">-->
+                                                <#--我加入的-->
+                                                <#--<span class="badge badge-primary">-->
+                                                     <#--<#if joinedProjectList ??>-->
+                                                         <#--${joinedProjectList?size}-->
+                                                     <#--<#else>-->
+                                                            <#--0-->
+                                                     <#--</#if>-->
+                                                <#--</span>-->
+                                            <#--</a>-->
+                                        <#--</li>-->
+                                        <#--<li class="">-->
+                                            <#--<a data-toggle="tab" href="#apply" aria-expanded="false">-->
+                                                <#--我申请的-->
+                                                <#--<span class="badge badge-warning">-->
+                                                     <#--<#if applyProjectList ??>-->
+                                                         <#--${applyProjectList?size}-->
+                                                     <#--<#else>-->
+                                                            <#--0-->
+                                                     <#--</#if>-->
+                                                <#--</span>-->
+                                            <#--</a>-->
+                                        <#--</li>-->
+                                    <#--</ul>-->
 
-                                                         <p>
-                                                          <#if project.projectDesc?? && project.projectDesc!="">
-                                                              ${project.projectDesc}
-                                                          </#if>
-                                                         </p>
-                                                         <p>
-                                                              <#if project.projectTags?? && project.projectTags!="">
-                                                                 <#list project.projectTags?split(",") as s>
-                                                               <a href="#"><code>${s}</code></a>
-                                                                 </#list>
-                                                              </#if>
-                                                         </p>
-                                                         <div>
-                                                             <p>
-                                                                 <small>创建时间：${project.createTime?string('yyyy-MM-dd hh:mm:ss')}</small>
-                                                                 <small>更新时间：${project.editTime?string('yyyy-MM-dd hh:mm:ss')}</small>
-                                                             </p>
-                                                         </div>
-                                                         <div class="search-actions text-center">
-                                                             <span class="text-info"></span>
-                                                         <span class="blue bolder bigger-125"></span>
-                                                             <div class="action-buttons bigger-125">
-                                                                 <a href="#">
-                                                                     <i class="ace-icon fa fa-exclamation-circle green"></i>
-                                                                 </a>
+                                    <#--<div class="tab-content">-->
+                                        <#--<div id="owned" class="tab-pane fade active in">-->
+                                             <#--<#if ownedProjectList?? && ownedProjectList?size != 0 >-->
+                                                 <#--<#list ownedProjectList as project>-->
+                                                     <#--<div class="media search-media">-->
+                                                         <#--<div class="media-body">-->
+                                                             <#--<div>-->
+                                                                 <#--<h3 class="media-heading">-->
+                                                                     <#--<a href="#" class="blue"><b>${project.projectName}</b></a>-->
+                                                                 <#--</h3>-->
+                                                             <#--</div>-->
 
-                                                                 <a href="#">
-                                                                     <i class="ace-icon fa fa-users red"></i>
-                                                                 </a>
+                                                             <#--<p>-->
+                                                                 <#--<#if project.projectDesc?? && project.projectDesc!="">-->
+                                                                     <#--${project.projectDesc}-->
+                                                                 <#--</#if>-->
+                                                             <#--</p>-->
+                                                             <#--<p>-->
+                                                                 <#--<#if project.projectTags?? && project.projectTags!="">-->
+                                                                     <#--<#list project.projectTags?split(",") as s>-->
+                                                                         <#--<a href="#"><code>${s}</code></a>-->
+                                                                     <#--</#list>-->
+                                                                 <#--</#if>-->
+                                                             <#--</p>-->
+                                                             <#--<div>-->
+                                                                 <#--<p>-->
+                                                                     <#--<small>创建时间：${project.createTime?string('yyyy-MM-dd hh:mm:ss')}</small>-->
+                                                                     <#--<small>更新时间：${project.editTime?string('yyyy-MM-dd hh:mm:ss')}</small>-->
+                                                                 <#--</p>-->
+                                                             <#--</div>-->
+                                                             <#--<div class="search-actions text-center">-->
+                                                                 <#--<span class="text-info"></span>-->
+                                                                 <#--<span class="blue bolder bigger-125"></span>-->
+                                                                 <#--<div class="action-buttons bigger-125">-->
+                                                                     <#--<a href="#">-->
+                                                                         <#--<i class="ace-icon fa fa-exclamation-circle green"></i>-->
+                                                                     <#--</a>-->
 
-                                                                 <a href="#">
-                                                                     <i class="ace-icon fa fa-external-link blue"></i>
-                                                                 </a>
-                                                             </div>
-                                                             <a class="search-btn-action btn btn-sm btn-block btn-info" href="${project.projectID}/view.html">进入</a>
-                                                         </div>
-                                                     </div>
-                                                 </div>
-                                                  <hr>
-                                                 </#list>
-                                             </#if>
-                                        </div>
+                                                                     <#--<a href="#">-->
+                                                                         <#--<i class="ace-icon fa fa-users red"></i>-->
+                                                                     <#--</a>-->
 
-                                        <div id="joined" class="tab-pane fade">
-                                              <#if joinedProjectList ?? && joinedProjectList?size == 0 >
-                                                  <div class="alert alert-warning">
-                                                      <button type="button" class="close" data-dismiss="alert">
-                                                          <i class="ace-icon fa fa-times"></i>
-                                                      </button>
-                                                      暂时没有加入项目
-                                                      <br>
-                                                  </div>
-                                              <#else>
-                                                  <#list joinedProjectList as project>
-                                                        <div class="media search-media">
-                                                            <div class="media-body">
-                                                                <div>
-                                                                    <h4 class="media-heading">
-                                                                        <a href="#" class="blue">${project.projectName}</a>
-                                                                    </h4>
-                                                                </div>
-                                                                <p>
-                                                                  <#if project.projectDesc?? && project.projectDesc!="">
-                                                                      ${project.projectDesc}
-                                                                  <#else>
-                                                                      该项目没有描述
-                                                                  </#if>
-                                                                </p>
+                                                                     <#--<a href="#">-->
+                                                                         <#--<i class="ace-icon fa fa-external-link blue"></i>-->
+                                                                     <#--</a>-->
+                                                                 <#--</div>-->
+                                                                 <#--<a class="search-btn-action btn btn-sm btn-block btn-info" href="${project.projectID}/view.html">进入</a>-->
+                                                             <#--</div>-->
+                                                         <#--</div>-->
+                                                     <#--</div>-->
+                                                     <#--<hr>-->
+                                                 <#--</#list>-->
+                                             <#--<#else>-->
+                                                 <#--<div class="alert alert-warning">-->
+                                                     <#--<button type="button" class="close" data-dismiss="alert">-->
+                                                         <#--<i class="ace-icon fa fa-times"></i>-->
+                                                     <#--</button>-->
+                                                     <#--暂时没有创建项目-->
+                                                     <#--<br>-->
+                                                 <#--</div>-->
+                                             <#--</#if>-->
+                                        <#--</div>-->
 
-                                                                <div class="search-actions text-center">
-                                                                    <span class="text-info">创建者</span>
-                                                                <#--<span class="blue bolder bigger-125">${project.creatorID}</span>-->
-                                                                    <div class="action-buttons bigger-125">
-                                                                        <a href="#">
-                                                                            <i class="ace-icon fa fa-phone green"></i>
-                                                                        </a>
+                                        <#--<div id="joined" class="tab-pane fade">-->
+                                              <#--<#if joinedProjectList ?? && joinedProjectList?size != 0 >-->
+                                                  <#--<#list joinedProjectList as project>-->
+                                                      <#--<div class="media search-media">-->
+                                                          <#--<div class="media-body">-->
+                                                              <#--<div>-->
+                                                                  <#--<h4 class="media-heading">-->
+                                                                      <#--<a href="#" class="blue">${project.projectName}</a>-->
+                                                                  <#--</h4>-->
+                                                              <#--</div>-->
+                                                              <#--<p>-->
+                                                                  <#--<#if project.projectDesc?? && project.projectDesc!="">-->
+                                                                      <#--${project.projectDesc}-->
+                                                                  <#--<#else>-->
+                                                                      <#--该项目没有描述-->
+                                                                  <#--</#if>-->
+                                                              <#--</p>-->
 
-                                                                        <a href="#">
-                                                                            <i class="ace-icon fa fa-heart red"></i>
-                                                                        </a>
+                                                              <#--<div class="search-actions text-center">-->
+                                                                  <#--<span class="text-info">创建者</span>-->
+                                                                  <#--&lt;#&ndash;<span class="blue bolder bigger-125">${project.creatorID}</span>&ndash;&gt;-->
+                                                                  <#--<div class="action-buttons bigger-125">-->
+                                                                      <#--<a href="#">-->
+                                                                          <#--<i class="ace-icon fa fa-phone green"></i>-->
+                                                                      <#--</a>-->
 
-                                                                        <a href="#">
-                                                                            <i class="ace-icon fa fa-star orange2"></i>
-                                                                        </a>
-                                                                    </div>
-                                                                    <a class="search-btn-action btn btn-sm btn-block btn-info"
-                                                                       href="${project.projectID}/view.html">管理项目</a>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                  </#list>
-                                              </#if>
-                                        </div>
-                                        <div id="apply" class="tab-pane fade">
-                                               <#if applyProjectList ?? && applyProjectList?size == 0 >
-                                                  <div class="alert alert-warning">
-                                                      <button type="button" class="close" data-dismiss="alert">
-                                                          <i class="ace-icon fa fa-times"></i>
-                                                      </button>
-                                                      暂时没有加入项目
-                                                      <br>
-                                                  </div>
-                                               <#else>
-                                                   <#list applyProjectList as project>
-                                                       <div class="media search-media disabled">
-                                                           <div class="media-body">
-                                                               <div>
-                                                                   <h4 class="media-heading">
-                                                                       <a href="#" class="blue">${project.projectName}</a>
-                                                                   </h4>
-                                                               </div>
-                                                               <p>
-                                                                     <#if project.projectDesc?? && project.projectDesc!="">
-                                                                         ${project.projectDesc}
-                                                                     <#else>
-                                                                          该项目没有描述
-                                                                     </#if>
-                                                               </p>
+                                                                      <#--<a href="#">-->
+                                                                          <#--<i class="ace-icon fa fa-heart red"></i>-->
+                                                                      <#--</a>-->
 
-                                                               <div class="search-actions text-center">
-                                                                   <span class="grey">$</span>
+                                                                      <#--<a href="#">-->
+                                                                          <#--<i class="ace-icon fa fa-star orange2"></i>-->
+                                                                      <#--</a>-->
+                                                                  <#--</div>-->
+                                                                  <#--<a class="search-btn-action btn btn-sm btn-block btn-info"-->
+                                                                     <#--href="${project.projectID}/view.html">管理项目</a>-->
+                                                              <#--</div>-->
+                                                          <#--</div>-->
+                                                      <#--</div>-->
+                                                  <#--</#list>-->
+                                              <#--<#else>-->
+                                                  <#--<div class="alert alert-warning">-->
+                                                      <#--<button type="button" class="close" data-dismiss="alert">-->
+                                                          <#--<i class="ace-icon fa fa-times"></i>-->
+                                                      <#--</button>-->
+                                                      <#--暂时没有加入项目-->
+                                                      <#--<br>-->
+                                                  <#--</div>-->
 
-                                                                   <span class="grey bolder bigger-125">250</span>
-                                                                   monthly
-                                                                   <div class="action-buttons bigger-125">
-                                                                       <a href="#">
-                                                                           <i class="ace-icon fa fa-phone green"></i>
-                                                                       </a>
+                                              <#--</#if>-->
+                                        <#--</div>-->
+                                        <#--<div id="apply" class="tab-pane fade">-->
+                                               <#--<#if applyProjectList ?? && applyProjectList?size != 0 >-->
+                                                   <#--<#list applyProjectList as project>-->
+                                                       <#--<div class="media search-media disabled">-->
+                                                           <#--<div class="media-body">-->
+                                                               <#--<div>-->
+                                                                   <#--<h4 class="media-heading">-->
+                                                                       <#--<a href="#" class="blue">${project.projectName}</a>-->
+                                                                   <#--</h4>-->
+                                                               <#--</div>-->
+                                                               <#--<p>-->
+                                                                   <#--<#if project.projectDesc?? && project.projectDesc!="">-->
+                                                                       <#--${project.projectDesc}-->
+                                                                   <#--<#else>-->
+                                                                       <#--该项目没有描述-->
+                                                                   <#--</#if>-->
+                                                               <#--</p>-->
 
-                                                                       <a href="#">
-                                                                           <i class="ace-icon fa fa-heart red"></i>
-                                                                       </a>
+                                                               <#--<div class="search-actions text-center">-->
+                                                                   <#--<span class="grey">$</span>-->
 
-                                                                       <a href="#">
-                                                                           <i class="ace-icon fa fa-star orange2"></i>
-                                                                       </a>
-                                                                   </div>
-                                                                   <a class="search-btn-action btn btn-sm btn-block btn-grey disabled">Unavailable!</a>
-                                                               </div>
-                                                           </div>
-                                                       </div>
-                                                   </#list>
-                                               </#if>
-                                        </div>
-                                    </div>
-                                </div>
+                                                                   <#--<span class="grey bolder bigger-125">250</span>-->
+                                                                   <#--monthly-->
+                                                                   <#--<div class="action-buttons bigger-125">-->
+                                                                       <#--<a href="#">-->
+                                                                           <#--<i class="ace-icon fa fa-phone green"></i>-->
+                                                                       <#--</a>-->
+
+                                                                       <#--<a href="#">-->
+                                                                           <#--<i class="ace-icon fa fa-heart red"></i>-->
+                                                                       <#--</a>-->
+
+                                                                       <#--<a href="#">-->
+                                                                           <#--<i class="ace-icon fa fa-star orange2"></i>-->
+                                                                       <#--</a>-->
+                                                                   <#--</div>-->
+                                                                   <#--<a class="search-btn-action btn btn-sm btn-block btn-grey disabled">Unavailable!</a>-->
+                                                               <#--</div>-->
+                                                           <#--</div>-->
+                                                       <#--</div>-->
+                                                   <#--</#list>-->
+                                               <#--<#else>-->
+                                                   <#--<div class="alert alert-warning">-->
+                                                       <#--<button type="button" class="close" data-dismiss="alert">-->
+                                                           <#--<i class="ace-icon fa fa-times"></i>-->
+                                                       <#--</button>-->
+                                                       <#--暂时没有加入项目-->
+                                                       <#--<br>-->
+                                                   <#--</div>-->
+                                               <#--</#if>-->
+                                        <#--</div>-->
+                                    <#--</div>-->
+                                <#--</div>-->
                             </div>
                         </div>
                     </div>
@@ -343,6 +347,13 @@
                             </button>
                             <strong>未查询到记录</strong>
                             <span id="project-show-alert-msg"></span>
+                            <br>
+                        </div>
+                        <div id="project-show-alert-success" class="alert alert-success" style="display: none">
+                            <button type="button" class="close" data-dismiss="alert">
+                                <i class="ace-icon fa fa-times"></i>
+                            </button>
+                            <span id="project-show-alert-msg-success"></span>
                             <br>
                         </div>
                         <div id="project-show" class="profile-user-info profile-user-info-striped" style="display: none">
@@ -400,7 +411,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary" id="join-project-btn" onclick="joinProject()" style="display: none">加入</button>
+                <button type="button" class="btn btn-primary" id="join-project-btn"  style="display: none">加入</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -438,9 +449,15 @@
 <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
 
 <script>
+
+    const API = {
+        "myProjectList":"/templates/api/project/my",
+        "searchProject":"/templates/api/project/info",
+        "joinProject":"/templates/api/project/apply"
+    }
     $(function () {
         $("#project-table").bootstrapTable({
-            url: "/templates/api/project/all",
+            url: API.myProjectList,
             method: "get",
             toolbar: "#tool-bar",
             striped: true,                      //是否显示行间隔色
@@ -462,23 +479,24 @@
 
             },
             //得到查询的参数
-            columns: [{
-                checkbox: true,
-                visible: true                  //是否显示复选框
-            }, {
-                field: 'id',
+            columns: [
+                {
+                field: 'projectID',
                 title: '项目编号',
                 sortable: true
             }, {
-                field: 'name',
+                field: 'projectName',
                 title: '项目名称',
-                sortable: true
+                sortable: true,
+                formatter:function(v, r, i){
+                    return '<a target="_blank" href="'+r.projectID+'/view.html">'+v+'</a>'
+                }
             }, {
-                field: 'description',
+                field: 'projectDesc',
                 title: '描述',
                 sortable: true,
             }, {
-                field: 'tags',
+                field: 'projectTags',
                 title: '标签',
             }, {
                 field: 'creator',
@@ -494,26 +512,34 @@
                 field: 'op',
                 title: '操作',
                 formatter: function (v, r, i) {
-                    return "<div >" +
-                            "<i class=\"ace-icon fa fa-hand-o-right icon-animated-hand-pointer blue\"></i>" +
-                            "<a href=\"" + r.id + "/view.html\">进入项目</a></div>"
+                    if(r.projectRole=="CREATOR"){
+                        return '<button class="btn btn-minier btn-default" disabled>离开项目</button>'
+                    }
+                    if(r.projectRole=='APPLY'){
+                        return '<button class="btn btn-minier btn-warning" >取消申请</button>'
+                    }
+                    return '<button class="btn btn-minier btn-danger">离开项目</button>'
                 }
             }],
         })
     });
 
+
     function searchProject() {
         const val = $("#project-input").val();
         let data ={};
-        if (parseFloat(val).toString() == "NaN") {
+        if (val.indexOf('-')>0) {
             data['invitationCode']=val;
             $("#join-project-btn").text("加入")
+            $('#join-project-btn').attr('onclick','joinProject(undefined,"'+val+'")')
+
         } else {
             data['projectID']=val;
             $("#join-project-btn").text("申请加入")
+            $('#join-project-btn').attr('onclick', 'joinProject("'+val+'",undefined)')
         }
         $.ajax({
-            url:"/templates/api/project/info",
+            url:API.searchProject,
             type:"get",
             data:data,
             success:function (data) {
@@ -531,25 +557,62 @@
             }
         })
     }
-    
+
+    /**
+     * 展示项目
+     * @param project
+     */
     function showProject(project) {
         $("#project-show").show()
         $("#project-show-alert").hide();
+        $("#project-show-alert-success").hide();
         $("#project-name-show").text(project['projectName']);
         $("#project-desc-show").text(project['projectDesc']);
         $("#project-tags-show").text(project['projectTags']);
         $("#project-create-time-show").text(new Date(project['createTime']).toLocaleString());
         $("#project-edit-time-show").text(new Date(project['editTime']).toLocaleString());
         $("#project-creator-show").text(project['creator']);
-        $("#join-project-btn").show();
+
+        if(project.projectRole==null){
+            $("#join-project-btn").show();
+        }else {
+            showInfo("您已经在项目内")
+        }
     }
+
+    function showInfo(msg){
+        $("#project-show-alert-success").show();
+        $("#project-show-alert-msg-success").text(msg);
+    }
+    /**
+     * 显示警告
+     * @param msg
+     */
     function showWarning(msg){
         $("#join-project-btn").hide();
         $("#project-show").hide()
+        $("#project-show-alert-success").hide();
         $("#project-show-alert").show();
         $("#project-show-alert-msg").text(msg);
     }
-    function joinProject() {
+    function joinProject(projectID,invitationCode) {
+        const data = {}
+        if(projectID==undefined){
+            data['invitationCode']=invitationCode;
+        }else {
+            data['projectID']=projectID;
+        }
+        $.ajax({
+            url:API.joinProject,
+            type:"POST",
+            data:data,
+            success:function (data) {
+                if(data.code==1){
+                    alert("操作成功");
+                    $("#project-table").bootstrapTable("refresh");
+                }
+            }
+        })
     }
 </script>
 </body>

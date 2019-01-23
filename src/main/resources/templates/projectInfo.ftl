@@ -295,7 +295,9 @@
                                     <a onclick="javascript:location='user.html'">
                                         <span class="badge badge-info">用户管理</span>
                                     </a>
-
+                                    <a data-toggle="modal" data-target="#invitationCodeModal">
+                                        <span class="badge badge-success">生成邀请码</span>
+                                    </a>
                                 </div>
                             </div>
 
@@ -353,7 +355,34 @@
             <!-- /.page-content -->
         </div>
         <!-- /.main-content -->
+        <div class="modal fade" id="invitationCodeModal" tabindex="-1" role="dialog" aria-labelledby="invitationCodeModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="invitationCodeModalLabel">生成邀请码</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="ace-icon fa fa-key "></i>
+                            </span>
+                            <input id="project-incode"type="text" class="form-control search-query" value="${project.invitationCode}">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-inverse btn-white" onclick="generateKey()">
+                                    <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                                    生成
+                                </button>
+                            </span>
+                        </div>
 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
         <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
             <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
         </a>
@@ -368,6 +397,11 @@
         <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
         <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
         <script>
+            const API={
+                updateProjectInfo:"/templates/api/project/${project.projectID}/",
+                deleteProject:"/templates/api/project/${project.projectID}",
+                updateProjectInCode:"/templates/api/project/${project.projectID}/invitationCode"
+            }
             $(function () {
                 $("#project-name").editable({
                     type: 'text',
@@ -433,7 +467,7 @@
                     data[params.name] = params.value
                     //async saving data in js model
                     $.ajax({
-                        url:'/templates/api/project/${project.projectID}/'+params.name,
+                        url:API.updateProjectInfo+params.name,
                         type: 'PUT',
                         async: true,
                         data: data,
@@ -451,7 +485,7 @@
                 if(name===$("#project-name").text()){
                     if(confirm("再一次确认")){
                         $.ajax({
-                            url:"/templates/api/project/${project.projectID}",
+                            url:API.deleteProject,
                             type:"DELETE",
                             success:function (data) {
                                 if(data.code===1){
@@ -464,6 +498,18 @@
                         })
                     }
                 }
+            }
+
+            function generateKey() {
+                $.ajax({
+                    url:API.updateProjectInCode,
+                    type:"PUT",
+                    success:function (data) {
+                        if(data.code==1){
+                            $("#project-incode").val(data.data)
+                        }
+                    }
+                })
             }
         </script>
 

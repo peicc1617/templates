@@ -15,13 +15,13 @@ public interface ProjectRoleMapper {
 
     long deleteProjectRole(@Param("projectID")long projectID,@Param("userID") long userID);
 
-    ProjectRole getMemberRoleOfProject(@Param("projectID") long projectID, @Param("userID") long userID);
+    ProjectRoleType getProjectRoleType(@Param("projectID") long projectID, @Param("userID") long userID);
 
-    List<ProjectRole> getRoleOfProject(long projectID);
+    List<ProjectRole> getRoleOfProject(@Param("projectID")long projectID);
 
     List<ProjectRole> getRoleOfProjectExcept(@Param("projectID")long projectID,@Param("roles")String roleTypes);
 
-    List<ProjectRole> getRoleOfProjectIn(long projectID,@Param("roles")ProjectRoleType[] roleTypes);
+    List<ProjectRole> getRoleOfProjectIn(@Param("projectID")long projectID,@Param("roles")ProjectRoleType[] roleTypes);
 
     List<Long> getUserIDListInProjectByProjectRoleType(@Param("projectID") long projectID,@Param("role") ProjectRoleType role);
 

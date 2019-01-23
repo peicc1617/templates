@@ -30,27 +30,12 @@
        SELECT * FROM project_node_result where projectID = #{id} AND nodeIndex = #{index} AND userID = #{userID}
     </select>
 
-    <update id="updateNodeResultList" parameterType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
-        UPDATE project_node_result
-        SET state = CASE
-        <foreach collection="list" item="item" index="index">
-            WHEN projectID = #{item.projectID} AND nodeIndex =#{item.nodeIndex} AND userID = #{item.userID} THEN #{state}
-        </foreach>,
-        SET  resultKey =CASE
-        <foreach collection="list" item="item" index="index">
-            WHEN projectID = #{item.projectID} AND nodeIndex =#{item.nodeIndex} AND userID = #{item.userID} THEN #{resultKey}
-        </foreach>,
-        SET  message =CASE
-        <foreach collection="list" item="item" index="index">
-            WHEN projectID = #{item.projectID} AND nodeIndex =#{item.nodeIndex} AND userID = #{item.userID} THEN #{message}
-        </foreach>,
-        SET  resultID =CASE
-        <foreach collection="list" item="item" index="index">
-            WHEN projectID = #{item.projectID} AND nodeIndex =#{item.nodeIndex} AND userID = #{item.userID} THEN #{resultID}
-        </foreach>,
-        SET  resultName =CASE
-        <foreach collection="list" item="item" index="index">
-            WHEN projectID = #{item.projectID} AND nodeIndex =#{item.nodeIndex} AND userID = #{item.userID} THEN #{resultName}
-        </foreach>,
+    <update id="updateNodeResult" parameterType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
+        UPDATE project_node_result set
+        state = #{state},
+        message =#{message},
+        resultID = #{resultID},
+        resultName= #{resultName}
+        WHERE projectID = #{projectID} and nodeIndex = #{nodeIndex} AND userID = #{userID}
     </update>
 </mapper>

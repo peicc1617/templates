@@ -1,94 +1,80 @@
+/**
+ * 初始化js事件
+ */
 $(document).ready(function(){
     $('#state-change-btn').on('click', finish);
-
-
     $("#cur-node-name-href").editable({
         type: 'text',
         title: '修改名称',
-        name:'name',
+        name:'nodeName',
         url: updateNodeHref,
-        validate: function (value) { //字段验证
-            if (!$.trim(value)) {
-                return '不能为空';
-            }
-        },
+        validate:validateEmpty
 
     })
-
     $("#cur-node-description-href").editable({
         type: 'textarea',
         title: '修改描述',
-        name:'description',
+        name:'nodeDesc',
         url: updateNodeHref,
-        validate: function (value) { //字段验证
-            if (!$.trim(value)) {
-                return '不能为空';
-            }
-        },
+        validate: validateEmpty
     })
     $("#cur-node-goal-href").editable({
         type: 'textarea',
         title: '修改目标',
         name:'goal',
         url: updateNodeHref,
-        validate: function (value) { //字段验证
-            if (!$.trim(value)) {
-                return '不能为空';
-            }
-        },
+        validate:validateEmpty
     })
-});
-function updateNodeHref(params) {
-    var d = new $.Deferred();
-    if (params.value === 'abc') {
-        return d.reject('error message'); //returning error via deferred object
-    } else {
-        data = {
-            projectID:PROJECT_ID,
-            nodeIndex:CUR_NODE.nodeIndex
-        }
-        data[params.name] = params.value
-        //async saving data in js model
-        $.ajax({
-            url: '/templates/api/project/node/'+params.name,
-            type: 'PUT',
-            async: true,
-            data: data,
-            success: function () {
-                CUR_NODE[params.name] = params.value;
-                stage.refreshGrid();
-                d.resolve();
+    function updateNodeHref(params) {
+        var d = new $.Deferred();
+        if (params.value === 'abc') {
+            return d.reject('error message'); //returning error via deferred object
+        } else {
+            data = {
+                projectID:PROJECT_ID,
+                nodeIndex:CUR_NODE.nodeIndex
             }
+            data[params.name] = params.value
+            //async saving data in js model
+            $.ajax({
+                url: API.editNode+params.name,
+                type: 'PUT',
+                async: true,
+                data: data,
+                success: function () {
+                    CUR_NODE[params.name] = params.value;
+                    d.resolve();
+                }
 
-        })
-        return d.promise();
+            })
+            return d.promise();
+        }
     }
-}
-//查看某个节点所触发的函数
-/**
- * @description 查看某个节点的函数
- */
-function viewNode() {
+    function validateEmpty(value) {
+        if (!$.trim(value)) {
+            return '不能为空';
+        }
+    }
+});
 
-}
 
 /**
  *
  * @param node
  */
-function updateView() {
+function refreshNodeRow() {
     //显示区域
     $("#stepInfoRow").attr("style", "display:none");
     $("#nodeInfoRow").attr("style", "display:display");
     //节点的名称
-    $("#cur-node-name-href").html(CUR_NODE.name);
+    $("#cur-node-name-href").editable("setValue",CUR_NODE.nodeName);
     //节点的描述
-    $("#cur-node-description-href").html(CUR_NODE.description);
+    $("#cur-node-description-href").editable("setValue",CUR_NODE.nodeDesc);
     if(CUR_NODE.templateProjectID===0){
         //显示工具页面
         $("a[href=#tool-tab]")[0].click();
         //当前节点绑定的是创新方法
-        $("#cur-node-goal-href").html(CUR_NODE.goal);
+        $("#cur-node-goal-href").editable("setValue",CUR_NODE.goal);
 
         //显示节点所选择的创新方法工具名
         $("#cur-node-data-widget").removeClass("widget-color-blue").removeClass("widget-color-dark");
@@ -154,44 +140,16 @@ function updateView() {
     }
 }
 
+
 /**
- * @description 修改某个节点的信息
+ * 给工作节点绑定APP
+ * @param appName
+ * @param appPath
+ * @param appIcon
  */
-function saveCurStepInfo() {
-
-    CUR_NODE.name = $("#node-name").val();
-    CUR_NODE.description = $("#node-description").val();
-    CUR_NODE.goal = $("#node-goal").val();
-
-    updateNode(false, function () {
-        ANALYSIS_MSG.type = MSG_TYPE_TABLE.NODE
-        ANALYSIS_MSG.content = "修改了节点[" + CUR_NODE.name + "]的信息"
-        Analysis.send();
-        resetGRID()
-    })
-    viewNode();
-    $("#cur-node-info-view-modal").modal('hide');
-}
-
-
-//向后台请求修改节点
-function updateNode(async, successFunction) {
-    //更新阶段信息，不涉及阶段个数，所以不需要修改edges
-    $.ajax({
-        url: "/templates/api/project/node",
-        type: "POST",
-        data: {
-            _method: "PUT",
-            projectID: PROJECT_ID,
-            node: JSON.stringify(CUR_NODE),
-        },
-        success: successFunction
-    })
-
-}
 function bindingApp(appName,appPath,appIcon){
     $.ajax({
-        url: '/templates/api/project/node/app',
+        url: API.nodeAPP,
         type: 'PUT',
         data: {
             projectID:PROJECT_ID,
@@ -204,7 +162,7 @@ function bindingApp(appName,appPath,appIcon){
             CUR_NODE.appName=appName;
             CUR_NODE.appPath = appPath;
             CUR_NODE.appIcon = appIcon;
-            updateView();
+            refreshNodeRow();
         }
 
     })
@@ -212,15 +170,17 @@ function bindingApp(appName,appPath,appIcon){
 
 function swapTemplate(){
     $.ajax({
-        url:"/templates/api/project/owned",
+        url:API.ownedProject,
         type:"GET",
         success:function(data){
-            if(data.length>0){
-                let $curStepTempSelect= $("#cur-node-temp-select");
-                data.forEach(project=>{
-                    let $option = $('<option></option>').text(project.name).attr('value',project.id);
-                    $curStepTempSelect.append($option);
-                })
+            if(data.code==1){
+                if(data.length>0){
+                    let $curStepTempSelect= $("#cur-node-temp-select");
+                    data.data.forEach(project=>{
+                        let $option = $('<option></option>').text(project.name).attr('value',project.id);
+                        $curStepTempSelect.append($option);
+                    })
+                }
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -232,10 +192,10 @@ function swapTemplate(){
     })
 }
 
-var NODE_JS = {
+const NODE_JS = {
     beforeAddNode:function (node) {
         $.ajax({
-            url: "/templates/api/project/node",
+            url: API.addNode,
             type: "POST",
             data: node,
             success: function (data) {
@@ -244,10 +204,9 @@ var NODE_JS = {
     },
     beforeRemoveNode:function (node) {
         $.ajax({
-            url: "/templates/api/project/node",
+            url: API.deleteNode,
             type: "DELETE",
             data: {
-                projectID: PROJECT_ID,
                 nodeIndex: node.nodeIndex,
             },
             success: function (data) {
@@ -258,7 +217,7 @@ var NODE_JS = {
     beforeViewNode:function(node){
         CUR_NODE = node;
         //设置当前节点的显示区域
-        updateView();
+        refreshNodeRow();
         //加载结果列表
         loadCurStepResult();
     }
@@ -267,13 +226,12 @@ var NODE_JS = {
 
 
 
-//锁定当前节点
 /**
  * @description 锁定节点的函数
  */
 function lockNode() {
     $.ajax({
-        url:"/templates/api/project/node/lock",
+        url:API.nodeLock,
         type:"PUT",
         data:{
             projectID:PROJECT_ID,
@@ -282,36 +240,39 @@ function lockNode() {
         },
         success:function (data) {
             CUR_NODE.lockState = !CUR_NODE.lockState;
-            updateView()
+            refreshNodeRow()
         }
     })
 
 }
 
+/**
+ * 当前节点状态设置为已完成
+ */
 function finish() {
     $.ajax({
-        url:"/templates/api/project/node/state",
+        url:API.nodeState,
         type:"PUT",
         data:{
-            projectID:PROJECT_ID,
             nodeIndex: CUR_NODE.nodeIndex,
             state:!CUR_NODE.lockState,
         },
         success:function (data) {
             CUR_NODE.state = !CUR_NODE.state;
-            updateView()
+            refreshNodeRow()
         }
     })
 }
 
+/**
+ * 保存当前工作节点的总结
+ */
 function saveNodeSummary(){
-
     let summary = $("#cur-node-summary").html();
     $.ajax({
-        url:"/templates/api/project/node/summary",
+        url:API.editNodeSummary,
         type:"PUT",
         data:{
-            projectID:PROJECT_ID,
             nodeIndex: CUR_NODE.nodeIndex,
             summary:summary,
         },
@@ -323,26 +284,21 @@ function saveNodeSummary(){
 /**
  * 绑定模板的函数
  */
-function bangdingTemplate() {
-
+function bindingTemplate() {
     $.ajax({
-        url:"/templates/api/project/node/template",
+        url:API.nodeTemplate,
         type:"PUT",
         data:{
-            projectID:PROJECT_ID,
             nodeIndex: CUR_NODE.nodeIndex,
             templateProjectID:parseInt($("#cur-node-temp-select").val()),
         },
         success:function (data) {
             CUR_NODE.state = 1;
             CUR_NODE.templateProjectID = parseInt($("#cur-node-temp-select").val());
-            updateView()
+            refreshNodeRow()
         }
     });
-
     CUR_NODE.state = 1;
-
-    viewNode();
 }
 
 

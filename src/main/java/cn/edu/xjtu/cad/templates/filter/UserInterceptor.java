@@ -1,40 +1,39 @@
 package cn.edu.xjtu.cad.templates.filter;
 
+import cn.edu.xjtu.cad.templates.config.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Map;
 
-public class LoginFilter implements Filter {
+
+public class UserInterceptor implements HandlerInterceptor {
+    @Autowired
+    User user;
+
     private final static String LOGIN_URL = "/webresources/userLogin.jsp";
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-
-    }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        HttpServletRequest request = (HttpServletRequest)servletRequest;
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Map<String,String> userInfo = (Map<String,String>) request.getSession().getAttribute("userInfo");
         if(userInfo==null){
             //用户未登录
-            HttpServletResponse response = (HttpServletResponse)servletResponse;
             StringBuilder redirectURL = new StringBuilder(LOGIN_URL).append("?serviceURL=");
-            if(request.getMethod()=="GET"){
+            if(request.getMethod().equals("GET")){
                 redirectURL.append(URLEncoder.encode(getFullServiceURL(request.getRequestURL(),request.getParameterMap()),"UTF-8"));
             }else {
                 redirectURL.append(URLEncoder.encode(request.getRequestURL().toString(),"UTF-8"));
             }
             response.sendRedirect(redirectURL.toString());
-        }else {
-            filterChain.doFilter(servletRequest,servletResponse);
+            return false;
         }
+        String userIDStr = userInfo.get("id");
+        user.setUserID(Long.valueOf(userIDStr));
+        return true;
     }
-
     /**
      * 获取完整的ServiceURL，
      * 通过将请求URL与参数列表进行拼接得到完成的URL,只适用于GET请求
@@ -57,9 +56,4 @@ public class LoginFilter implements Filter {
         return requestURL.toString();
     }
 
-
-    @Override
-    public void destroy() {
-
-    }
 }

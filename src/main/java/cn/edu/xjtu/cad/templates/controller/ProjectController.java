@@ -1,13 +1,11 @@
 package cn.edu.xjtu.cad.templates.controller;
 
-import cn.edu.xjtu.cad.templates.annotation.CurUser;
-import cn.edu.xjtu.cad.templates.annotation.CurUserID;
 import cn.edu.xjtu.cad.templates.annotation.SystemControllerLog;
-import cn.edu.xjtu.cad.templates.model.Result;
+import cn.edu.xjtu.cad.templates.aop.MyException;
 import cn.edu.xjtu.cad.templates.model.log.LogType;
 import cn.edu.xjtu.cad.templates.model.log.MethodType;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
-import cn.edu.xjtu.cad.templates.model.project.User;
+import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.service.ProjectService;
 import cn.edu.xjtu.cad.templates.dao.ProjectMapper;
 import cn.edu.xjtu.cad.templates.dao.ProjectRoleMapper;
@@ -15,7 +13,9 @@ import cn.edu.xjtu.cad.templates.model.project.Project;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,6 +23,8 @@ import java.util.Map;
 public class ProjectController {
 
 
+    @Autowired
+    User user;
 
     @Autowired
     ProjectMapper projectMapper;
@@ -34,56 +36,97 @@ public class ProjectController {
     ProjectRoleMapper projectRoleMapper;
 
     /**
-     * 获取当前用户所出的所有项目
+     * 获取当前用户所拥有的所有项目
      * @return 返回项目列表JSON格式
      */
     @RequestMapping(value = "/owned", method = RequestMethod.GET)
-    public Result getOwnedProjectList(@CurUser User user) {
-        return projectService.getOwnedProjectListResult(user);
+    public List<Project> getOwnedProjectList() {
+        return projectService.getOwnedProjectList(user);
     }
 
     @RequestMapping(value = "/joined", method = RequestMethod.GET)
-    public Result getJoinedProjectList(@CurUser User user) {
-        return projectService.getJoinedProjectListResult(user);
+    public List<Project> getJoinedProjectList() {
+//        return projectService.getJoinedProjectListResult(user);
+        return null;
     }
 
-    @RequestMapping(value = "/my", method = RequestMethod.GET)
-    public Result getMyProjectList(@CurUser User user) {
-        return projectService.getMyProjectListResult(user);
-    }
-
-    @RequestMapping(value = "/open",method = RequestMethod.GET)
-    public Result getOpenProjectList(){
-        return projectService.getOpenProjectListResult();
-    }
-
-    @RequestMapping(value = "/info",method = RequestMethod.GET,params = "projectID")
-    public Result getProjectInfoByProjectID(@CurUser User user, long projectID){
-        return projectService.getProjectInfoByIDResult(user,projectID);
-    }
-
-    @RequestMapping(value = "/info",method = RequestMethod.GET,params = "invitationCode")
-    public Result getProjectInfoByCode(@CurUser User user, String invitationCode){
-        return projectService.getProjectInfoByCodeResult(invitationCode);
-    }
     /**
-     * 获取id对应项目
+     * 获取我的项目列表
+     * @return
+     */
+    @RequestMapping(value = "/my", method = RequestMethod.GET)
+    public List<Project> getMyProjectList() {
+        return projectService.getMyProjectList(user.getUserID());
+    }
+
+    /**
+     * 获取当前所有的公开项目
+     * @return
+     */
+    @RequestMapping(value = "/public",method = RequestMethod.GET)
+    public List<Project> getOpenProjectList(){
+        return projectService.getOpenProjectList(user.getUserID());
+    }
+
+
+    /**
+     * 获取id对应项目信息
+     * @param projectID
+     * @return
+     */
+    @RequestMapping(value = "/info",method = RequestMethod.GET)
+    public Project getProjectInfoByProjectID(long projectID) throws MyException {
+        return projectService.getProjectInfoByProjectID(user.getUserID(),projectID);
+    }
+
+    /**
+     * 根据邀请码获取项目信息
+     * @param invitationCode 邀请码
+     * @return
+     */
+    @RequestMapping(value = "/info",method = RequestMethod.GET,params = "invitationCode")
+    public Project getProjectInfoByCode(String invitationCode) throws MyException {
+        return projectService.getProjectInfoByCode(user.getUserID(),invitationCode);
+    }
+
+    /**
+     * 申请加入项目
      * @param projectID 项目ID
      * @return 返回该项目，JSON格式
      */
-    @RequestMapping(value = "", method = RequestMethod.GET,params = "projectID")
-    public Result getProjectByProjectID(@CurUser User user, long projectID) {
-        return projectService.getProjectByIDResult(user,projectID);
+    @RequestMapping(value = "/apply", method = RequestMethod.POST,params = "projectID")
+    public void applyToProject(long projectID) throws MyException {
+         projectService.applyToProject(user.getUserID(),projectID);
     }
 
-    @RequestMapping(value = "",method = RequestMethod.GET,params = "invitationCode")
-    public Result getProjectByCode(String invitationCode){
-        return projectService.getProjectByCodeResult(invitationCode);
+
+    /**
+     * 根据邀请码加入项目
+     * @param invitationCode
+     * @return
+     */
+    @RequestMapping(value = "/apply",method = RequestMethod.POST,params = "invitationCode")
+    public void joinProjectByCode(String invitationCode) throws MyException {
+         projectService.joinProjectByCode(user.getUserID(),invitationCode);
+    }
+
+    @RequestMapping(value = "/quit",method = RequestMethod.DELETE,params = "projectID")
+    public ModelAndView quitFromProject(long projectID){
+        ModelAndView model = new ModelAndView( "forward:/api/project/"+projectID+"/role?userID="+user.getUserID());//默认forward，可以不用写
+        return model;
     }
 
     /**
+     * 获取项目的详细信息，包括项目的信息、项目内的工作节点信息、项目内的阶段信息。
+     * @param projectID
+     * @return
+     */
+    @RequestMapping(value = "/{projectID}/detail",method = RequestMethod.GET)
+    public Project getProjectDetail(@PathVariable long projectID){
+        return projectService.getProjectByID(projectID);
+    }
+    /**
      * 创建项目
-     *
      * @param project 项目的基本信息
      * @return 返回是否创建成功，True or False
      */
@@ -92,8 +135,8 @@ public class ProjectController {
             logType = LogType.PROJECT,
             methodType = MethodType.ADD)
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public Result createProject(@CurUserID long userID,Project project,long referID) {
-        return projectService.newProject(project, userID,referID);
+    public long createProject(Project project,long referID) throws MyException {
+        return projectService.newProject(project, user.getUserID(),referID);
     }
 
     /**
@@ -108,8 +151,8 @@ public class ProjectController {
             logType = LogType.PROJECT,
             methodType = MethodType.UPDATE)
     @RequestMapping(value = "/{projectID}/projectName", method = RequestMethod.PUT)
-    public Result updateProjectName(@CurUser User user,@PathVariable long projectID, String projectName) {
-        return projectService.updateProjectInfo(user,projectID,projectName,null,null);
+    public void updateProjectName(@PathVariable long projectID, String projectName) throws MyException {
+        projectService.updateProjectInfo(user,projectID,projectName,null,null);
     }
 
     /**
@@ -123,8 +166,8 @@ public class ProjectController {
             logType = LogType.PROJECT,
             methodType = MethodType.UPDATE)
     @RequestMapping(value = "/{projectID}/projectDesc", method = RequestMethod.PUT)
-    public Result updateProjectDes(@CurUser User user,@PathVariable long projectID, String projectDesc) {
-        return projectService.updateProjectInfo(user,projectID,null,projectDesc,null);
+    public void updateProjectDes(@PathVariable long projectID, String projectDesc) throws MyException {
+        projectService.updateProjectInfo(user,projectID,null,projectDesc,null);
     }
 
     /**
@@ -136,18 +179,23 @@ public class ProjectController {
      */
     @SystemControllerLog(content = "将项目标签修改为${projectTags}", logType = LogType.PROJECT, methodType = MethodType.UPDATE)
     @RequestMapping(value = "/{projectID}/projectTags", method = RequestMethod.PUT)
-    public Result updateProjectTags(@CurUser User user,@PathVariable long projectID, String projectTags) {
-        return projectService.updateProjectInfo(user,projectID,null,null,projectTags);
+    public void updateProjectTags(@PathVariable long projectID, String projectTags) throws MyException {
+         projectService.updateProjectInfo(user,projectID,null,null,projectTags);
+    }
+
+    @RequestMapping(value = "/{projectID}/invitationCode", method = RequestMethod.PUT)
+    public String updateProjectInvitationCode(@PathVariable long projectID) throws MyException {
+        return projectService.updateProjectInCode(user,projectID);
     }
 
     @SystemControllerLog(content = "将项目删除", logType = LogType.PROJECT, methodType = MethodType.DELETE)
     @RequestMapping(value = "/{projectID}", method = RequestMethod.DELETE)
-    public Result deleteProject(@CurUser User user,@PathVariable long projectID) {
-        return projectService.deleteProject(user,projectID);
+    public void deleteProject(@PathVariable long projectID) {
+         projectService.deleteProject(user,projectID);
     }
 
     @RequestMapping(value = "/{projectID}/role/userList", method = RequestMethod.GET)
-    public Result getProjectRoleByID(@CurUser User user,@PathVariable long projectID) {
+    public List<ProjectRole> getProjectRoleListByProjectID(@PathVariable long projectID) {
         return projectService.getUserListInProject(user,projectID);
     }
 
@@ -157,8 +205,8 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/{projectID}/role/member", method = RequestMethod.GET)
-    public ProjectRole getProjectRole(@PathVariable long projectID, long userID) {
-        return projectRoleMapper.getMemberRoleOfProject(projectID, userID);
+    public ProjectRoleType getProjectRole(@PathVariable long projectID, long userID) {
+        return projectRoleMapper.getProjectRoleType(projectID, userID);
     }
 
     /**
@@ -172,22 +220,34 @@ public class ProjectController {
             logType = LogType.USER,
             methodType = MethodType.UPDATE)
     @RequestMapping(value = "/{projectID}/role", method = RequestMethod.PUT)
-    public Result updateProjectRole(@CurUser User user, @PathVariable long projectID, long userID, ProjectRoleType projectRole) {
-        return projectService.updateRoleOfMemberInProject(user,projectID,userID,projectRole);
+    public void updateProjectRole(@PathVariable long projectID, long userID, ProjectRoleType projectRole) throws MyException {
+        projectService.updateRoleOfMemberInProject(user,projectID,userID,projectRole);
     }
 
 
+    /**
+     * 邀请用户加入项目
+     * @param projectID
+     * @param userID
+     * @return
+     */
     @SystemControllerLog(content = "邀请用户${userID}加入项目", logType = LogType.USER, methodType = MethodType.ADD)
     @RequestMapping(value = "/{projectID}/role", method = RequestMethod.POST)
-    public Result addProjectRole(@CurUser User curUser,@PathVariable long projectID,long  userID) {
-
-        return projectService.appendUser2Project(curUser,projectID,userID);
+    public void addProjectRole(@PathVariable long projectID,long  userID) throws MyException {
+        projectService.appendUser2Project(user.getProjectRoleType(),projectID,userID,ProjectRoleType.MEMBER);
     }
 
+
+    /**
+     * 将用户移除项目
+     * @param projectID
+     * @param userID
+     * @return
+     */
     @SystemControllerLog(content = "将用户${userID}移除出项目", logType = LogType.USER, methodType = MethodType.DELETE)
     @RequestMapping(value = "/{projectID}/role", method = RequestMethod.DELETE)
-    public Result deleteProjectRole(@CurUser User user,@PathVariable long projectID, long userID) {
-        return projectService.deleteUserFromProject(user,projectID,userID);
+    public void deleteProjectRole(@PathVariable long projectID, long userID) throws MyException {
+        projectService.deleteUserFromProject(user,projectID,userID);
     }
 
 

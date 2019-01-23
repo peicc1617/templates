@@ -50,5 +50,9 @@ public interface ProjectMapper {
     long deleteProject(long projectID);
 
 
-    List<Project> getOpenProject();
+    List<Project> getOpenProject(@Param("userID") long userID);
+
+    long updateProjectInCode(@Param("projectID")long projectID,@Param("invitationCode") String invitationCode);
+
+    List<Project> getProjectListByUserAndRole(@Param("userID")long userID,@Param("projectRole") ProjectRoleType creator);
 }

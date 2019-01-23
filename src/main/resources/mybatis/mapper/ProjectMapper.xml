@@ -5,10 +5,12 @@
     <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
     <insert id="addProject" parameterType="cn.edu.xjtu.cad.templates.model.project.Project" useGeneratedKeys="true"
             keyProperty="projectID">
-        INSERT INTO project (projectName, projectDesc, projectTags) VALUES
+        INSERT INTO project (projectName, projectDesc, projectTags,openState,invitationCode) VALUES
             (#{projectName},
              #{projectDesc},
-             #{projectTags})
+             #{projectTags},
+             #{openState},
+             #{invitationCode})
     </insert>
 
     <select id="getAllProjectListByUserID" resultType="cn.edu.xjtu.cad.templates.model.project.Project">
@@ -44,6 +46,12 @@
         WHERE invitationCode = #{invitationCode}
     </select>
 
+    <select id="getProjectListByUserAndRole" resultType="cn.edu.xjtu.cad.templates.model.project.Project">
+        SELECT *
+        FROM project,project_role
+        WHERE project.projectID = project_role.projectID AND userID = #{userID} AND project_role.projectRole = #{projectRole}
+    </select>
+
     <select id="getOpenProject" resultType="cn.edu.xjtu.cad.templates.model.project.Project">
         SELECT * FROM project WHERE openState = 1;
     </select>
@@ -54,6 +62,11 @@
         where projectID = #{projectID}
     </update>
 
+    <update id="updateProjectInCode">
+        UPDATE project
+        set invitationCode = #{invitationCode}
+        where projectID = #{projectID}
+    </update>
     <delete id="deleteProject">
         DELETE FROM project WHERE projectID = #{projectID}
     </delete>

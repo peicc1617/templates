@@ -5,23 +5,23 @@
     <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
 
     <insert id="addAllNodes" parameterType="java.util.List">
-        INSERT INTO project_node (projectID,nodeIndex,name,description,goal,stepIndex) VALUES
+        INSERT INTO project_node (projectID,nodeIndex,nodeName,nodeDesc,goal,stepIndex) VALUES
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.projectID},
             #{item.nodeIndex},
-            #{item.name},
-            #{item.description},
+            #{item.nodeName},
+            #{item.nodeDesc},
             #{item.goal},
             #{item.stepIndex})
         </foreach>
     </insert>
 
     <insert id="addNode" parameterType="cn.edu.xjtu.cad.templates.model.project.node.Node">
-        INSERT INTO project_node  (projectID,nodeIndex,name,description,goal,stepIndex) VALUES
+        INSERT INTO project_node  (projectID,nodeIndex,nodeName,nodeDesc,goal,stepIndex) VALUES
             (#{projectID},
             #{nodeIndex},
-            #{name},
-            #{description},
+            #{nodeName},
+            #{nodeDesc},
             #{goal},
             #{stepIndex})
     </insert>
@@ -32,8 +32,8 @@
 
     <update id="updateNode" parameterType="cn.edu.xjtu.cad.templates.model.project.node.Node">
         UPDATE project_node SET
-        name = #{name},
-        description = #{description},
+        nodeName = #{nodeName},
+        nodeDesc = #{nodeDesc},
         stepIndex = #{stepIndex},
         goal = #{goal},
         summary = #{summary},

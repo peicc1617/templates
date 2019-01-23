@@ -45,6 +45,9 @@
     <script src="assets/js/html5shiv.min.js"></script>
     <script src="assets/js/respond.min.js"></script>
     <![endif]-->
+    <script>
+
+    </script>
 </head>
 
 <body class="no-skin">
@@ -86,6 +89,7 @@
                         <div class="row">
                             <table id="project-table">
                             </table>
+
                         </div>
 
                     </div>
@@ -96,7 +100,7 @@
         </div>
     </div><!-- /.main-content -->
 
-     <#include "/common/footer.ftl">
+    <#include "/common/footer.ftl">
 
 
     <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
@@ -141,7 +145,7 @@
 <![endif]-->
 <script type="text/javascript">
     if ('ontouchstart' in document.documentElement) document.write(
-            "<script src='/webresources/ace-master/assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+        "<script src='/webresources/ace-master/assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
 </script>
 <script src="/webresources/ace-master/assets/js/bootstrap.min.js"></script>
 
@@ -158,13 +162,17 @@
 <script src="/webresources/ace-master/assets/js/bootstrap-tag.min.js"></script>
 <script src="/webresources/bootstrap/bootstrap-table/bootstrap-table.js"></script>
 <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
-
 <script>
+    const API = {
+        publicProjectList: "/templates/api/project/public",
+        joinProject:"/templates/api/project/apply",
+        quitProject:"/templates/api/project/quit"
+    }
     $(function () {
         $("#project-table").bootstrapTable({
-            url:"/templates/api/project/all",
-            method:"get",
-            toolbar:"#tool-bar",
+            url: API.publicProjectList,
+            method: "get",
+            toolbar: "#tool-bar",
             striped: true,                      //是否显示行间隔色
             // pagination: true,                   //是否显示分页（*）
             // sortable: true,                     //是否启用排序
@@ -179,79 +187,96 @@
             uniqueId: "id",                     //每一行的唯一标识，一般为主键列
             // showToggle: true,                   //是否显示详细视图和列表视图的切换按钮
             cardView: false,                    //是否显示详细视图
-            detailView: true,                  //是否显示父子表,
-            detailFormatter:function(index,row){
-
-            },
+            detailView: false,                  //是否显示父子表,
             //得到查询的参数
-            columns: [{
-                checkbox: true,
-                visible: true                  //是否显示复选框
-            }, {
-                field: 'id',
-                title: '项目编号',
-                sortable: true
-            }, {
-                field: 'name',
-                title: '项目名称',
-                sortable: true
-            }, {
-                field: 'description',
-                title: '描述',
-                sortable: true,
-            }, {
-                field: 'tags',
-                title: '标签',
-            }, {
-                field: 'creator',
-                title: '创建者'
-            }, {
-                field: 'createTime',
-                title: '创建时间',
-                formatter:function(value){
-                    return new Date(value).toLocaleString();
+            columns: [
+                {
+                    field: 'projectID',
+                    title: '项目编号',
+                    sortable: true
                 },
-                sortable: true
-            }, {
-                field: 'op',
-                title: '操作',
-                formatter:function (v,r,i) {
-                    return "<div >" +
-                            "<i class=\"ace-icon fa fa-hand-o-right icon-animated-hand-pointer blue\"></i>" +
-                            "<a href=\""+r.id+"/view.html\">进入项目</a></div>"
-                }
-            }],
+                {
+                    field: 'projectName',
+                    title: '项目名称',
+                    sortable: true,
+                    formatter: function (v, r, i) {
+                        return '<a target="_blank" href="' + r.projectID + '/view.html">' + v + '</a>'
+                    }
+                }, {
+                    field: 'projectDesc',
+                    title: '描述',
+                    sortable: true,
+                    formatter: function (v, r, i) {
+                        if(v!=null&&v!=undefined&&v.trim().length!=0){
+                            return v.substring(0, 20) + "...";
+                        }
+
+                    }
+                }, {
+                    field: 'projectTags',
+                    title: '标签',
+                    formatter: function (v) {
+                        return v.split(',').map(tag => {
+                            return '<span class="label label-warning label-white middle">' + tag + '</span>'
+                        }).join('');
+                    }
+                }, {
+                    field: 'creator',
+                    title: '创建者'
+                }, {
+                    field: 'editTime',
+                    title: '更新时间',
+                    formatter: function (value) {
+                        return new Date(value).toLocaleString();
+                    },
+                    sortable: true
+                }, {
+                    field: 'op',
+                    title: '操作',
+                    formatter: function (v, r, i) {
+                        if(r.projectRole==null||r.projectRole==undefined){
+                            return '<button class="btn btn-minier btn-info" onclick="joinProject('+r.projectID+')">申请加入</button>';
+                        }
+                        if(r.projectRole==="APPLY"){
+                            return '<button class="btn btn-minier btn-warning" onclick="quitFromProject('+r.projectID+')">取消申请</button>';
+                        }
+                        return '<button class="btn btn-minier btn-danger" onclick="quitFromProject('+r.projectID+')">退出项目</button>';
+
+                    }
+                }],
         })
     });
 
-
-    function descriptionFormatter(value, row, index) {
-        return "<small>" + value + "</small>"
+    function joinProject(projectID) {
+        $.ajax({
+            url:API.joinProject,
+            type:"POST",
+            data:{
+                projectID:projectID
+            },
+            success:function (data) {
+                if(data.code==1){
+                    alert("申请成功");
+                    $("#project-table").bootstrapTable("refresh");
+                }
+            }
+        })
     }
 
-    function recommendFormatter() {
-        return "<a class=\"blue\" href=\"#\"><i class=\"ace-icon fa fa-search-plus bigger-130\"></i></a>";
-    }
-
-    function caseFormatter() {
-        return "<a class=\"blue\" href=\"#\"><i class=\"ace-icon fa fa-search-plus bigger-130\"></i></a>";
-    }
-
-    function viewFormatter() {
-        return "<a class=\"blue\" href=\"#\"><i class=\"ace-icon fa fa-search-plus bigger-130\"></i></a>";
-    }
-
-    function detailFormatter(index, row) {
-        return "<p>" + row.description + "</p>";
-    }
-
-    function selectRefer(e) {
-        var row = $("#refer-table").bootstrapTable("getSelections")[0];
-        if (row) {
-            $('#project-refer').val("[" + row.referID + "]" + row.referName);
-            $("#project-refer-hidden").val(row.referID);
-        }
-        $(e).prev().click()
+    function quitFromProject(projectID) {
+        $.ajax({
+            url:API.quitProject,
+            type:"DELETE",
+            data:{
+                projectID:projectID
+            },
+            success:function (data) {
+                if(data.code==1){
+                    alert("操作成功");
+                    $("#project-table").bootstrapTable("refresh");
+                }
+            }
+        })
     }
 </script>
 </body>

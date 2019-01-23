@@ -1,7 +1,6 @@
 package cn.edu.xjtu.cad.templates.aop;
 
-import cn.edu.xjtu.cad.templates.model.project.User;
-import cn.edu.xjtu.cad.templates.service.LogService;
+import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.service.ProjectService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -14,12 +13,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.ContextLoader;
-import org.springframework.web.context.WebApplicationContext;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.Map;
 
 @Aspect
 @Component

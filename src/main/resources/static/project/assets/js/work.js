@@ -74,8 +74,8 @@ $(document).ready(function () {
                     func: function (workFlow,workStep) {
                         let step = {
                             stepIndex: UUID(),
-                            name: "阶段",
-                            description: "描述",
+                            stepName: "阶段",
+                            stepDesc: "描述",
                             projectID: PROJECT_ID,
                             pos:workStep.step.pos,
                         };
@@ -87,8 +87,8 @@ $(document).ready(function () {
                     func: function (workFlow,workStep) {
                         let step = {
                             stepIndex: UUID(),
-                            name: "阶段",
-                            description: "描述",
+                            stepName: "阶段",
+                            stepDesc: "描述",
                             projectID: PROJECT_ID,
                             pos:workStep.step.pos+1,
                         };
@@ -1120,7 +1120,7 @@ $(document).ready(function () {
          */
         addStep: function (step) {
             //触发事件
-            this.trigger('before.add-step', step)
+            this.trigger('before.add-step', step);
             //执行函数
             this.options.stepMap.forEach((steppp,stepIndex)=>{
                 if(steppp.pos>=step.pos&&steppp.stepIndex!=step.stepIndex){
@@ -1351,7 +1351,7 @@ $(document).ready(function () {
                 x: (this.xy1.x + this.xy2.x) / 2,
                 y: this.xy1.y + this.barHeight / 2,
                 "font-size": (this.barHeight / 2).toFixed(2) + "px",
-            })[0].textContent = this.step.name;
+            })[0].textContent = this.step.stepName;
 
         },
         drawToolBar: function () {
@@ -1507,7 +1507,7 @@ $(document).ready(function () {
             const name = svg('text', $nodeG, undefined, {
                 class: 'work node name',
             });
-            name.textContent = this.node.name;
+            name.textContent = this.node.nodeName;
             $(name).attr(textAttr);
             const app = svg('text', $nodeG, undefined, {
                 class: 'work node appName',
@@ -1539,7 +1539,7 @@ $(document).ready(function () {
                 y: this.y + this.height / 3 * 2,
                 // "transform":"translate("+this.x+","+this.y+")"
             })
-            $('.name', this.nodeGID)[0].textContent = this.node.name;
+            $('.name', this.nodeGID)[0].textContent = this.node.nodeName;
             $('.appName', this.nodeGID)[0].textContent = this.node.appName;
         },
         showAppName: function () {
@@ -1729,7 +1729,7 @@ $(document).ready(function () {
         }
     }
     $.ajax({
-        url: "/templates/api/project",
+        url: API.projectDetail,
         data: {
             projectID: PROJECT_ID,
         },
