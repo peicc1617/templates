@@ -54,7 +54,7 @@
             li: []
         }
         const STATE_DIV = {
-            "${NodeResultState.UN_BIND}": {
+            "0": {
                 span: {
                     style: "label arrowed",
                     text: "未绑定数据",
