@@ -47,5 +47,12 @@
     <delete id="deleteLog">
         DELETE FROM  ${tableName} where logID = #{id}
     </delete>
+    
+    <select id="getProjectLogCut" resultType="cn.edu.xjtu.cad.templates.model.log.ProjectLog">
+        SELECT * FROM ${tableName} where projectID = #{projectID} ORDER BY operateDate DESC LIMIT ${limit}
+    </select>
+    <select id="getAllProjectLog" resultType="cn.edu.xjtu.cad.templates.model.log.ProjectLog">
+        SELECT * FROM ${tableName} where projectID = #{projectID} ORDER BY operateDate
+    </select>
 
 </mapper>

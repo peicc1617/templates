@@ -184,8 +184,8 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/{projectID}/invitationCode", method = RequestMethod.PUT)
-    public String updateProjectInvitationCode(@PathVariable long projectID) throws MyException {
-        return projectService.updateProjectInCode(user,projectID);
+    public String[] updateProjectInvitationCode(@PathVariable long projectID) throws MyException {
+        return new String[]{projectService.updateProjectInCode(user,projectID)};
     }
 
     @SystemControllerLog(content = "将项目删除", logType = LogType.PROJECT, methodType = MethodType.DELETE)

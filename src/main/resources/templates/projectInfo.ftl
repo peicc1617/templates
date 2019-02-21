@@ -67,61 +67,6 @@
         }
 
         PROJECT_ID = ${project.projectID};
-
-        var ANALYSIS_MSG = {
-            projectID: PROJECT_ID,
-            type: 0,
-            content: ""
-        };
-        const MSG_TYPE_TABLE = {
-            "PROJECT": 1,
-            "NODE": 2,
-            "USER": 3,
-            "RESULT": 4
-        }
-        const STATE_ERROR = {
-            button: {
-                style: "btn-danger",
-                text: "错误",
-            },
-            li: []
-        }
-        const STATE_DIV = {
-            "0": {
-                button: {
-                    style: "btn-light",
-                    text: "待绑定",
-                },
-            },
-            "1": {
-                button: {
-                    style: "btn-grey",
-                    text: "待审阅",
-                },
-                li: [
-                    {text: "接受", state: 3},
-                    {text: "待修改", state: 2},
-                ]
-            },
-            "2": {
-                button: {
-                    style: "btn-warning",
-                    text: "待修改"
-                },
-                li: [
-                    {text: "接受", state: 3},
-                ]
-            },
-            "3": {
-                button: {
-                    style: "btn-success",
-                    text: "已接受"
-                },
-                li: [
-                    {text: "待修改", state: 2},
-                ]
-            },
-        };
     </script>
 </head>
 <body class="no-skin">
@@ -339,9 +284,99 @@
                             <div class="widget-body">
                                 <div class="widget-main padding-8">
                                     <div class="row">
+                                        <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+                                            <#--今天记录-->
+                                            <#if todayActivity?? && todayActivity?size!=0>
+                                            <div class="timeline-container">
+                                            <div class="timeline-label">
+													<span class="label label-primary arrowed-in-right label-lg">
+														<b>今天</b>
+													</span>
+                                            </div>
+                                            <div class="timeline-items">
+                                                <#list todayActivity as activity>
+                                                    <div class="timeline-item clearfix">
+                                                        <#include "/common/activityIconFormatter.ftl">
+                                                        <div class="widget-box transparent">
+                                                            <div class="widget-body">
+                                                                <div class="widget-main">
+                                                                    <span class="bolder blue">${activity.userID}:</span>
+                                                                    ${activity.content?replace("[", "<span class=\"green bolder\">")?replace("]", "</span>")}
+                                                                    <div class="pull-right">
+                                                                        <i class="ace-icon fa fa-clock-o bigger-110"></i>
+                                                                        今天,${activity.operateDate?string('hh:mm:ss')}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </#list>
+                                            </div>
+                                            </div>
+                                                </#if>
+                                            <#--昨天的记录-->
+                                                <#if yesterdayActivity?? && yesterdayActivity?size!=0>
+                                                <div class="timeline-container">
+                                                    <div class="timeline-label">
+													<span class="label label-primary arrowed-in-right label-lg">
+														<b>昨天</b>
+													</span>
+                                                    </div>
+                                                    <div class="timeline-items">
+                                                        <#list yesterdayActivity as activity>
+                                                            <div class="timeline-item clearfix">
+                                                                <#include "/common/activityIconFormatter.ftl">
+                                                                <div class="widget-box transparent">
+                                                                    <div class="widget-body">
+                                                                        <div class="widget-main">
+                                                                            <span class="bolder blue">${activity.userID}:</span>
+                                                                            ${activity.content?replace("[", "<span class=\"green bolder\">")?replace("]", "</span>")}
+                                                                            <div class="pull-right">
+                                                                                <i class="ace-icon fa fa-clock-o bigger-110"></i>
+                                                                                昨天,${activity.operateDate?string('hh:mm:ss')}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </#list>
+                                                    </div>
+                                                    <!-- /.timeline-items -->
+                                                </div>
+                                                </#if>
+                                            <#--更早的记录-->
+                                            <#if beforeActivity?? && beforeActivity?size!=0>
+                                                <div class="timeline-container">
+                                                    <div class="timeline-label">
+                                                <span class="label label-primary arrowed-in-right label-lg">
+                                                    <b>更早</b>
+                                                </span>
+                                                    </div>
+                                                    <div class="timeline-items">
+                                                        <#list yesterdayActivity as activity>
+                                                            <div class="timeline-item clearfix">
+                                                                <#include "/common/activityIconFormatter.ftl">
+                                                                <div class="widget-box transparent">
+                                                                    <div class="widget-body">
+                                                                        <div class="widget-main">
+                                                                            <span class="bolder blue">${activity.userID}:</span>
+                                                                            ${activity.content?replace("[", "<span class=\"green bolder\">")?replace("]", "</span>")}
+                                                                            <div class="pull-right">
+                                                                                <i class="ace-icon fa fa-clock-o bigger-110"></i>
+                                                                                ${activity.operateDate?string('yyyy-MM-dd hh:mm:ss')}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            </#list>
+                                                    </div>
+                                                    <!-- /.timeline-items -->
+                                                </div>
+                                                </#if>
+                                        </div>
                                     </div>
-
-
                                 </div>
                             </div>
                         </div>
@@ -506,7 +541,7 @@
                     type:"PUT",
                     success:function (data) {
                         if(data.code==1){
-                            $("#project-incode").val(data.data)
+                            $("#project-incode").val(data.data[0])
                         }
                     }
                 })

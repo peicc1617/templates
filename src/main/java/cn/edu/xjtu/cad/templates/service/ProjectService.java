@@ -126,6 +126,16 @@ public class ProjectService {
         for (Edge edge : edgeMapper.getEdgesOfProject(projectID)) {
             String nodeI = edge.getNodeI();
             String nodeJ = edge.getNodeJ();
+            //如果边的两个点有失效的，那么删除该边
+            if(!nodeMap.containsKey(edge.getNodeI())){
+                edgeMapper.deleteEdgeOfNode(projectID,edge.getNodeI());
+                break;
+            }
+            if(!nodeMap.containsKey(edge.getNodeJ())){
+                edgeMapper.deleteEdgeOfNode(projectID,edge.getNodeJ());
+                break;
+            }
+
             if (nodeMap.get(nodeI).getNextNodeIndexList() == null) {
                 nodeMap.get(nodeI).setNextNodeIndexList(new ArrayList<>());
             }
@@ -402,12 +412,12 @@ public class ProjectService {
     }
 
     public String updateProjectInCode(User user,long projectID) throws MyException {
-        String newIncode = generateInvitationCode();
-        long lineN = projectMapper.updateProjectInCode(projectID,newIncode);
+        String newCode = generateInvitationCode();
+        long lineN = projectMapper.updateProjectInCode(projectID,newCode);
         if(lineN==0){
             throw  new MyException(ResultCode.RESUTL_DATA_NONE);
         }
-        return newIncode;
+        return newCode;
     }
 
 }

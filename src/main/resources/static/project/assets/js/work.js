@@ -49,6 +49,37 @@ $(document).ready(function () {
                     name: "创建工作路径",
                     icon: "#icon-link",
                     func: function (workFlow, workNode) {
+                        // 点击创建工作路径按钮首先激活开始创建路径事件
+                        // 该事件表示nodesContainer内的除了当前node都激活hover事件
+                        let curWorkNode ;
+                        const showVirtualPathEvent = function () {
+                            //鼠标悬浮激活的事件
+                            //获取当前停留的workNode
+                            curWorkNode = workFlow.workNodeMap.get($(this).attr('id'));
+                            workFlow.showVirtualPath(workNode, curWorkNode);
+                        },hideVirtualPathEvent=function(){
+                            //鼠标离开激活的事件
+                            workFlow.hideVirtualPath();
+                        },confirmPathEvent=function(){
+                            //确认工作路径事件
+                            workFlow.addWorkPath(workNode,curWorkNode);
+                        },cancelEvent=function(){
+                            $(workFlow.options.nodesContainer).children(':not(#' + workNode.node.nodeIndex + ')').off({
+                                'mouseover': showVirtualPathEvent,
+                                'mouseout': hideVirtualPathEvent,
+                                'mousedown': confirmPathEvent,
+                            })
+                            $(this).off('mouseup', cancelEvent)
+                        }
+                        $(workFlow.options.nodesContainer).children(':not(#' + workNode.node.nodeIndex + ')')
+                            .on({
+                                'mouseover': showVirtualPathEvent,
+                                'mouseout': hideVirtualPathEvent,
+                                'mousedown': confirmPathEvent,
+                            })
+                        //设置取消事件
+                        workFlow.$el.on('mouseup', cancelEvent)
+                        // workFlow.addEdge(workNode.node);
                     }
                 }
             ]
@@ -58,39 +89,39 @@ $(document).ready(function () {
                 [{
                     name: "阶段前移",
                     icon: '#icon-pre',
-                    func: function (workFlow,workStep) {
-                        workFlow.updateStepPos(workStep.step,workStep.step.pos-1);
+                    func: function (workFlow, workStep) {
+                        workFlow.updateStepPos(workStep.step, workStep.step.pos - 1);
                     }
                 }, {
                     name: "阶段后移",
                     icon: "#icon-next",
-                    func: function (workFlow,workStep) {
-                        workFlow.updateStepPos(workStep.step,workStep.step.pos+1);
+                    func: function (workFlow, workStep) {
+                        workFlow.updateStepPos(workStep.step, workStep.step.pos + 1);
                     }
                 }],
                 [{
                     name: "添加前序阶段",
                     icon: '#icon-pre-2',
-                    func: function (workFlow,workStep) {
+                    func: function (workFlow, workStep) {
                         let step = {
                             stepIndex: UUID(),
                             stepName: "阶段",
                             stepDesc: "描述",
                             projectID: PROJECT_ID,
-                            pos:workStep.step.pos,
+                            pos: workStep.step.pos,
                         };
                         workFlow.addStep(step)
                     }
                 }, {
                     name: "添加后序阶段",
                     icon: "#icon-next-2",
-                    func: function (workFlow,workStep) {
+                    func: function (workFlow, workStep) {
                         let step = {
                             stepIndex: UUID(),
                             stepName: "阶段",
                             stepDesc: "描述",
                             projectID: PROJECT_ID,
-                            pos:workStep.step.pos+1,
+                            pos: workStep.step.pos + 1,
                         };
                         workFlow.addStep(step)
                     }
@@ -176,38 +207,38 @@ $(document).ready(function () {
         afterRefreshStep: function (step) {
 
         },
-        beforeViewNode:function(step){
+        beforeViewNode: function (step) {
 
         },
-        afterViewNode:function(step){
+        afterViewNode: function (step) {
 
         },
         beforeViewStep: function (step) {
         },
         afterViewStep: function (step) {
         },
-        beforeAddLink: function () {
+        beforeAddPath: function () {
 
         },
-        afterAddLink: function () {
+        afterAddPath: function () {
 
         },
-        beforeRemoveLink: function () {
+        beforeRemovePath: function () {
 
         },
-        afterRemoveLink: function () {
+        afterRemovePath: function () {
 
         },
-        beforeViewLink: function () {
+        beforeViewPath: function () {
 
         },
-        afterViewLink: function () {
+        afterViewPath: function () {
 
         },
-        beforeUpdateStepPos:function () {
+        beforeUpdateStepPos: function () {
 
         },
-        afterUpdateStepPos:function () {
+        afterUpdateStepPos: function () {
 
         }
     }
@@ -272,18 +303,18 @@ $(document).ready(function () {
             /**
              * 添加连线触发的事件
              */
-            'before.add-link.work.flow': 'beforeAddLink',
-            'after.add-link.work.flow': 'afterAddLink',
+            'before.add-path.work.flow': 'beforeAddPath',
+            'after.add-path.work.flow': 'afterAddPath',
             /**
              * 删除连线触发的事件
              */
-            'before.remove-link.work.flow': 'beforeRemoveLink',
-            'after.remove-link.work.flow': 'afterRemoveLink',
+            'before.remove-path.work.flow': 'beforeRemovePath',
+            'after.remove-path.work.flow': 'afterRemovePath',
             /**
              * 查看连线触发的事件
              */
-            'before.view-link.work.flow': 'beforeViewLink',
-            'after.view-link.work.flow': 'afterViewLink',
+            'before.view-path.work.flow': 'beforeViewPath',
+            'after.view-path.work.flow': 'afterViewPath',
             /**
              * 查看连线触发的事件
              */
@@ -340,7 +371,7 @@ $(document).ready(function () {
          * 根据节点之间的关系得到所有的路径
          */
         getPath: function () {
-            this.options.stepMap = new Map(Array.from(this.options.stepMap).sort((e1,e2)=>e1[1].pos-e2[1].pos));
+            this.options.stepMap = new Map(Array.from(this.options.stepMap).sort((e1, e2) => e1[1].pos - e2[1].pos));
             const nodeMap = this.options.nodeMap;
             const stepMap = this.options.stepMap;
             const freeNodeSet = new Set();//自由节点Set
@@ -727,7 +758,7 @@ $(document).ready(function () {
                 }
             });
             //绑定阶段显示按钮事件
-            $("#step-change-btn").on('click',function () {
+            $("#step-change-btn").on('click', function () {
                 if (this.checked) {
                     workFlow.showAllSteps();
                 } else {
@@ -735,7 +766,7 @@ $(document).ready(function () {
                 }
             });
             //绑定创新方法显示按钮事件
-            $("#name-change-btn").on('click',function () {
+            $("#name-change-btn").on('click', function () {
                 if (this.checked) {
                     workFlow.showAllNodesApp();
                 } else {
@@ -744,7 +775,7 @@ $(document).ready(function () {
             })
             let viewMove = false;
             this.$el.on({
-                mousewheel:function (e) {
+                mousewheel: function (e) {
                     if (e.originalEvent.wheelDelta > 0) {
                         console.log("缩小", workFlow.scale)
                         //缩小
@@ -759,32 +790,32 @@ $(document).ready(function () {
                     }
                     workFlow.refreshViewBox();
                     e = e || window.event;
-                    if(e.preventDefault) {
+                    if (e.preventDefault) {
                         // Firefox
                         e.preventDefault();
                         e.stopPropagation();
                     } else {
                         // IE
-                        e.cancelBubble=true;
+                        e.cancelBubble = true;
                         e.returnValue = false;
                     }
                     return false;
                 },
-                mousedown:function(){
-                    viewMove=true;
+                mousedown: function () {
+                    viewMove = true;
                     workFlow.startMoveView();
                 },
-                mouseup:function () {
-                    if(viewMove){
+                mouseup: function () {
+                    if (viewMove) {
                         workFlow.stopMoveView();
                     }
                 },
-                mouseleave:function () {
-                    if(viewMove){
+                mouseleave: function () {
+                    if (viewMove) {
                         workFlow.stopMoveView();
                     }
                 },
-                mousemove:function (e) {
+                mousemove: function (e) {
                     //获取svg相对于浏览器的坐标
                     const svgPos = {
                         x: workFlow.el.getBoundingClientRect().x,
@@ -814,7 +845,7 @@ $(document).ready(function () {
                     mouseup: function () {
                         workFlow.stopMoveNode(workNode);
                     },
-                    onclick:function () {
+                    onclick: function () {
                         workFlow.clickWorkNode(nodeIndex);
                     }
                 });
@@ -840,8 +871,8 @@ $(document).ready(function () {
             this.$el.on('mousemove', moveNode = function () {
                 const pos = workFlow.getMousePos();
                 const dPos = {
-                    x: pos.x - workNode.x-workNode.width/2,
-                    y: pos.y - workNode.y-workNode.height/2
+                    x: pos.x - workNode.x - workNode.width / 2,
+                    y: pos.y - workNode.y - workNode.height / 2
                 }
                 workNode.translate(dPos.x, dPos.y);
             });
@@ -984,17 +1015,17 @@ $(document).ready(function () {
             //计算舞台高度
             this.stageHeight = (this.rowN + 2) * this.nodeVerDis;
             //计算控件高度，为了更好的显示，控件高度不会大于浏览器窗口高度
-            this.height = this.stageHeight<window.innerWidth?this.stageHeight:window.innerHeight;
+            this.height = this.stageHeight < window.innerWidth ? this.stageHeight : window.innerHeight;
             //计算舞台宽度
             this.stageWidth = (this.columnN + 1) * this.nodeHorDis;
             //获取svg控件宽度
             this.width = this.$el.width();
             let startX = 0;
-            if(this.stageWidth<this.width){
+            if (this.stageWidth < this.width) {
                 //如果舞台宽度小于控件宽度，那么调整舞台显示宽度为svg的宽度
                 //并且为了保证布局在中心部分显示，所以需要调整viewBox的x1,y1
-                startX=(this.stageWidth-this.width)/2
-                    this.stageWidth=this.width;
+                startX = (this.stageWidth - this.width) / 2
+                this.stageWidth = this.width;
             }
             //计算viewBox的高度
             this.viewBoxHeight = this.height * this.scale;
@@ -1038,20 +1069,20 @@ $(document).ready(function () {
             console.log("开始")
             let workFlow = this;
             const prePos = workFlow.getMousePos();//获取鼠标在svg坐标系内的坐标
-            const initViewBoxCX = this.viewBoxCX,initViewBoxCY = this.viewBoxCY;
+            const initViewBoxCX = this.viewBoxCX, initViewBoxCY = this.viewBoxCY;
             this.$el.on("mousemove", viewMove = function (e) {
                 const curPos = workFlow.getMousePos();//获取鼠标在SVG内的当前的坐标
                 //计算得到鼠标的坐标变化值
-                let dx = curPos.x-prePos.x;
-                let dy = curPos.y-prePos.y;
-                console.log(dx,dy);
-                workFlow.viewBoxCX= initViewBoxCX-dx;
-                workFlow.viewBoxCY= initViewBoxCY-dy;
+                let dx = curPos.x - prePos.x;
+                let dy = curPos.y - prePos.y;
+                console.log(dx, dy);
+                workFlow.viewBoxCX = initViewBoxCX - dx;
+                workFlow.viewBoxCY = initViewBoxCY - dy;
                 workFlow.refreshViewBox()
             })
         },
         stopMoveView: function () {
-            this.$el.off("mousemove",viewMove);
+            this.$el.off("mousemove", viewMove);
         },
         /**
          * 重设舞台的Viewbox显示区域
@@ -1122,12 +1153,12 @@ $(document).ready(function () {
             //触发事件
             this.trigger('before.add-step', step);
             //执行函数
-            this.options.stepMap.forEach((steppp,stepIndex)=>{
-                if(steppp.pos>=step.pos&&steppp.stepIndex!=step.stepIndex){
+            this.options.stepMap.forEach((steppp, stepIndex) => {
+                if (steppp.pos >= step.pos && steppp.stepIndex != step.stepIndex) {
                     steppp.pos++;
                 }
             })
-            this.options.stepMap.set(step.stepIndex,step);
+            this.options.stepMap.set(step.stepIndex, step);
             //触发事件
             this.trigger('after.add-step', step);
             this.refreshView();
@@ -1139,8 +1170,8 @@ $(document).ready(function () {
          */
         removeStep: function (stepIndex) {
             let containNode = false;
-            this.options.nodeMap.forEach((node,nodeIndex)=>{
-                containNode=containNode||node.stepIndex==stepIndex;
+            this.options.nodeMap.forEach((node, nodeIndex) => {
+                containNode = containNode || node.stepIndex == stepIndex;
             })
 
             if (containNode) {
@@ -1173,14 +1204,7 @@ $(document).ready(function () {
             //触发事件
             this.trigger('after.view-step', step)
         },
-        /**
-         *
-         * @param oldStepIndex 旧的阶段索引
-         * @param newStepIndex 新的阶段索引
-         */
-        updateStepIndex: function (oldStepIndex, newStepIndex) {
 
-        },
         /**
          * 添加节点
          * @param 新节点所属的阶段
@@ -1188,11 +1212,14 @@ $(document).ready(function () {
         addNode: function (stepIndex) {
             let node = {
                 lockState: false,
-                name: "节点",
+                nodeName: "节点",
                 nodeIndex: UUID(),
                 state: 0,
                 stepIndex: stepIndex,
-                projectID: PROJECT_ID
+                projectID: PROJECT_ID,
+                nodeDesc: "修改描述",
+                goal: "修改目标",
+
             }
             //触发事件
             this.trigger('before.add-node', node);
@@ -1215,7 +1242,7 @@ $(document).ready(function () {
                 alert("当前为已完成阶段，无法删除");
                 return false;
             }
-            if (node.nextNodeIndexList!=null && node.nextNodeIndexList.length > 0) {
+            if (node.nextNodeIndexList != null && node.nextNodeIndexList.length > 0) {
                 alert("当前节点包含后序节点，无法删除")
                 return false;
             }
@@ -1242,22 +1269,49 @@ $(document).ready(function () {
          * @param newStepIndex 新的阶段索引
          */
         updateStepPos(step, newStepPos) {
-            if(newStepPos<0||newStepPos>=this.stepStartMap.size){
+            if (newStepPos < 0 || newStepPos >= this.stepStartMap.size) {
                 alert("无法移动")
                 return;
             }
-            this.trigger('before.update-step-pos', step,newStepPos);
-            const d = step.pos-newStepPos;
-            this.options.stepMap.forEach((step,stepIndex)=>{
-                if(step.pos==newStepPos){
-                    step.pos+=d;
+            this.trigger('before.update-step-pos', step, newStepPos);
+            const d = step.pos - newStepPos;
+            this.options.stepMap.forEach((step, stepIndex) => {
+                if (step.pos == newStepPos) {
+                    step.pos += d;
                 }
             })
-            step.pos=newStepPos;
-            this.trigger('after.update-step-pos', step,newStepPos);
+            step.pos = newStepPos;
+            this.trigger('after.update-step-pos', step, newStepPos);
+            this.refreshView();
+        },
+
+        showVirtualPath(workNode1,workNode2){
+            this.hideVirtualPath();
+            new WorkPath(workNode1, workNode2, this.options.edgesContainer,true);
+        },
+        hideVirtualPath(){
+            $('.virtualPath').remove();
+        },
+        addWorkPath(workNode1,workNode2){
+            const path={
+                projectID:PROJECT_ID,
+                nodeI:workNode1.node.nodeIndex,
+                nodeJ:workNode2.node.nodeIndex
+            }
+            this.trigger('before.add-path', path);
+            this.trigger('after.add-path', path);
+            this.refreshView();
+        },
+        deleteWorkPath(nodeI,nodeJ){
+            const path={
+                projectID:PROJECT_ID,
+                nodeI:nodeI,
+                nodeJ:nodeJ
+            }
+            this.trigger('before.remove-path', path);
+            this.trigger('after.remove-path', path);
             this.refreshView();
         }
-
     }
     var TIPS_TABLE = [{
         'cx': 30,
@@ -1465,17 +1519,6 @@ $(document).ready(function () {
                 }
             }],
         };
-        this.groupDom = "";
-        this.timeoutNameSet = new Set();
-
-        this.typeOfCircle = {
-            true: 'stepnode finished',
-            false: 'stepnode unfinished',
-        };
-        this.typeOfPath = {
-            true: 'finished-path',
-            false: 'unfinished-path'
-        }
     }
 
     WorkNode.prototype = {
@@ -1492,7 +1535,7 @@ $(document).ready(function () {
         initDom: function () {
             this.nodeGID = "#" + this.node.nodeIndex;
             const $nodeG = $(svg('g', $(this.container), this.nodeGID, {
-                class: 'work node ' + (this.node.isFinished ? 'finished ' : "unFinished") + (this.node.lockState ? "locked" : ""),
+                class: 'work node ' + (this.node.state ? ' finished ' : " unFinished") + (this.node.lockState ? " locked" : "") + (this.node.templateProjectID>0?' template':''),
             }));
             const $rect = $(svg('rect', $nodeG, undefined, {
                 rx: 10,
@@ -1555,44 +1598,48 @@ $(document).ready(function () {
          */
         appendPressState: function () {
             $(this.nodeGID).attr("pressed", true);
-            $(this.container).append( $(this.nodeGID));
+            $(this.container).append($(this.nodeGID));
         },
-        removePressState:function(){
+        removePressState: function () {
             $(this.nodeGID).attr("pressed", false);
         },
         /**
          * 绑定相关事件
          */
         bindListener: function () {
-            let workNode = this;
-            let isDown = false;
-            let isMove = false;
-            $(this.nodeGID).on({
-                "mousedown": function () {
+            //绑定按钮长按的移动事件
+            const workNode = this,
+                id = this.nodeGID;
+            $(id).on({
+                mousedown: function () {
+                    //设置按下标记isDown
+                    $(id).data('pressDown',true);
                     //设置按下时间为2秒
-                    isDown =true;
-                    nodeMove = setTimeout(function () {
+                    $(id).data('nodeMove',setTimeout(function () {
+                        if(! $(id).data('pressDown')){
+                            return;
+                        }
                         workNode.appendPressState();
-                        isMove=true;
-                        $(workNode).trigger("mousedown");
-                    }, 1000);
+                        $(id).data('pressMove',true);
+                        $(id).trigger("mousedown");
+                    }, 2000))
                 },
-                "mouseup": function () {
-                    if(isDown||isMove){
-                        clearTimeout(nodeMove);
+                mouseup: function () {
+                    if ($(id).data('pressDown') || $(id).data('pressMove')) {
+                        clearTimeout($(id).data('nodeMove') );
                         workNode.removePressState();
                     }
-                    if(isMove){
+                    if ($(id).data('pressMove')) {
                         $(workNode).trigger("mouseup");
-                    }else if(isDown){
+                    } else if ($(id).data('pressDown')) {
                         $(workNode).trigger("onclick");
                     }
-                    isDown=false;
-                    isMove=false;
+                    $(id).data('pressDown',false);
+                    $(id).data('pressMove',false);
                 },
-                mouseleave:function () {
-                    if(isDown&&!isMove){
-                        clearTimeout(nodeMove);
+                mouseleave: function () {
+                    if ($(id).data('pressDown') || $(id).data('pressMove')) {
+                        clearTimeout($(id).data('nodeMove') );
                         workNode.removePressState();
                     }
 
@@ -1608,27 +1655,41 @@ $(document).ready(function () {
      * @param nodeJ 结束节点索引
      * @param pathClass 路径的属性
      * @param dArr 路径的绘制数组
+     * @param v 虚拟节点标记
      * @constructor
      */
-    var WorkPath = function (workNodeI, workNodeJ, containerID) {
+    var WorkPath = function (workNodeI, workNodeJ, containerID,v) {
         this.workNodeI = workNodeI;
         this.workNodeJ = workNodeJ;
         this.nodeI = this.workNodeI.node.nodeIndex;
         this.nodeJ = this.workNodeJ.node.nodeIndex;
         this.midPos = {};
         this.$container = $(containerID)
+        this.v = v;
         this.initDom();
     }
     WorkPath.prototype = {
         initDom: function () {
-            const path = svg("path", this.$container, undefined, {
-                nodeI: this.nodeI,
-                nodeJ: this.nodeJ,
-                class: this.getPathClass(),
-                d: this.getPathD(),
-                'stroke': "#838B8B",
-                'stroke-width': 4
-            })
+            if(this.v){
+                const path = svg("path", this.$container, undefined, {
+                    nodeI: this.nodeI,
+                    nodeJ: this.nodeJ,
+                    class: this.getPathClass(),
+                    d: this.getPathD(),
+                    'stroke': "#B7B7B7",
+                    'stroke-width': 3
+                })
+            }else {
+                const path = svg("path", this.$container, undefined, {
+                    nodeI: this.nodeI,
+                    nodeJ: this.nodeJ,
+                    class: this.getPathClass(),
+                    d: this.getPathD(),
+                    'stroke': "#9AC0CD",
+                    'stroke-width': 4
+                })
+            }
+
             this.bindListener();
         },
         setPathPos: function (dArr) {
@@ -1643,7 +1704,7 @@ $(document).ready(function () {
             })
         },
         getPathClass: function () {
-            return pathClass = "work path " + (this.workNodeJ.node.isFinished ? "finished" : "unFinished");
+            return "work path " + (this.workNodeJ.node.isFinished ? "finished" : "unFinished") + (this.v?" virtualPath":"");
         },
         getPathD: function () {
             let x1 = this.workNodeI.x + this.workNodeI.width / 2,
@@ -1726,7 +1787,14 @@ $(document).ready(function () {
         },
         beforeViewNode: function (node) {
             NODE_JS.beforeViewNode(node);
-        }
+        },
+        beforeAddPath:function (path) {
+            NODE_JS.beforeAddPath(path);
+        },
+        beforeRemovePath:function (path) {
+            NODE_JS.beforeRemovePath(path);
+        },
+
     }
     $.ajax({
         url: API.projectDetail,
@@ -1737,7 +1805,7 @@ $(document).ready(function () {
         success: function (data) {
             switch (data.code) {
                 case 1:
-                    data=data.data;
+                    data = data.data;
                     workOptions['nodeMap'] = new Map();
                     workOptions['stepMap'] = new Map();
                     for (let nodeIndex in data.nodeMap) {

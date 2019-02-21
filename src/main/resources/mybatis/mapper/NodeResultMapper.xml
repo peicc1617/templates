@@ -13,8 +13,14 @@
         </foreach>
     </insert>
 
+    <delete id="deleteNodeResult">
+        DELETE FROM project_node_result where projectID = #{id} AND nodeIndex = #{index} AND userID = #{userID}
+    </delete>
     <select id="getResultListByNodeIndex" resultType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
         SELECT * FROM project_node_result where projectID = #{id} AND nodeIndex = #{index}
+    </select>
+    <select id="getMyNodeResultInNode" resultType="cn.edu.xjtu.cad.templates.model.project.node.NodeResult">
+        SELECT * FROM project_node_result where projectID = #{id} AND nodeIndex = #{index} AND userID = #{userID}
     </select>
 
 
@@ -35,7 +41,8 @@
         state = #{state},
         message =#{message},
         resultID = #{resultID},
-        resultName= #{resultName}
+        resultName= #{resultName},
+        resultKey = #{resultKey}
         WHERE projectID = #{projectID} and nodeIndex = #{nodeIndex} AND userID = #{userID}
     </update>
 </mapper>

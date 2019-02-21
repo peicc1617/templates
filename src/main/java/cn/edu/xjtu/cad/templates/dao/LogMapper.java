@@ -2,12 +2,14 @@ package cn.edu.xjtu.cad.templates.dao;
 
 import cn.edu.xjtu.cad.templates.model.log.LogType;
 import cn.edu.xjtu.cad.templates.model.log.Log;
+import cn.edu.xjtu.cad.templates.model.log.ProjectLog;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 
 @Repository
 public interface LogMapper {
@@ -30,4 +32,7 @@ public interface LogMapper {
 
     long deleteLog(@Param("id") long id,@Param("tableName") String logTableName);
 
+    List<ProjectLog> getProjectLogCut(@Param("projectID")long projectID,@Param("limit") long limit,@Param("tableName") String logTableName);
+
+    List<ProjectLog> getAllProjectLog(@Param("projectID") long projectID,@Param("tableName") String dataBaseName);
 }

@@ -16,5 +16,12 @@
     <select id="getEdgesOfProject" resultType="cn.edu.xjtu.cad.templates.model.project.Edge">
       SELECT * FROM project_edge WHERE projectID = #{projectID}
     </select>
+    
+    <delete id="deleteEdgeOfNode" >
+      DELETE  FROM project_edge WHERE projectID = #{projectID} AND (nodeI = #{nodeIndex} OR nodeJ = #{nodeIndex})
+    </delete>
 
+    <delete id="deleteEdge" >
+      DELETE  FROM project_edge WHERE projectID = #{projectID} AND nodeI = #{nodeIndex} AND nodeJ = #{nodeIndex}
+    </delete>
 </mapper>

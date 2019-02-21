@@ -7,16 +7,16 @@ public class NodeRole {
     private long projectID;
     private String nodeIndex;
     private long userID;
-    private NodeRoleType nodeRole;
+    private NodeRoleType roleType;
 
     public NodeRole() {
     }
 
-    public NodeRole(long projectID, String nodeIndex, long userID, NodeRoleType nodeRole) {
+    public NodeRole(long projectID, String nodeIndex, long userID, NodeRoleType roleType) {
         this.projectID = projectID;
         this.nodeIndex = nodeIndex;
         this.userID = userID;
-        this.nodeRole = nodeRole;
+        this.roleType = roleType;
     }
 
     public static Map<String,String> getNodeRoleTypeMap(){
@@ -51,11 +51,11 @@ public class NodeRole {
         this.userID = userID;
     }
 
-    public NodeRoleType getNodeRole() {
-        return nodeRole;
+    public NodeRoleType getRoleType() {
+        return roleType;
     }
 
-    public void setNodeRole(NodeRoleType nodeRole) {
-        this.nodeRole = nodeRole;
+    public void setRoleType(NodeRoleType roleType) {
+        this.roleType = roleType;
     }
 }

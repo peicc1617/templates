@@ -14,81 +14,42 @@
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-skins.min.css"/>
     <link rel="stylesheet" href="/webresources/bootstrap/bootstrap-table/bootstrap-table.css">
     <link rel="stylesheet" href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css">
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap-duallistbox.min.css" />
     <link rel="stylesheet" href="/templates/project/assets/css/step.css">
     <script>
         //定义API接口
-        const API ={
-            projectDetail:"/templates/api/project/${project.projectID}/detail",
-            stepURL:"/templates/api/project/${project.projectID}/step/{}",
-            addStep:"/templates/api/project/${project.projectID}/step",
-            deleteStep:"/templates/api/project/${project.projectID}/step",
-            editStep:"/templates/api/project/${project.projectID}/step/",
-            editStepSummary:"/templates/api/project/${project.projectID}/step/summary",
-            addNode:"/templates/api/project/${project.projectID}/node",
-            deleteNode:"/templates/api/project/${project.projectID}/node",
-            editNode:"/templates/api/project/${project.projectID}/node/",
-            editNodeSummary:"/templates/api/project/${project.projectID}/node/summary",
-            nodeTemplate:"/templates/api/project/${project.projectID}/node/template",
-            nodeState:"/templates/api/project/${project.projectID}/node/state",
-            nodeLock:"/templates/api/project/${project.projectID}/node/lock",
-            nodeAPP:"/templates/api/project/${project.projectID}/node/app",
-            ownedProject:"/templates/api/project/owned",
-            projectManage:"/projectManager/api/v1/project",
-            nodeResult:"/templates/api/project/${project.projectID}/node/result",
-            nodeResultBinding:"/templates/api/project/${project.projectID}/node/result/binding",
-            appProjectBinding:"/projectManager/api/v2/project/",
-            nodeResultDisable:"/templates/api/project/${project.projectID}/node/result/list/disable",
-            nodeResultOutDate:"/templates/api/project/${project.projectID}/node/result/list/outDate",
+        const API = {
+            projectDetail: "/templates/api/project/${project.projectID}/detail",
+            stepURL: "/templates/api/project/${project.projectID}/step/{}",
+            addStep: "/templates/api/project/${project.projectID}/step",
+            deleteStep: "/templates/api/project/${project.projectID}/step",
+            editStep: "/templates/api/project/${project.projectID}/step/",
+            editStepSummary: "/templates/api/project/${project.projectID}/step/summary",
+            addNode: "/templates/api/project/${project.projectID}/node",
+            deleteNode: "/templates/api/project/${project.projectID}/node",
+            editNode: "/templates/api/project/${project.projectID}/node/",
+            editNodeSummary: "/templates/api/project/${project.projectID}/node/summary",
+            nodeTemplate: "/templates/api/project/${project.projectID}/node/template",
+            nodeState: "/templates/api/project/${project.projectID}/node/state",
+            nodeLock: "/templates/api/project/${project.projectID}/node/lock",
+            nodeAPP: "/templates/api/project/${project.projectID}/node/app",
+            ownedProject: "/templates/api/project/owned",
+            projectManage: "/projectManager/api/v1/project",
+            nodeResult: "/templates/api/project/${project.projectID}/node/result",
+            nodeResultBinding: "/templates/api/project/${project.projectID}/node/result/binding",
+            appProjectData: "/projectManager/api/v1/project",
+            appProjectBinding: "/projectManager/api/v1/project/key",
+            nodeResultDisable: "/templates/api/project/${project.projectID}/node/result/list/disable",
+            nodeResultOutDate: "/templates/api/project/${project.projectID}/node/result/list/outDate",
+            nodeResultUnbind: "/templates/api/project/${project.projectID}/node/result/unbinding",
+            nodeResultMy:"/templates/api/project/${project.projectID}/node/result/my",
+            nodeRoleList:"/templates/api/project/${project.projectID}/node/role/list",
+            nodeRole:"/templates/api/project/${project.projectID}/node/role",
+            path:"/templates/api/project/${project.projectID}/node/path",
         };
-        PROJECT_ID = ${project.projectID}
-        //解析projectID，
-        if(isNaN(PROJECT_ID)){
-            //如果解析出错误
-            alert("参数错误");//后续跳转
-        }
-        const STATE_ERROR = {
-            button: {
-                style: "btn-danger",
-                text: "错误",
-            },
-            li: []
-        }
-        const STATE_DIV = {
-            "0": {
-                span: {
-                    style: "label arrowed",
-                    text: "未绑定数据",
-                },
-            },
-            "1": {
-                button: {
-                    style: "btn-grey",
-                    text: "待审阅",
-                },
-                li: [
-                    {text: "接受", state:3},
-                    {text: "待修改", state:2},
-                ]
-            },
-            "2": {
-                button: {
-                    style: "btn-warning",
-                    text: "待修改"
-                },
-                li: [
-                    {text: "接受", state:3},
-                ]
-            },
-            "3": {
-                button: {
-                    style: "btn-success",
-                    text: "已接受"
-                },
-                li: [
-                    {text: "待修改", state:2},
-                ]
-            },
-        };
+        PROJECT_ID =${project.projectID}
+        const STATE_DIV = JSON.parse('${nodeResultStateMap}');
+        const NODE_ROLE = JSON.parse('${nodeRoleMap}');
     </script>
 </head>
 <body class="no-skin">
@@ -127,7 +88,7 @@
                 <div class="row">
                     <div class="col-xs-12">
 
-                        <div id="svgRow" center class="row " >
+                        <div id="svgRow" center class="row ">
                             <div class="col-xs-12">
 
                                 <div class="col-sm-6" style="height:40px;line-height:35px; ">
@@ -153,27 +114,30 @@
                                     <svg class="center" id="toolbar" xmlns="http://www.w3.org/2000/svg" version="1.1"
                                          preserveAspectRatio="xMidYMin meet" width="100%"
                                          height="40" viewBox="0 0 430 40">
-                                        <g class="trigger menu-trigger" nodeIndex="2">
-                                            <circle cx="20" r="10" cy="20" class="stepnode finished"></circle>
+                                        <g class="work node finished" nodeIndex="2">
+                                            <circle cx="20" r="10" cy="20" ></circle>
                                             <text x="40" y="20" class="node-text" font-size="1.25em" text-anchor="start"
                                                   dominant-baseline="middle">已完成
                                             </text>
                                         </g>
-                                        <g class="trigger menu-trigger" nodeIndex="2">
-                                            <circle cx="120" r="10" cy="20" class="stepnode unfinished"></circle>
-                                            <text x="140" y="20" class="node-text" font-size="1.25em" text-anchor="start"
+                                        <g class="work node unFinished" nodeIndex="2">
+                                            <circle cx="120" r="10" cy="20" ></circle>
+                                            <text x="140" y="20" class="node-text" font-size="1.25em"
+                                                  text-anchor="start"
                                                   dominant-baseline="middle">未完成
                                             </text>
                                         </g>
-                                        <g class="trigger menu-trigger" nodeIndex="2">
-                                            <circle cx="220" r="10" cy="20" class="stepnode locked  "></circle>
-                                            <text x="240" y="20" class="node-text" font-size="1.25em" text-anchor="start"
+                                        <g class="work node locked" nodeIndex="2">
+                                            <circle cx="220" r="10" cy="20" ></circle>
+                                            <text x="240" y="20" class="node-text" font-size="1.25em"
+                                                  text-anchor="start"
                                                   dominant-baseline="middle">锁定
                                             </text>
                                         </g>
-                                        <g class="trigger menu-trigger" nodeIndex="2">
-                                            <circle cx="320" r="10" cy="20" class="stepnode finished template"></circle>
-                                            <text x="340" y="20" class="node-text" font-size="1.25em" text-anchor="start"
+                                        <g class="work node template" nodeIndex="2">
+                                            <circle cx="320" r="10" cy="20" ></circle>
+                                            <text x="340" y="20" class="node-text" font-size="1.25em"
+                                                  text-anchor="start"
                                                   dominant-baseline="middle">已连接模板
                                             </text>
                                         </g>
@@ -184,7 +148,8 @@
 
 
                             <svg id="mySVG" xmlns="http://www.w3.org/2000/svg" version="1.1"
-                                 preserveAspectRatio="xMidYMin meet" style="border-top:1px solid lightgrey;border-bottom:1px solid lightgrey">
+                                 preserveAspectRatio="xMidYMin meet"
+                                 style="border-top:1px solid lightgrey;border-bottom:1px solid lightgrey">
                                 <g id="filterContainer">
                                     <filter id="btnFeOffset" x="0" y="0" width="200%" height="200%">
                                         <feGaussianBlur in="SourceAlpha" stdDeviation="2.2"/>
@@ -264,7 +229,8 @@
                                         <path d="M780,508L325,18L220,123l367.5,385L220,893l105,105L780,508z"></path>
                                     </symbol>
                                     <symbol class="icon icon-download" id="icon-delete-2" viewBox="0 0 1000 1000">
-                                        <path d="M745,648L605,508l140-140L640,263L500,403L360,263L255,368l140,140L255,648l105,105l140-140l140,140L745,648z M500,858c-96.6,0-179.1-34.2-247.4-102.6C184.2,687.1,150,604.6,150,508s34.2-179.1,102.6-247.4C320.9,192.2,403.4,158,500,158s179.1,34.2,247.4,102.6C815.8,328.9,850,411.4,850,508s-34.2,179.1-102.6,247.4C679.1,823.8,596.6,858,500,858z M500,998c134.8,0,250.2-48,346.1-143.9C942,758.2,990,642.8,990,508c0-134.8-48-250.2-143.9-346.1S634.8,18,500,18c-134.8,0-250.2,48-346.1,143.9C58,257.8,10,373.2,10,508c0,134.8,48,250.2,143.9,346.1C249.8,950,365.2,998,500,998z"></path>                                </symbol>
+                                        <path d="M745,648L605,508l140-140L640,263L500,403L360,263L255,368l140,140L255,648l105,105l140-140l140,140L745,648z M500,858c-96.6,0-179.1-34.2-247.4-102.6C184.2,687.1,150,604.6,150,508s34.2-179.1,102.6-247.4C320.9,192.2,403.4,158,500,158s179.1,34.2,247.4,102.6C815.8,328.9,850,411.4,850,508s-34.2,179.1-102.6,247.4C679.1,823.8,596.6,858,500,858z M500,998c134.8,0,250.2-48,346.1-143.9C942,758.2,990,642.8,990,508c0-134.8-48-250.2-143.9-346.1S634.8,18,500,18c-134.8,0-250.2,48-346.1,143.9C58,257.8,10,373.2,10,508c0,134.8,48,250.2,143.9,346.1C249.8,950,365.2,998,500,998z"></path>
+                                    </symbol>
                                     <defs>
                                         <marker id="markerArrow1" markerWidth="10" markerHeight="10" refx="15" refy="3"
                                                 orient="auto" markerUnits="strokeWidth">
@@ -281,8 +247,10 @@
                                     <defs>
                                         <marker id="markerArrow3" markerWidth="10" markerHeight="10" refx="10" refy="5"
                                                 orient="auto" markerUnits="strokeWidth">
-                                            <line x1="0" y1="0" x2="10" y2="10" style="stroke:rgb(255,0,0);stroke-width:2"/>
-                                            <line x1="0" y1="10" x2="10" y2="0" style="stroke:rgb(255,0,0);stroke-width:2"/>
+                                            <line x1="0" y1="0" x2="10" y2="10"
+                                                  style="stroke:rgb(255,0,0);stroke-width:2"/>
+                                            <line x1="0" y1="10" x2="10" y2="0"
+                                                  style="stroke:rgb(255,0,0);stroke-width:2"/>
                                         </marker>
                                     </defs>
                                 </g>
@@ -306,11 +274,11 @@
                         </div>
 
                         <div id="stepInfoRow" class="row" style="display:none">
-                            <div class="col-sm-12 widget-container-col ui-sortable" >
+                            <div class="col-sm-12 widget-container-col ui-sortable">
                                 <div class="widget-box transparent ui-sortable-handle">
                                     <div class="widget-header widget-header-small">
                                         <h3 class="widget-title smaller">
-                                            <a id="cur-step-name-href" ></a>
+                                            <a id="cur-step-name-href"></a>
                                             <small><a id="cur-step-description-href"></a></small>
                                         </h3>
 
@@ -323,12 +291,14 @@
                                                 <div class="col-xs-12">
                                                     <div id="cur-step-static" class="row">
                                                         <div class="col-xs-6 col-sm-6">
-                                                            <div id="cur-step-result-static"  style="width: 100%;height:300px;"></div>
+                                                            <div id="cur-step-result-static"
+                                                                 style="width: 100%;height:300px;"></div>
 
                                                         </div>
 
                                                         <div class="col-xs-6 col-sm-6">
-                                                            <div id="cur-step-activity-static" style="width: 100%;height:300px;"></div>
+                                                            <div id="cur-step-activity-static"
+                                                                 style="width: 100%;height:300px;"></div>
 
                                                         </div>
                                                     </div>
@@ -352,7 +322,8 @@
 
                                                                 </div>
                                                                 <div class="btn-group">
-                                                                    <a class="btn btn-sm btn-grey" onclick="saveStepSummary()" >
+                                                                    <a class="btn btn-sm btn-grey"
+                                                                       onclick="saveStepSummary()">
                                                                         <i class="ace-icon fa fa-floppy-o"></i>
                                                                         <span>保存&nbsp;</span>
                                                                     </a>
@@ -392,7 +363,8 @@
                                                                 </div>
                                                                 <!-- 字体 -->
                                                                 <div class="btn-group">
-                                                                    <a class="btn dropdown-toggle" data-toggle="dropdown"
+                                                                    <a class="btn dropdown-toggle"
+                                                                       data-toggle="dropdown"
                                                                        title=""
                                                                        data-original-title="Font Size">
                                                                         <i class=" ace-icon fa fa-text-height"></i>&nbsp;
@@ -433,15 +405,18 @@
                                                                 </div>
                                                                 <!-- 加粗 斜体 删除线 下划线 -->
                                                                 <div class="btn-group">
-                                                                    <a class="btn btn-sm btn-info" data-edit="bold" title=""
+                                                                    <a class="btn btn-sm btn-info" data-edit="bold"
+                                                                       title=""
                                                                        data-original-title="Bold (Ctrl/Cmd+B)">
                                                                         <i class=" ace-icon fa fa-bold"></i>
                                                                     </a>
-                                                                    <a class="btn btn-sm btn-info" data-edit="italic" title=""
+                                                                    <a class="btn btn-sm btn-info" data-edit="italic"
+                                                                       title=""
                                                                        data-original-title="Italic (Ctrl/Cmd+I)">
                                                                         <i class=" ace-icon fa fa-italic"></i>
                                                                     </a>
-                                                                    <a class="btn btn-sm btn-info" data-edit="strikethrough"
+                                                                    <a class="btn btn-sm btn-info"
+                                                                       data-edit="strikethrough"
                                                                        title=""
                                                                        data-original-title="Strikethrough">
                                                                         <i class=" ace-icon fa fa-strikethrough"></i>
@@ -469,7 +444,8 @@
                                                                        data-original-title="Reduce indent (Shift+Tab)">
                                                                         <i class=" ace-icon fa fa-outdent"></i>
                                                                     </a>
-                                                                    <a class="btn btn-sm btn-purple" data-edit="indent" title=""
+                                                                    <a class="btn btn-sm btn-purple" data-edit="indent"
+                                                                       title=""
                                                                        data-original-title="Indent (Tab)">
                                                                         <i class=" ace-icon fa fa-indent"></i>
                                                                     </a>
@@ -478,20 +454,24 @@
                                                                 <div class="btn-group">
                                                                     <a class="btn btn-sm btn-primary active"
                                                                        data-edit="justifyleft"
-                                                                       title="" data-original-title="Align Left (Ctrl/Cmd+L)">
+                                                                       title=""
+                                                                       data-original-title="Align Left (Ctrl/Cmd+L)">
                                                                         <i class=" ace-icon fa fa-align-left"></i>
                                                                     </a>
-                                                                    <a class="btn btn-sm btn-primary" data-edit="justifycenter"
+                                                                    <a class="btn btn-sm btn-primary"
+                                                                       data-edit="justifycenter"
                                                                        title=""
                                                                        data-original-title="Center (Ctrl/Cmd+E)">
                                                                         <i class=" ace-icon fa fa-align-center"></i>
                                                                     </a>
-                                                                    <a class="btn btn-sm btn-primary" data-edit="justifyright"
+                                                                    <a class="btn btn-sm btn-primary"
+                                                                       data-edit="justifyright"
                                                                        title=""
                                                                        data-original-title="Align Right (Ctrl/Cmd+R)">
                                                                         <i class=" ace-icon fa fa-align-right"></i>
                                                                     </a>
-                                                                    <a class="btn btn-sm btn-inverse" data-edit="justifyfull"
+                                                                    <a class="btn btn-sm btn-inverse"
+                                                                       data-edit="justifyfull"
                                                                        title=""
                                                                        data-original-title="Justify (Ctrl/Cmd+J)">
                                                                         <i class=" ace-icon fa fa-align-justify"></i>
@@ -506,7 +486,8 @@
                                                                     </a>
                                                                     <div class="dropdown-menu dropdown-caret dropdown-menu-right">
                                                                         <div class="input-group">
-                                                                            <input class="form-control" placeholder="Image URL"
+                                                                            <input class="form-control"
+                                                                                   placeholder="Image URL"
                                                                                    type="text"
                                                                                    data-editimage="insertImage">
                                                                             <span class="input-group-btn">
@@ -515,19 +496,23 @@
                                                                         </div>
                                                                         <div class="space-2"></div>
                                                                         <label class="center block no-margin-bottom">
-                                                                            <button class="btn btn-sm btn-success" type="button"
+                                                                            <button class="btn btn-sm btn-success"
+                                                                                    type="button"
                                                                                     id="Wyimage">
-                                                                                <i class=" ace-icon fa fa-file"></i>Choose Image
+                                                                                <i class=" ace-icon fa fa-file"></i>Choose
+                                                                                Image
                                                                                 …
                                                                             </button>
-                                                                            <input type="file" data-editimage="insertImage"
+                                                                            <input type="file"
+                                                                                   data-editimage="insertImage"
                                                                                    accept="image/*">
                                                                         </label>
                                                                     </div>
                                                                 </div>
                                                                 <!--  图片大小 -->
                                                                 <div class="btn-group">
-                                                                    <a class="btn btn-sm btn-grey" title="" onclick="imgPlus()">
+                                                                    <a class="btn btn-sm btn-grey" title=""
+                                                                       onclick="imgPlus()">
                                                                         <i class=" ace-icon fa fa-plus"></i>
                                                                     </a>
                                                                     <a class="btn btn-sm btn-grey" title=""
@@ -537,11 +522,13 @@
                                                                 </div>
                                                                 <!--  撤销 -->
                                                                 <div class="btn-group">
-                                                                    <a class="btn btn-sm btn-grey" data-edit="undo" title=""
+                                                                    <a class="btn btn-sm btn-grey" data-edit="undo"
+                                                                       title=""
                                                                        data-original-title="Undo">
                                                                         <i class=" ace-icon fa fa-undo"></i>
                                                                     </a>
-                                                                    <a class="btn btn-sm btn-grey" data-edit="redo" title=""
+                                                                    <a class="btn btn-sm btn-grey" data-edit="redo"
+                                                                       title=""
                                                                        data-original-title="Redo">
                                                                         <i class=" ace-icon fa fa-repeat"></i>
                                                                     </a>
@@ -553,11 +540,12 @@
                                                     </div>
                                                     <div class="widget-body">
                                                         <div class="widget-main">
-                                                            <div class="tab-pane active" >
+                                                            <div class="tab-pane active">
                                                                 <!--word编辑区-->
                                                                 <div class="row">
                                                                     <div class="col-xs-12">
-                                                                        <div class="wysiwyg-editor" id="cur-step-summary"
+                                                                        <div class="wysiwyg-editor"
+                                                                             id="cur-step-summary"
                                                                              contenteditable="true"
                                                                              style="height: 600px;">
                                                                         </div>
@@ -590,7 +578,8 @@
                                         </li>
 
                                         <li class="">
-                                            <a data-toggle="tab" href="#template-tab" aria-expanded="false" onclick="swapTemplate()">
+                                            <a data-toggle="tab" href="#template-tab" aria-expanded="false"
+                                               onclick="swapTemplate()">
                                                 <i class="orange ace-icon fa fa-rss bigger-120"></i>
                                                 模板
                                             </a>
@@ -601,11 +590,16 @@
                                             <div class="row">
                                                 <div class="col-xs-12 col-sm-2 center">
 															<span class="profile-picture">
-																<img id="cur-node-app-img"class="editable img-responsive" width="100" height="100" alt="创新方法APP" id="avatar2" src="/templates/project/assets/img/app.png">
+																<img id="cur-node-app-img"
+                                                                     class="editable img-responsive" width="100"
+                                                                     height="100" alt="创新方法APP" id="avatar2"
+                                                                     src="/templates/project/assets/img/app.png">
 															</span>
 
                                                     <p>
-                                                        <span id="app-name" class="label label-lg arrowed-in arrowed-in-right">无</span>
+                                                        <a id="app-name"
+                                                              class="label label-lg arrowed-in arrowed-in-right">
+                                                            无</a>
                                                     </p>
                                                 </div><!-- /.col -->
 
@@ -624,7 +618,7 @@
                                                         <div class="profile-info-row">
                                                             <div class="profile-info-name">描述</div>
 
-                                                            <div class="profile-info-value" >
+                                                            <div class="profile-info-value">
                                                                 <span id="cur-node-description-href">alexdoe</span>
                                                             </div>
                                                         </div>
@@ -633,32 +627,39 @@
                                                             <div class="profile-info-name">目标</div>
 
                                                             <div class="profile-info-value">
-                                                                <span id="cur-node-goal-href" >alexdoe</span>
+                                                                <span id="cur-node-goal-href">alexdoe</span>
                                                             </div>
                                                         </div>
-
-
 
 
                                                     </div>
 
                                                 </div><!-- /.col -->
                                                 <div class="col-xs-12 col-sm-2">
-                                                    <a  type="button" class="btn btn-sm btn-white btn-block btn-success" data-toggle="modal" data-target="#store-modal">
-                                                        <i class="ace-icon fa fa-plus-circle" ></i>
-                                                        <span >应用商店</span>
+                                                    <a type="button" class="btn btn-sm btn-white btn-block btn-success"
+                                                       data-toggle="modal" data-target="#store-modal">
+                                                        <i class="ace-icon fa fa-plus-circle"></i>
+                                                        <span>应用商店</span>
                                                     </a>
-                                                    <a href="#" type="button" class="btn btn-sm btn-white btn-block btn-primary" id="app-result-btn"  data-toggle="modal" data-target="#tool-result-modal">
-                                                        <i class="ace-icon fa fa-info-circle" ></i>
-                                                        <span >查看数据</span>
+                                                    <a href="#" type="button"
+                                                       class="btn btn-sm btn-white btn-block btn-primary"
+                                                       id="app-result-btn" data-toggle="modal"
+                                                       data-target="#tool-result-modal">
+                                                        <i class="ace-icon fa fa-info-circle"></i>
+                                                        <span>查看数据</span>
                                                     </a>
-                                                    <a onclick="javascript:window.open('/templates/project/member.html?projectID='+PROJECT_ID);" type="button" class="btn btn-sm btn-white btn-block btn-purple">
+                                                    <a href="#" type="button"
+                                                       id="app-result-btn" data-toggle="modal"
+                                                       data-target="#node-role-manager-modal"
+                                                       class="btn btn-sm btn-white btn-block btn-purple">
                                                         <i class="ace-icon fa fa-user "></i>
-                                                        <span >成员管理</span>
+                                                        <span>成员管理</span>
                                                     </a>
-                                                    <a href="#" type="button" class="btn btn-sm btn-white btn-block btn-grey" id="cur-node-lock-btn" onclick="lockNode()">
+                                                    <a href="#" type="button"
+                                                       class="btn btn-sm btn-white btn-block btn-dark"
+                                                       id="cur-node-lock-btn" onclick="lockNode()">
                                                         <i class="ace-icon fa fa-envelope-o"></i>
-                                                        <span >锁定节点</span>
+                                                        <span>锁定节点</span>
                                                     </a>
                                                 </div>
                                             </div><!-- /.row -->
@@ -678,40 +679,41 @@
 
                                                         <div class="widget-body">
                                                             <div id="cur-node-result-info" class="alert alert-warning">
-                                                                <button type="button" class="close" data-dismiss="alert">
+                                                                <button type="button" class="close"
+                                                                        data-dismiss="alert">
                                                                     <i class="ace-icon fa fa-times"></i>
                                                                 </button>
                                                                 <strong>注意</strong>
                                                                 该节点还没有绑定APP,请绑定APP后在查看相关数据
                                                                 <br>
                                                             </div>
-                                                            <div class="widget-main padding-16">
+                                                            <div id="cur-node-result-info-2" class="widget-main padding-16">
                                                                 <#--<div class="clearfix">-->
-                                                                    <#--<div class="grid3 center">-->
-                                                                        <#--<div class="easy-pie-chart percentage" data-percent="45" data-color="#CA5952" style="height: 72px; width: 72px; line-height: 71px; color: rgb(202, 89, 82);">-->
-                                                                            <#--<span class="percent" id="cur-node-result-cnt">45</span>-->
-                                                                            <#--<canvas height="72" width="72" ></canvas></div>-->
-                                                                        <#--<div class="space-2"></div>-->
-                                                                        <#--成员数-->
-                                                                    <#--</div>-->
+                                                                <#--<div class="grid3 center">-->
+                                                                <#--<div class="easy-pie-chart percentage" data-percent="45" data-color="#CA5952" style="height: 72px; width: 72px; line-height: 71px; color: rgb(202, 89, 82);">-->
+                                                                <#--<span class="percent" id="cur-node-result-cnt">45</span>-->
+                                                                <#--<canvas height="72" width="72" ></canvas></div>-->
+                                                                <#--<div class="space-2"></div>-->
+                                                                <#--成员数-->
+                                                                <#--</div>-->
 
-                                                                    <#--<div class="grid3 center">-->
-                                                                        <#--<div class="center easy-pie-chart percentage" data-percent="90" data-color="#59A84B" style="height: 72px; width: 72px; line-height: 71px; color: rgb(89, 168, 75);">-->
-                                                                            <#--<span class="percent" id="cur-node-finished-cnt">90</span>%-->
-                                                                            <#--<canvas height="72" width="72"></canvas></div>-->
+                                                                <#--<div class="grid3 center">-->
+                                                                <#--<div class="center easy-pie-chart percentage" data-percent="90" data-color="#59A84B" style="height: 72px; width: 72px; line-height: 71px; color: rgb(89, 168, 75);">-->
+                                                                <#--<span class="percent" id="cur-node-finished-cnt">90</span>%-->
+                                                                <#--<canvas height="72" width="72"></canvas></div>-->
 
-                                                                        <#--<div class="space-2"></div>-->
-                                                                        <#--完成数-->
-                                                                    <#--</div>-->
+                                                                <#--<div class="space-2"></div>-->
+                                                                <#--完成数-->
+                                                                <#--</div>-->
 
-                                                                    <#--<div class="grid3 center">-->
-                                                                        <#--<div class="center easy-pie-chart percentage" data-percent="80" data-color="#9585BF" style="height: 72px; width: 72px; line-height: 71px; color: rgb(149, 133, 191);">-->
-                                                                            <#--<span class="percent" id="cur-node-pending-cnt">80</span>%-->
-                                                                            <#--<canvas height="72" width="72"></canvas></div>-->
+                                                                <#--<div class="grid3 center">-->
+                                                                <#--<div class="center easy-pie-chart percentage" data-percent="80" data-color="#9585BF" style="height: 72px; width: 72px; line-height: 71px; color: rgb(149, 133, 191);">-->
+                                                                <#--<span class="percent" id="cur-node-pending-cnt">80</span>%-->
+                                                                <#--<canvas height="72" width="72"></canvas></div>-->
 
-                                                                        <#--<div class="space-2"></div>-->
-                                                                        <#--任务比-->
-                                                                    <#--</div>-->
+                                                                <#--<div class="space-2"></div>-->
+                                                                <#--任务比-->
+                                                                <#--</div>-->
                                                                 <#--</div>-->
                                                                 <#--<div class="hr hr-16"></div>-->
                                                                 <table id="cur-node-result-table"></table>
@@ -741,7 +743,8 @@
 
                                                                     </div>
                                                                     <div class="btn-group">
-                                                                        <a class="btn btn-sm btn-grey" onclick="saveNodeSummary()" >
+                                                                        <a class="btn btn-sm btn-grey"
+                                                                           onclick="saveNodeSummary()">
                                                                             <i class="ace-icon fa fa-floppy-o"></i>
                                                                             <span>保存&nbsp;</span>
                                                                         </a>
@@ -781,7 +784,8 @@
                                                                     </div>
                                                                     <!-- 字体 -->
                                                                     <div class="btn-group">
-                                                                        <a class="btn dropdown-toggle" data-toggle="dropdown"
+                                                                        <a class="btn dropdown-toggle"
+                                                                           data-toggle="dropdown"
                                                                            title=""
                                                                            data-original-title="Font Size">
                                                                             <i class=" ace-icon fa fa-text-height"></i>&nbsp;
@@ -822,20 +826,24 @@
                                                                     </div>
                                                                     <!-- 加粗 斜体 删除线 下划线 -->
                                                                     <div class="btn-group">
-                                                                        <a class="btn btn-sm btn-info" data-edit="bold" title=""
+                                                                        <a class="btn btn-sm btn-info" data-edit="bold"
+                                                                           title=""
                                                                            data-original-title="Bold (Ctrl/Cmd+B)">
                                                                             <i class=" ace-icon fa fa-bold"></i>
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-info" data-edit="italic" title=""
+                                                                        <a class="btn btn-sm btn-info"
+                                                                           data-edit="italic" title=""
                                                                            data-original-title="Italic (Ctrl/Cmd+I)">
                                                                             <i class=" ace-icon fa fa-italic"></i>
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-info" data-edit="strikethrough"
+                                                                        <a class="btn btn-sm btn-info"
+                                                                           data-edit="strikethrough"
                                                                            title=""
                                                                            data-original-title="Strikethrough">
                                                                             <i class=" ace-icon fa fa-strikethrough"></i>
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-info" data-edit="underline"
+                                                                        <a class="btn btn-sm btn-info"
+                                                                           data-edit="underline"
                                                                            title=""
                                                                            data-original-title="Underline">
                                                                             <i class=" ace-icon fa fa-underline"></i>
@@ -853,12 +861,14 @@
                                                                            data-original-title="Number list">
                                                                             <i class=" ace-icon fa fa-list-ol"></i>
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-purple" data-edit="outdent"
+                                                                        <a class="btn btn-sm btn-purple"
+                                                                           data-edit="outdent"
                                                                            title=""
                                                                            data-original-title="Reduce indent (Shift+Tab)">
                                                                             <i class=" ace-icon fa fa-outdent"></i>
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-purple" data-edit="indent" title=""
+                                                                        <a class="btn btn-sm btn-purple"
+                                                                           data-edit="indent" title=""
                                                                            data-original-title="Indent (Tab)">
                                                                             <i class=" ace-icon fa fa-indent"></i>
                                                                         </a>
@@ -867,20 +877,24 @@
                                                                     <div class="btn-group">
                                                                         <a class="btn btn-sm btn-primary active"
                                                                            data-edit="justifyleft"
-                                                                           title="" data-original-title="Align Left (Ctrl/Cmd+L)">
+                                                                           title=""
+                                                                           data-original-title="Align Left (Ctrl/Cmd+L)">
                                                                             <i class=" ace-icon fa fa-align-left"></i>
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-primary" data-edit="justifycenter"
+                                                                        <a class="btn btn-sm btn-primary"
+                                                                           data-edit="justifycenter"
                                                                            title=""
                                                                            data-original-title="Center (Ctrl/Cmd+E)">
                                                                             <i class=" ace-icon fa fa-align-center"></i>
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-primary" data-edit="justifyright"
+                                                                        <a class="btn btn-sm btn-primary"
+                                                                           data-edit="justifyright"
                                                                            title=""
                                                                            data-original-title="Align Right (Ctrl/Cmd+R)">
                                                                             <i class=" ace-icon fa fa-align-right"></i>
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-inverse" data-edit="justifyfull"
+                                                                        <a class="btn btn-sm btn-inverse"
+                                                                           data-edit="justifyfull"
                                                                            title=""
                                                                            data-original-title="Justify (Ctrl/Cmd+J)">
                                                                             <i class=" ace-icon fa fa-align-justify"></i>
@@ -890,12 +904,14 @@
                                                                     <div class="btn-group">
                                                                         <a class="btn btn-sm btn-success dropdown-toggle"
                                                                            data-toggle="dropdown"
-                                                                           title="" data-original-title="Insert picture">
+                                                                           title=""
+                                                                           data-original-title="Insert picture">
                                                                             <i class=" ace-icon fa fa-picture-o"></i>
                                                                         </a>
                                                                         <div class="dropdown-menu dropdown-caret dropdown-menu-right">
                                                                             <div class="input-group">
-                                                                                <input class="form-control" placeholder="Image URL"
+                                                                                <input class="form-control"
+                                                                                       placeholder="Image URL"
                                                                                        type="text"
                                                                                        data-editimage="insertImage">
                                                                                 <span class="input-group-btn">
@@ -904,19 +920,23 @@
                                                                             </div>
                                                                             <div class="space-2"></div>
                                                                             <label class="center block no-margin-bottom">
-                                                                                <button class="btn btn-sm btn-success" type="button"
+                                                                                <button class="btn btn-sm btn-success"
+                                                                                        type="button"
                                                                                         id="Wyimage">
-                                                                                    <i class=" ace-icon fa fa-file"></i>Choose Image
+                                                                                    <i class=" ace-icon fa fa-file"></i>Choose
+                                                                                    Image
                                                                                     …
                                                                                 </button>
-                                                                                <input type="file" data-editimage="insertImage"
+                                                                                <input type="file"
+                                                                                       data-editimage="insertImage"
                                                                                        accept="image/*">
                                                                             </label>
                                                                         </div>
                                                                     </div>
                                                                     <!--  图片大小 -->
                                                                     <div class="btn-group">
-                                                                        <a class="btn btn-sm btn-grey" title="" onclick="imgPlus()">
+                                                                        <a class="btn btn-sm btn-grey" title=""
+                                                                           onclick="imgPlus()">
                                                                             <i class=" ace-icon fa fa-plus"></i>
                                                                         </a>
                                                                         <a class="btn btn-sm btn-grey" title=""
@@ -926,11 +946,13 @@
                                                                     </div>
                                                                     <!--  撤销 -->
                                                                     <div class="btn-group">
-                                                                        <a class="btn btn-sm btn-grey" data-edit="undo" title=""
+                                                                        <a class="btn btn-sm btn-grey" data-edit="undo"
+                                                                           title=""
                                                                            data-original-title="Undo">
                                                                             <i class=" ace-icon fa fa-undo"></i>
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-grey" data-edit="redo" title=""
+                                                                        <a class="btn btn-sm btn-grey" data-edit="redo"
+                                                                           title=""
                                                                            data-original-title="Redo">
                                                                             <i class=" ace-icon fa fa-repeat"></i>
                                                                         </a>
@@ -945,7 +967,8 @@
                                                                     <label class="pull-right inline">
                                                                         <small class="muted smaller-90">是否完成</small>
                                                                         <input id="state-change-btn" checked="checked"
-                                                                               type="checkbox" class="ace ace-switch ace-switch-5">
+                                                                               type="checkbox"
+                                                                               class="ace ace-switch ace-switch-5">
                                                                         <span class="lbl middle"></span>
                                                                     </label>
                                                                 </div>
@@ -959,7 +982,8 @@
                                                                     <!--word编辑区-->
                                                                     <div class="row">
                                                                         <div class="col-xs-12">
-                                                                            <div class="wysiwyg-editor" id="cur-node-summary"
+                                                                            <div class="wysiwyg-editor"
+                                                                                 id="cur-node-summary"
                                                                                  contenteditable="true"
                                                                                  style="height: 600px;">
                                                                             </div>
@@ -981,19 +1005,29 @@
                                                 <div>
                                                     <label for="cur-node-temp-select">链接现有模板</label>
                                                     <select class="form-control" id="cur-node-temp-select">
+                                                        <#if ownedProjectList?? && ownedProjectList?size!=0>
+                                                            <#list ownedProjectList as project>
+                                                                <#if project.projectID!=curProjectID>
+                                                                    <option value="${project.projectID}">${project.projectName}</option>
+                                                                </#if>
+
+                                                            </#list>
+                                                        <#else >
+                                                            <option>无可选模板</option>
+                                                        </#if>
                                                     </select>
                                                     <div class="space-4"></div>
                                                     <div class="col-md-offset-3 col-md-9">
                                                         <button class="btn btn-info" type="button"
-                                                                onclick="javascript:window.open('/templates/manager.html?projectID='+$('#cur-node-temp-select').val(),'_blank')">
-                                                            进入当前模板
+                                                                onclick="javascript:window.open('/templates/project/221'+$('#cur-node-temp-select').val()+'/view.html','_blank')">
+                                                            进入选择的模板
                                                         </button>
                                                         <button class="btn btn-success" type="button"
                                                                 onclick="bindingTemplate()">
                                                             链接模板
                                                         </button>
                                                         <button class="btn btn-primary" type="button"
-                                                                onclick="javascript:window.open('/templates/createProject.html','_blank',)">
+                                                                onclick="javascript:window.open('/templates/project/new.html','_blank',)">
                                                             新建模板
                                                         </button>
                                                     </div>
@@ -1007,13 +1041,8 @@
                             </div>
                         </div>
                     </div>
-
-
                 </div>
-
-
             </div>
-
         </div>
         <!-- /.page-content -->
     </div>
@@ -1033,16 +1062,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <table id="tool-project-table" data-toggle="table">
-                            <thead>
-                            <tr>
-                                <th data-field="projectName">项目名</th>
-                                <th data-field="createTime" data-formatter="timeFormatter">创建时间</th>
-                                <th data-field="editTime" data-formatter="timeFormatter">修改时间</th>
-                                <th data-field="memo">备注</th>
-                                <th data-field="op" data-formatter="toolProjectPreView">操作</th>
-                            </tr>
-                            </thead>
+                        <table id="tool-project-table">
+
                         </table>
                     </div>
                 </div>
@@ -1055,23 +1076,50 @@
         </div>
         <!-- /.modal -->
     </div>
-    <div class="modal fade bs-example-modal-lg " id="tool-result-view-modal" tabindex="-1" role="dialog"
+    <div class="modal fade bs-example-modal-lg " id="node-role-manager-modal" tabindex="-1" role="dialog"
          aria-labelledby="tool-result-view-label"
          aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         &times;
                     </button>
-                    <h4 class="modal-title" id="tool-result-view-modal-label">结果预览</h4>
+                    <h4 class="modal-title" id="tool-result-view-modal-label">管理当前节点用户权限</h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div id="preViewRow" class="col-xs-10"></div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <#--<select multiple="multiple" size="10" name="duallistbox_demo1[]" id="duallist">-->
+                                    <#--<option value="option1">Option 1</option>-->
+                                    <#--<option value="option2">Option 2</option>-->
+                                    <#--<option value="option3" selected="selected">Option 3</option>-->
+                                    <#--<option value="option4">Option 4</option>-->
+                                    <#--<option value="option5">Option 5</option>-->
+                                    <#--<option value="option6" selected="selected">Option 6</option>-->
+                                    <#--<option value="option7">Option 7</option>-->
+                                    <#--<option value="option8">Option 8</option>-->
+                                    <#--<option value="option9">Option 9</option>-->
+                                    <#--<option value="option0">Option 10</option>-->
+                                <#--</select>-->
+
+                                <#--<div class="hr hr-16 hr-dotted"></div>-->
+                                <table id="nodeRoleTable">
+
+                                </table>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+
+                </div>
             </div>
+
             <!-- /.modal-content -->
         </div>
         <!-- /.modal -->
@@ -1140,7 +1188,6 @@
         </div>
         <!-- /.modal -->
     </div>
-
     <!-- #dialog-message -->
     <!-- 关联模板模态框 modal end -->
     <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
@@ -1164,8 +1211,10 @@
     <script src="/templates/project/assets/js/result.js"></script>
     <#--这里需要引用echarts的3.x版本，因为在绘制甘特图的时候，3.x的版本可以支持时间的堆叠，而4.x版本不支持。-->
     <script src="/templates/project/assets/js/echarts.js"></script>
+    <script src="http://innovation.xjtu.edu.cn/webresources/ace-master/assets/js/bootbox.js"></script>
     <#--引入日期处理插件-->
     <script src="/templates/project/assets/js/moment-with-locales.min.js"></script>
+    <script src="/webresources/ace-master/assets/js/jquery.bootstrap-duallistbox.min.js"></script>
     <script>
         $(function () {
             $('.modal.aside').ace_aside();

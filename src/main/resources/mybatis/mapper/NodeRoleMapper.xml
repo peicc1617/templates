@@ -6,16 +6,16 @@
 
 
     <insert id="addNodeRole">
-        INSERT INTO project_node_role VALUES  (#{projectID},#{nodeIndex},#{userID},#{nodeRole})
+        INSERT INTO project_node_role VALUES  (#{projectID},#{nodeIndex},#{userID},#{roleType})
     </insert>
     
     <insert id="addAllNodeRole" parameterType="java.util.List">
-        INSERT INTO project_node_role (projectID,nodeIndex,userID,nodeRole) VALUES
+        INSERT INTO project_node_role (projectID,nodeIndex,userID,roleType) VALUES
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.projectID},
             #{item.nodeIndex},
             #{item.userID},
-            #{item.nodeRole})
+            #{item.roleType})
         </foreach>
     </insert>
 
@@ -23,12 +23,15 @@
         DELETE FROM project_node_role where projectID = #{projectID} AND nodeIndex = #{nodeIndex} AND userID = #{userID}
     </delete>
 
-    <select id="getNodeRole">
-        SELECT * FROM project_node_role where projectID = #{projectID} AND nodeIndex = #{nodeIndex} AND userID = #{userID}
+    <select id="getNodeRole" resultType="cn.edu.xjtu.cad.templates.model.project.node.NodeRoleType">
+        SELECT roleType FROM project_node_role where projectID = #{projectID} AND nodeIndex = #{nodeIndex} AND userID = #{userID}
+    </select>
+    <select id="getNodeRoleList" resultType="cn.edu.xjtu.cad.templates.model.project.node.NodeRole">
+        SELECT * FROM project_node_role where projectID = #{projectID} AND nodeIndex = #{nodeIndex}
     </select>
 
     <update id="updateNodeRole">
-        UPDATE project_node_role SET nodeRole = #{nodeRole.nodeRole} WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}AND userID =#{userID}
+        UPDATE project_node_role SET roleType = #{roleType} WHERE projectID = #{projectID} AND nodeIndex = #{nodeIndex}AND userID =#{userID}
     </update>
 
 </mapper>

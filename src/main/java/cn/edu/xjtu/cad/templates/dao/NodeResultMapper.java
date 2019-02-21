@@ -25,6 +25,7 @@ public interface NodeResultMapper {
      */
     List<NodeResult> getResultListByNodeIndex(@Param("id") long projectID,@Param("index")String nodeIndex);
 
+    NodeResult getMyNodeResultInNode(@Param("id") long projectID,@Param("index")String nodeIndex,@Param("userID") long userID);
     /**
      * 根据节点index和多个用户ID查询结果
      * @param projectID 项目ID
@@ -40,4 +41,6 @@ public interface NodeResultMapper {
      * @return 成功更新的行数
      */
     long updateNodeResult(NodeResult nodeResult);
+
+    void deleteNodeResult(@Param("id") long projectID,@Param("index")String nodeIndex,@Param("userID") long userID);
 }

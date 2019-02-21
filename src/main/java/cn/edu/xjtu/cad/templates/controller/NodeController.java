@@ -5,6 +5,7 @@ import cn.edu.xjtu.cad.templates.annotation.SystemControllerLog;
 import cn.edu.xjtu.cad.templates.dao.*;
 import cn.edu.xjtu.cad.templates.model.log.LogType;
 import cn.edu.xjtu.cad.templates.model.log.MethodType;
+import cn.edu.xjtu.cad.templates.model.project.Edge;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
 import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.model.project.node.*;
@@ -69,10 +70,29 @@ public class NodeController {
     }
 
     /**
+     * 添加边
+     * @param projectID
+     * @param path
+     */
+    @RequestMapping(value = "/path",method = RequestMethod.POST)
+    public void addPath(@PathVariable long projectID, Edge path){
+        nodeService.addPath(user,path);
+    }
+
+    /**
+     * 删除边
+     * @param projectID
+     * @param path
+     */
+    @RequestMapping(value = "/path",method = RequestMethod.DELETE)
+    public void deletePath(@PathVariable long projectID, Edge path){
+        nodeService.deletePath(user,path);
+    }
+    /**
      * 更新节点名称
      * @param projectID 项目ID
      * @param nodeIndex 节点索引
-     * @param name 新名称
+     * @param nodeName 新名称
      * @return
      */
     @SystemControllerLog(content = "将节点${nodeIndex}的名称修改为${name}",logType = LogType.NODE,methodType = MethodType.UPDATE)
@@ -90,19 +110,19 @@ public class NodeController {
      * 更新节点描述
      * @param projectID 项目ID
      * @param nodeIndex 节点索引
-     * @param description 新描述
+     * @param nodeDesc 新描述
      * @return
      */
     @SystemControllerLog(content = "将节点${nodeIndex}的描述修改为${description}",logType = LogType.NODE,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/nodeDesc",method = RequestMethod.PUT)
-    public boolean updateNodeDes(@PathVariable long projectID,String nodeIndex,String nodeDesc){
+    public void updateNodeDes(@PathVariable long projectID,String nodeIndex,String nodeDesc){
         Node node = nodeMapper.getNode(projectID,nodeIndex);
         if(node!=null){
             node.setNodeDesc(nodeDesc);
             nodeMapper.updateNode(node);
         }
-        return true;
     }
+
 
     /**
      * 更新节点目标
@@ -113,13 +133,12 @@ public class NodeController {
      */
     @SystemControllerLog(content = "将节点${nodeIndex}的目标修改为${goal}",logType = LogType.NODE,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/goal",method = RequestMethod.PUT)
-    public boolean updateNodeGoal(@PathVariable long projectID,String nodeIndex,String goal){
+    public void updateNodeGoal(@PathVariable long projectID,String nodeIndex,String goal){
         Node node = nodeMapper.getNode(projectID,nodeIndex);
         if(node!=null){
             node.setGoal(goal);
             nodeMapper.updateNode(node);
         }
-        return true;
     }
 
     /**
@@ -131,13 +150,12 @@ public class NodeController {
      */
     @SystemControllerLog(content = "填写了节点总结，总结内容为${summary}",logType = LogType.NODE,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/summary",method = RequestMethod.PUT)
-    public boolean updateNodeReview(@PathVariable long projectID,String nodeIndex,String summary){
+    public void updateNodeReview(@PathVariable long projectID,String nodeIndex,String summary){
         Node node = nodeMapper.getNode(projectID,nodeIndex);
         if(node!=null){
             node.setSummary(summary);
             nodeMapper.updateNode(node);
         }
-        return true;
     }
 
 
@@ -152,7 +170,7 @@ public class NodeController {
      */
     @SystemControllerLog(content = "节点绑定了${appName}",logType = LogType.NODE,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/app",method = RequestMethod.PUT)
-    public boolean updateNodeApp(@PathVariable long projectID,String nodeIndex,String appName,String appPath,String appIcon){
+    public void updateNodeApp(@PathVariable long projectID,String nodeIndex,String appName,String appPath,String appIcon){
         Node node = nodeMapper.getNode(projectID,nodeIndex);
         if(node!=null){
             node.setAppName(appName);
@@ -161,7 +179,6 @@ public class NodeController {
             node.setTemplateProjectID(0);
             nodeMapper.updateNode(node);
         }
-        return true;
     }
 
     /**
@@ -173,23 +190,21 @@ public class NodeController {
      */
     @SystemControllerLog(content = "将节点状态更改为${state}",logType = LogType.NODE,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/state",method = RequestMethod.PUT)
-    public boolean updateNodeState(@PathVariable long projectID,String nodeIndex,boolean state){
+    public void updateNodeState(@PathVariable long projectID,String nodeIndex,boolean state){
         Node node = nodeMapper.getNode(projectID,nodeIndex);
         if(node!=null){
             node.setState(state);
             nodeMapper.updateNode(node);
         }
-        return true;
     }
 
     @RequestMapping(value = "/lock",method = RequestMethod.PUT)
-    public boolean updateNodeLock(@PathVariable long projectID,String nodeIndex,boolean lockState){
+    public void updateNodeLock(@PathVariable long projectID,String nodeIndex,boolean lockState){
         Node node = nodeMapper.getNode(projectID,nodeIndex);
         if(node!=null){
             node.setLockState(lockState);
             nodeMapper.updateNode(node);
         }
-        return true;
     }
 
 
@@ -202,13 +217,12 @@ public class NodeController {
      */
     @SystemControllerLog(content = "将节点${nodeIndex}所属阶段修改为${stepIndex}",logType = LogType.NODE,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/step",method = RequestMethod.PUT)
-    public boolean updateNodeStep(@PathVariable long projectID,String nodeIndex,String stepIndex){
+    public void updateNodeStep(@PathVariable long projectID,String nodeIndex,String stepIndex){
         Node node = nodeMapper.getNode(projectID,nodeIndex);
         if(node!=null){
             node.setStepIndex(stepIndex);
             nodeMapper.updateNode(node);
         }
-        return true;
     }
 
     /**
@@ -220,13 +234,12 @@ public class NodeController {
      */
     @SystemControllerLog(content = "将节点${nodeIndex}和模板项目${templateProjectID}进行绑定",logType = LogType.NODE,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/template",method = RequestMethod.PUT)
-    public boolean updateNodeTemplate(@PathVariable long projectID,String nodeIndex,int templateProjectID){
+    public void updateNodeTemplate(@PathVariable long projectID,String nodeIndex,int templateProjectID){
         Node node = nodeMapper.getNode(projectID,nodeIndex);
         if(node!=null){
             node.setTemplateProjectID(templateProjectID);
             nodeMapper.updateNode(node);
         }
-        return true;
     }
 
     /**
@@ -238,6 +251,17 @@ public class NodeController {
     @RequestMapping(value = "/result",method = RequestMethod.GET)
     public List<NodeResult> getResultListOfNodeIndex(@PathVariable long projectID,String nodeIndex){
         return nodeResultMapper.getResultListByNodeIndex(projectID,nodeIndex);
+    }
+
+    /**
+     * 获取当前用户在当前节点的结果数据
+     * @param projectID
+     * @param nodeIndex
+     * @return
+     */
+    @RequestMapping(value = "/result/my",method = RequestMethod.GET)
+    public NodeResult getMyResultOfNodeIndex(@PathVariable long projectID,String nodeIndex){
+        return nodeResultMapper.getMyNodeResultInNode(projectID,nodeIndex,user.getUserID());
     }
 
     /**
@@ -331,7 +355,7 @@ public class NodeController {
      */
     @SystemControllerLog(content = "修改了绑定数据${resultName}的状态为${state}",logType = LogType.RESULT,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/result",method = RequestMethod.PUT)
-    public boolean updateStateOfResult(NodeResult nodeResult){
+    public void updateStateOfResult(NodeResult nodeResult){
         switch (nodeResult.getState()){
             case ACCEPT:
                 nodeResult.setMessage(NodeResult.PASSED_MESSAGE);
@@ -352,10 +376,22 @@ public class NodeController {
                 break;
         }
         nodeResultMapper.updateNodeResult(nodeResult);
-        return true;
     }
 
+    /**
+     * 获取当前节点内的权限
+     * @param projectID
+     * @param nodeIndex
+     */
+    @RequestMapping(value = "/role/list",method = RequestMethod.GET)
+    public List<NodeRole> getNodeRoleList(@PathVariable long projectID,String nodeIndex){
+        return nodeService.getNodeRoleList(user,projectID,nodeIndex);
+    }
 
+    @RequestMapping(value = "/role",method = RequestMethod.PUT)
+    public void NodeRole(@PathVariable long projectID,NodeRole nodeRole){
+        nodeService.updateNodeRole(user,nodeRole);
+    }
 
 
 }

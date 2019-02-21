@@ -23,6 +23,15 @@ public class Edge {
      */
     private String nodeJ;
 
+    public Edge() {
+    }
+
+    public Edge(long projectID, String nodeI, String nodeJ) {
+        this.projectID = projectID;
+        this.nodeI = nodeI;
+        this.nodeJ = nodeJ;
+    }
+
     public int getId() {
         return id;
     }

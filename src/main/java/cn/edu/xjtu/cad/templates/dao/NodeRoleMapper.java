@@ -15,13 +15,15 @@ public interface NodeRoleMapper {
 
     long addNodeRole(NodeRole nodeRole);
 
-    long deleteNodeRole(@Param("projectID") long projectID, @Param("nodeIndex")int nodeIndex,@Param("userID") long userID);
+    long deleteNodeRole(@Param("projectID") long projectID, @Param("nodeIndex")String nodeIndex,@Param("userID") long userID);
 
-    NodeRoleType getNodeRole(@Param("projectID")long projectID, long nodeIndex, long userID);
+    NodeRoleType getNodeRole(@Param("projectID")long projectID,@Param("nodeIndex") String nodeIndex,@Param("userID") long userID);
 
     long updateNodeRole(NodeRole nodeRole);
 
     long addAllNodeRole(List<NodeRole> nodeRoleList);
 
     List<NodeRoleType> getUserNodeRole(@Param("projectID")long projectID,@Param("userID") long userID);
+
+    List<NodeRole> getNodeRoleList(@Param("projectID")long projectID,@Param("nodeIndex") String nodeIndex);
 }

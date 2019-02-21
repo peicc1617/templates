@@ -10,6 +10,9 @@ public class ProjectLog extends Log {
     private String stepIndex;
     private String nodeIndex;
 
+    public ProjectLog() {
+    }
+
     public ProjectLog(LogType logType, MethodType logMethod, long userID, String content, String ipAddr) {
         super(logType, logMethod,  userID, content, ipAddr);
     }

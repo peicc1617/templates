@@ -42,7 +42,7 @@ public class CurUserResolver implements HandlerMethodArgumentResolver {
         List<NodeRole> nodeRoleList = userMapper.getNodeRole(userID);
         Map<String,NodeRoleType> nodeRoleTypeMap = userMapper.getNodeRole(userID)
                 .stream()
-                .collect(Collectors.toMap(role->role.getProjectID()+";"+role.getNodeIndex(),NodeRole::getNodeRole));
+                .collect(Collectors.toMap(role->role.getProjectID()+";"+role.getNodeIndex(),NodeRole::getRoleType));
         return null;
     }
 }

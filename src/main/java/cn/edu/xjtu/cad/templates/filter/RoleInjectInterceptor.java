@@ -50,7 +50,6 @@ public class RoleInjectInterceptor implements HandlerInterceptor {
                 request.getRequestDispatcher("/project/noAccess.html").forward(request, response);
                 return false;
             }
-            return true;
         }
         user.setProjectRoleType(projectRoleType);
         return  true;

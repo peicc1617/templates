@@ -43,6 +43,19 @@ function validateEmpty(v){
         return '不能为空';
     }
 }
+function refreshStepRow(step){
+    $("#stepInfoRow").show();
+    $("#nodeInfoRow").hide();
+    //节点的名称
+    $("#cur-step-name-href").editable("setValue",step.stepName);
+    //节点的描述
+    $("#cur-step-description-href").editable("setValue",step.stepDesc);
+    $("#cur-step-summary").html(step.summary)
+    let resultChart = echarts.init(document.getElementById('cur-step-result-static'));
+    let activityChart = echarts.init(document.getElementById('cur-step-activity-static'));
+    resultStaticFill(resultChart,0);
+    activityStaticFill(activityChart,0);
+}
 const STEP_JS = {
     /**
      * 查看阶段
@@ -50,17 +63,8 @@ const STEP_JS = {
      */
     afterViewStep:function (step) {
         CUR_STEP = step;
-        $("#stepInfoRow").show();
-        $("#nodeInfoRow").hide();
-        //节点的名称
-        $("#cur-step-name-href").editable("setValue",step.stepName);
-        //节点的描述
-        $("#cur-step-description-href").editable("setValue",step.stepDesc);
-        $("#cur-step-summary").html(step.summary)
-        let resultChart = echarts.init(document.getElementById('cur-step-result-static'));
-        let activityChart = echarts.init(document.getElementById('cur-step-activity-static'));
-        resultStaticFill(resultChart,0);
-        activityStaticFill(activityChart,0);
+        refreshStepRow(step)
+
     },
     /**
      * 在添加step之前
@@ -321,7 +325,6 @@ function activityStaticFill($echart,stepIndex){
     };
     $echart.setOption(option);
 }
-
 
 /**
  * 更新阶段信息的函数

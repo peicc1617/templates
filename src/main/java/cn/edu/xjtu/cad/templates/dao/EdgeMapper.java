@@ -14,7 +14,7 @@ public interface EdgeMapper {
      * @param edgeList
      * @return
      */
-    boolean addAllEdges(List<Edge> edgeList);
+    void addAllEdges(List<Edge> edgeList);
 
     /**
      * 从数据库中查询边
@@ -22,4 +22,10 @@ public interface EdgeMapper {
      * @return
      */
     List<Edge> getEdgesOfProject(long projectID);
+
+
+    void deleteEdgeOfNode(long projectID,String nodeIndex);
+
+
+    void deleteEdge(long projectID,String nodeI,String nodeJ);
 }

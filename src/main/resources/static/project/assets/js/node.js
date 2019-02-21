@@ -1,43 +1,50 @@
+
+
+const NODE_ELS = {
+    nodeRoleManagerModal: "#node-role-manager-modal",
+    nodeRoleTable:"#nodeRoleTable",
+}
+
 /**
  * 初始化js事件
  */
-$(document).ready(function(){
+$(document).ready(function () {
     $('#state-change-btn').on('click', finish);
     $("#cur-node-name-href").editable({
         type: 'text',
         title: '修改名称',
-        name:'nodeName',
+        name: 'nodeName',
         url: updateNodeHref,
-        validate:validateEmpty
-
+        validate: validateEmpty
     })
     $("#cur-node-description-href").editable({
         type: 'textarea',
         title: '修改描述',
-        name:'nodeDesc',
+        name: 'nodeDesc',
         url: updateNodeHref,
         validate: validateEmpty
     })
     $("#cur-node-goal-href").editable({
         type: 'textarea',
         title: '修改目标',
-        name:'goal',
+        name: 'goal',
         url: updateNodeHref,
-        validate:validateEmpty
+        validate: validateEmpty
     })
+
     function updateNodeHref(params) {
         var d = new $.Deferred();
         if (params.value === 'abc') {
             return d.reject('error message'); //returning error via deferred object
         } else {
             data = {
-                projectID:PROJECT_ID,
-                nodeIndex:CUR_NODE.nodeIndex
+                projectID: PROJECT_ID,
+                nodeIndex: CUR_NODE.nodeIndex
             }
             data[params.name] = params.value
             //async saving data in js model
             $.ajax({
-                url: API.editNode+params.name,
+                url: API.editNode + params.name,
                 type: 'PUT',
                 async: true,
                 data: data,
@@ -50,14 +57,96 @@ $(document).ready(function(){
             return d.promise();
         }
     }
+
     function validateEmpty(value) {
         if (!$.trim(value)) {
             return '不能为空';
         }
     }
+
+    $( NODE_ELS.nodeRoleTable).bootstrapTable({
+
+        columns: [{
+            field: 'userID',
+            title: '用户ID',
+
+        }, {
+            field: 'nickName',
+            title: '姓名',
+
+        }, {
+            field: 'roleType',
+            title: '用户权限',
+            editable: {
+                type: 'select',
+                title: '修改用户在节点内的权限',
+                source: NODE_ROLE
+            }
+        }],
+        height: 500,
+        striped: true,  //表格显示条纹，默认为false
+        pagination: true, // 在表格底部显示分页组件，默认false
+        pageList: [5, 10], // 设置页面可以显示的数据条数
+        pageSize: 5, // 页面数据条数
+        pageNumber: 1, // 首页页码,
+        onEditableSave(field, row, oldValue, $el) {
+            data = row;
+            $.ajax({
+                url: API.nodeRole,
+                method: "PUT",
+                data: data,
+                async: false,
+                success: function (data) {
+                    alert("修改成功")
+                },
+                error: function () {
+                    row[field] = oldValue;
+                    alert("修改失败")
+                },
+            })
+        }
+    })
+
+    $(NODE_ELS.nodeRoleManagerModal).on({
+        'show.bs.modal': function () {
+            refreshNodeRoleTable()
+        },
+        'hide.bs.modal': function () {
+            loadCurStepResult()
+        }
+    })
 });
 
+function refreshNodeRoleTable(){
+    getNodeRoleList().then(function (data) {
+        $( NODE_ELS.nodeRoleTable).bootstrapTable('load',data);
+    },function () {
+        
+    })
+}
 
+function getNodeRoleList(){
+    return new Promise(((resolve, reject) => {
+        $.ajax({
+            url: API.nodeRoleList,
+            type: "GET",
+            data: {
+                nodeIndex: CUR_NODE.nodeIndex
+            },
+            success: function (data) {
+                if (data.code == 1) {
+                    //请求成功以后
+                    resolve(data.data);
+                } else {
+                    reject();
+                }
+            },
+            error: function () {
+                reject();
+            }
+        })
+    }))
+}
 /**
  *
  * @param node
@@ -67,14 +156,14 @@ function refreshNodeRow() {
     $("#stepInfoRow").attr("style", "display:none");
     $("#nodeInfoRow").attr("style", "display:display");
     //节点的名称
-    $("#cur-node-name-href").editable("setValue",CUR_NODE.nodeName);
+    $("#cur-node-name-href").editable("setValue", CUR_NODE.nodeName);
     //节点的描述
-    $("#cur-node-description-href").editable("setValue",CUR_NODE.nodeDesc);
-    if(CUR_NODE.templateProjectID===0){
+    $("#cur-node-description-href").editable("setValue", CUR_NODE.nodeDesc);
+    if (!CUR_NODE.templateProjectID >0) {
         //显示工具页面
         $("a[href=#tool-tab]")[0].click();
         //当前节点绑定的是创新方法
-        $("#cur-node-goal-href").editable("setValue",CUR_NODE.goal);
+        $("#cur-node-goal-href").editable("setValue", CUR_NODE.goal);
 
         //显示节点所选择的创新方法工具名
         $("#cur-node-data-widget").removeClass("widget-color-blue").removeClass("widget-color-dark");
@@ -91,9 +180,9 @@ function refreshNodeRow() {
             //设置按钮的状态和对应的函数
             $i.addClass("fa-unlock");
             $i.attr("title", "当前节点处于开放状态，其他用户可以绑定数据。点击锁定当前节点")
-            if(CUR_NODE.appName){
+            if (CUR_NODE.appName) {
                 $widget.addClass("widget-color-blue");
-            }else {
+            } else {
                 $widget.addClass("widget-color-grey");
             }
         } else {
@@ -102,25 +191,22 @@ function refreshNodeRow() {
             $i.addClass("fa-lock");
             $i.attr("title", "当前节点处于锁定状态，其他用户不可以绑定数据。点击开放当前节点")
         }
-        if(CUR_NODE.appName){
+        if (CUR_NODE.appName) {
             //如果已绑定APP，显示App名称
             //显示节点所选择的创新方法工具名
             $("#app-name").text(CUR_NODE.appName).addClass("label-success")
                 .attr('onclick', 'javascript:window.open(\"' + CUR_NODE.appPath + '")')
             $("#app-result-btn").removeClass("disabled")
 
-            $("#cur-node-app-img").attr("src",CUR_NODE.appIcon);
+            $("#cur-node-app-img").attr("src", CUR_NODE.appIcon);
             // $("#btn-group-app-result").css('display','');
-        }else {
+        } else {
             //如果没有绑定APP，那么不显示该控件
             // $("#btn-group-app-result").css('display','none');
             $("#app-result-btn").addClass("disabled")
             $("#app-name").text("").removeClass("label-success").attr("onclick");
-            $("#cur-node-app-img").attr("src","/templates/project/assets/img/app.png");
-
-
+            $("#cur-node-app-img").attr("src", "/templates/project/assets/img/app.png");
         }
-
         //设置结果录入界面的状态，是否已完成
         $("#cur-node-summary-widget").removeClass("widget-color-blue").removeClass("widget-color-red");
         if (CUR_NODE.state == "1") {
@@ -131,7 +217,8 @@ function refreshNodeRow() {
             $("#cur-node-summary-widget").addClass("widget-color-red");
         }
         $("#cur-node-summary").html(CUR_NODE.summary);
-    }else {
+        loadCurStepResult();
+    } else {
         //当前节点绑定的是模板
         $("a[href=#template-tab]")[0].click();
         $("#cur-node-temp-select").val(CUR_NODE.templateProjectID)
@@ -147,19 +234,19 @@ function refreshNodeRow() {
  * @param appPath
  * @param appIcon
  */
-function bindingApp(appName,appPath,appIcon){
+function bindingApp(appName, appPath, appIcon) {
     $.ajax({
         url: API.nodeAPP,
         type: 'PUT',
         data: {
-            projectID:PROJECT_ID,
-            nodeIndex:CUR_NODE.nodeIndex,
-            appName:appName,
-            appPath:appPath,
-            appIcon:appIcon,
+            projectID: PROJECT_ID,
+            nodeIndex: CUR_NODE.nodeIndex,
+            appName: appName,
+            appPath: appPath,
+            appIcon: appIcon,
         },
         success: function (data) {
-            CUR_NODE.appName=appName;
+            CUR_NODE.appName = appName;
             CUR_NODE.appPath = appPath;
             CUR_NODE.appIcon = appIcon;
             refreshNodeRow();
@@ -168,16 +255,16 @@ function bindingApp(appName,appPath,appIcon){
     })
 }
 
-function swapTemplate(){
+function swapTemplate() {
     $.ajax({
-        url:API.ownedProject,
-        type:"GET",
-        success:function(data){
-            if(data.code==1){
-                if(data.length>0){
-                    let $curStepTempSelect= $("#cur-node-temp-select");
-                    data.data.forEach(project=>{
-                        let $option = $('<option></option>').text(project.name).attr('value',project.id);
+        url: API.ownedProject,
+        type: "GET",
+        success: function (data) {
+            if (data.code == 1) {
+                if (data.length > 0) {
+                    let $curStepTempSelect = $("#cur-node-temp-select");
+                    data.data.forEach(project => {
+                        let $option = $('<option></option>').text(project.name).attr('value', project.id);
                         $curStepTempSelect.append($option);
                     })
                 }
@@ -193,7 +280,7 @@ function swapTemplate(){
 }
 
 const NODE_JS = {
-    beforeAddNode:function (node) {
+    beforeAddNode: function (node) {
         $.ajax({
             url: API.addNode,
             type: "POST",
@@ -202,7 +289,7 @@ const NODE_JS = {
             }
         })
     },
-    beforeRemoveNode:function (node) {
+    beforeRemoveNode: function (node) {
         $.ajax({
             url: API.deleteNode,
             type: "DELETE",
@@ -214,16 +301,35 @@ const NODE_JS = {
             }
         })
     },
-    beforeViewNode:function(node){
+    beforeViewNode: function (node) {
         CUR_NODE = node;
         //设置当前节点的显示区域
         refreshNodeRow();
         //加载结果列表
-        loadCurStepResult();
-    }
-    
-}
+        // loadCurStepResult();
+    },
+    beforeAddPath:function (path) {
+        $.ajax({
+            url: API.path,
+            type: "POST",
+            data: path,
+            success: function (data) {
 
+            }
+        })
+    },
+    beforeRemovePath:function (path) {
+        $.ajax({
+            url: API.path,
+            type: "DELETE",
+            data: path,
+            success: function (data) {
+
+            }
+        })
+    },
+
+}
 
 
 /**
@@ -231,14 +337,14 @@ const NODE_JS = {
  */
 function lockNode() {
     $.ajax({
-        url:API.nodeLock,
-        type:"PUT",
-        data:{
-            projectID:PROJECT_ID,
+        url: API.nodeLock,
+        type: "PUT",
+        data: {
+            projectID: PROJECT_ID,
             nodeIndex: CUR_NODE.nodeIndex,
-            lockState:!CUR_NODE.lockState,
+            lockState: !CUR_NODE.lockState,
         },
-        success:function (data) {
+        success: function (data) {
             CUR_NODE.lockState = !CUR_NODE.lockState;
             refreshNodeRow()
         }
@@ -247,58 +353,98 @@ function lockNode() {
 }
 
 /**
+ *
+ * @param promise
+ */
+function updateNode(promise){
+    promise.then(function () {
+        refreshNodeRow();
+    },function (text) {
+        alert(text)
+    })
+}
+/**
  * 当前节点状态设置为已完成
  */
 function finish() {
-    $.ajax({
-        url:API.nodeState,
-        type:"PUT",
-        data:{
-            nodeIndex: CUR_NODE.nodeIndex,
-            state:!CUR_NODE.lockState,
-        },
-        success:function (data) {
-            CUR_NODE.state = !CUR_NODE.state;
-            refreshNodeRow()
-        }
-    })
+    updateNode(new Promise(((resolve, reject) => {
+        $.ajax({
+            url: API.nodeState,
+            type: "PUT",
+            data: {
+                nodeIndex: CUR_NODE.nodeIndex,
+                state: !CUR_NODE.state,
+            },
+            success: function (data) {
+                if(data.code){
+                    CUR_NODE.state = !CUR_NODE.state;
+                    resolve()
+                }else {
+                    reject(data.msg)
+                }
+            },
+            error:function () {
+                reject("网络错误")
+            }
+        })
+    })))
 }
 
 /**
  * 保存当前工作节点的总结
  */
-function saveNodeSummary(){
-    let summary = $("#cur-node-summary").html();
-    $.ajax({
-        url:API.editNodeSummary,
-        type:"PUT",
-        data:{
-            nodeIndex: CUR_NODE.nodeIndex,
-            summary:summary,
-        },
-        success:function (data) {
-            CUR_NODE.summary = summary;
-        }
-    });
+function saveNodeSummary() {
+    updateNode(new Promise(((resolve, reject) => {
+        let summary = $("#cur-node-summary").html();
+        $.ajax({
+            url: API.editNodeSummary,
+            type: "PUT",
+            data: {
+                nodeIndex: CUR_NODE.nodeIndex,
+                summary: summary,
+            },
+            success: function (data) {
+                if(data.code){
+                    CUR_NODE.summary = summary;
+                    resolve()
+                }else {
+                    reject(data.msg)
+                }
+            },
+            error:function () {
+                reject("网络错误")
+            }
+        })
+    })))
 }
+
 /**
  * 绑定模板的函数
  */
 function bindingTemplate() {
-    $.ajax({
-        url:API.nodeTemplate,
-        type:"PUT",
-        data:{
-            nodeIndex: CUR_NODE.nodeIndex,
-            templateProjectID:parseInt($("#cur-node-temp-select").val()),
-        },
-        success:function (data) {
-            CUR_NODE.state = 1;
-            CUR_NODE.templateProjectID = parseInt($("#cur-node-temp-select").val());
-            refreshNodeRow()
-        }
-    });
-    CUR_NODE.state = 1;
+    updateNode(new Promise(((resolve, reject) => {
+        let templateProjectID = parseInt($("#cur-node-temp-select").val());
+        $.ajax({
+            url: API.nodeTemplate,
+            type: "PUT",
+            data: {
+                nodeIndex: CUR_NODE.nodeIndex,
+                templateProjectID: templateProjectID,
+            },
+            success: function (data) {
+                if(data.code){
+                    CUR_NODE.state = true;
+                    CUR_NODE.templateProjectID = parseInt($("#cur-node-temp-select").val());
+                    resolve()
+                }else {
+                    reject(data.msg)
+                }
+            },
+            error:function () {
+                reject("网络错误")
+            }
+        })
+    })))
 }
 
 

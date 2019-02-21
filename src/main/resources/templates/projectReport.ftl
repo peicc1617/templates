@@ -20,79 +20,13 @@
     <script src="js/projectID.js"></script>
 
     <script>
-        //首先获取ID
-        function getQueryString(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-            var r = window.location.search.substr(1).match(reg);
-            if (r != null) return unescape(r[2]);
-            return null;
-        }
+        PROJECT_ID = ${project.projectID};
 
-        PROJECT_ID = parseInt(getQueryString("projectID"));
-        //解析projectID，
-        if (isNaN(PROJECT_ID)) {
-            //如果解析出错误
-            alert("参数错误");//后续跳转
-        }
-        var ANALYSIS_MSG = {
-            projectID: PROJECT_ID,
-            type: 0,
-            content: ""
-        };
-        const MSG_TYPE_TABLE = {
-            "PROJECT": 1,
-            "NODE": 2,
-            "USER": 3,
-            "RESULT": 4
-        }
-        const STATE_ERROR = {
-            button: {
-                style: "btn-danger",
-                text: "错误",
-            },
-            li: []
-        }
-        const STATE_DIV = {
-            "0": {
-                button: {
-                    style: "btn-light",
-                    text: "待绑定",
-                },
-            },
-            "1": {
-                button: {
-                    style: "btn-grey",
-                    text: "待审阅",
-                },
-                li: [
-                    {text: "接受", state: 3},
-                    {text: "待修改", state: 2},
-                ]
-            },
-            "2": {
-                button: {
-                    style: "btn-warning",
-                    text: "待修改"
-                },
-                li: [
-                    {text: "接受", state: 3},
-                ]
-            },
-            "3": {
-                button: {
-                    style: "btn-success",
-                    text: "已接受"
-                },
-                li: [
-                    {text: "待修改", state: 2},
-                ]
-            },
-        };
     </script>
 </head>
 <body class="no-skin">
 <div id="navbar" class="navbar navbar-default          ace-save-state navbar-fixed-top">
-    <script src="assets/js/nav-bar.js"></script>
+    <script src="/webresources/common/js/nav-bar.js"></script>
 </div>
 
 <div class="main-container ace-save-state" id="main-container">
@@ -102,58 +36,9 @@
         } catch (e) {
         }
     </script>
-    <div id="sidebar" class="sidebar                  responsive     ace-save-state sidebar-fixed" data-sidebar="true"
-         data-sidebar-scroll="true"
-         data-sidebar-hover="true">
-        <script type="text/javascript">
-            try {
-                ace.settings.loadState('sidebar')
-            } catch (e) {
-            }
-        </script>
+    <#include "/common/navList.ftl">
 
-        <div class="sidebar-shortcuts" id="sidebar-shortcuts">
-            <div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
-                <button class="btn btn-success">
-                    <i class="ace-icon fa fa-signal"></i>
-                </button>
-
-                <button class="btn btn-info">
-                    <i class="ace-icon fa fa-pencil"></i>
-                </button>
-
-                <button class="btn btn-warning">
-                    <i class="ace-icon fa fa-users"></i>
-                </button>
-
-                <button class="btn btn-danger">
-                    <i class="ace-icon fa fa-cogs"></i>
-                </button>
-            </div>
-
-            <div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
-                <span class="btn btn-success"></span>
-
-                <span class="btn btn-info"></span>
-
-                <span class="btn btn-warning"></span>
-
-                <span class="btn btn-danger"></span>
-            </div>
-        </div>
-        <!-- /.sidebar-shortcuts -->
-        <ul class="nav nav-list" id="sideList">
-        </ul>
-        <!-- /.nav-list -->
-
-        <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
-            <i id="sidebar-toggle-icon" class="ace-save-state ace-icon fa fa-angle-double-left"
-               data-icon1="ace-icon fa fa-angle-double-left"
-               data-icon2="ace-icon fa fa-angle-double-right"></i>
-        </div>
-    </div>
     <div class="main-content">
-
         <div class="main-content-inner">
             <div class="breadcrumbs ace-save-state fixed" id="breadcrumbs">
                 <ul class="breadcrumb">
@@ -168,31 +53,8 @@
                 </ul>
                 <!-- /.breadcrumb -->
             </div>
-
             <div class="page-content">
-                <div class="page-header">
-                    <h1>
-                        柔性模板
-                        <small>
-                            <i class="ace-icon fa fa-angle-double-right"></i>
-                            <strong id="project_name"></strong>
-                            <div class="pull-right">
-                 <span class="btn btn-sm " onclick="javascript:location ='/templates/project/project.html?projectID='+PROJECT_ID">
-															进入项目
-															<i class="ace-icon fa fa-signal"></i>
-														</span>
-                                <span class="btn btn-primary btn-sm tooltip-primary" onclick="javascript:location ='/templates/project/info.html?projectID='+PROJECT_ID">
-															项目信息
-															<i class="ace-icon fa fa-lightbulb-o"></i>
-														</span>
-                                <span class="btn btn-purple btn-sm tooltip-purple" onclick="javascript:location ='/templates/project/report.html?projectID='+PROJECT_ID">
-															导出报告
-															<i class="ace-icon fa fa-print"></i>
-														</span>
-                            </div>
-                        </small>
-                    </h1>
-                </div>
+                <#include "/common/projectTitle.ftl">
                 <!-- /.ace-settings-box -->
                 <div class="row">
                     <div class="col-xs-12 col-sm-10 col-sm-offset-1">
@@ -345,7 +207,7 @@
 
                         <div class="WordSection1">
                             <p class="MsoTitle" style="text-indent:32.15pt"><span
-                                        lang="EN-US"><%=project.getName()%></span><span
+                                        lang="EN-US">${project.projectID}-</span><span
                                         style="font-family:宋体;mso-ascii-font-family:Arial;mso-hansi-font-family:Arial">创新方法改进报告</span>
                             </p>
 
@@ -361,7 +223,7 @@
                             </h1>
 
                             <p class="MsoNormal" style="text-indent:24.0pt"><span
-                                        style='font-family:宋体;&#10;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'><%=project.getDescription()%></span>
+                                        style='font-family:宋体;&#10;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'>${project.projectDesc}</span>
                             </p>
 
                             <h1 style="margin-top:6.0pt;margin-right:0cm;margin-bottom:6.0pt;margin-left:&#10;0cm;text-indent:0cm;mso-list:l27 level1 lfo2">
@@ -377,7 +239,7 @@
                             <p class="MsoNormal" style="text-indent:24.0pt"><span
                                         style='font-family:宋体;&#10;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'>  <c:forEach
                                             var="user" items="<%=userList%>">
-                                <strong>${user.getUsername()};</strong>
+                                <strong>刘加军;</strong>
                             </c:forEach></span>
                             </p>
 
@@ -391,19 +253,18 @@
                             </h1>
 
                             <p class="MsoNormal" style="text-indent:24.0pt"><span
-                                        style='font-family:宋体;&#10;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'><%=project.getTags()%></span>
+                                        style='font-family:宋体;&#10;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'>${project.projectTags}</span>
                             </p>
                             <h1 style="margin-top:6.0pt;margin-right:0cm;margin-bottom:6.0pt;margin-left:&#10;0cm;text-indent:0cm;mso-list:l27 level1 lfo2">
                                 <!--[if !supportLists]--><span lang="EN-US"
                                                                style='mso-fareast-font-family:"Times New Roman";mso-bidi-font-family:&#10;"Times New Roman"'><span
-                                            style="mso-list:Ignore">3<span style="mso-spacerun:yes">&nbsp; </span><span
+                                            style="mso-list:Ignore">4<span style="mso-spacerun:yes">&nbsp; </span><span
                                                 style="mso-spacerun:yes">&nbsp;</span></span></span><!--[endif]--><span
                                         style='font-family:黑体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:&#10;"Times New Roman"'>项目实施阶段</span>
                             </h1>
                             <c:set var="indexOfNode" value="0"/>
                             <c:forEach var="node" items="<%=project.getNodes()%>">
                                 <c:set var="indexOfNode" value="${indexOfNode+1}"/>
-                                <%--阶段名称--%>
                                 <h2 style="margin-top:12.0pt;margin-right:0cm;margin-bottom:6.0pt;margin-left:&#10;44.55pt;mso-list:l27 level2 lfo2">
                                     <!--[if !supportLists]--><span lang="EN-US"
                                                                    style='mso-fareast-font-family:"Times New Roman";mso-bidi-font-family:"Times New Roman";&#10;color:black;mso-font-kerning:0pt;font-weight:normal'><span
@@ -446,40 +307,6 @@
             <!-- /.page-content -->
         </div>
         <!-- /.main-content -->
-
-        <div class="modal fade" id="user-new-modal" tabindex="-1" role="dialog" aria-labelledby="userListModalLabel"
-             aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title" id="userListModalLabel">选择新的用户邀请</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <table id="user-list-table" data-height="400"
-                                       data-url="/CAI-templates/user/list">
-                                    <thead>
-                                    <tr>
-                                        <th data-field="username">用户名</th>
-                                        <th data-field="personName">用户昵称</th>
-                                        <th data-field="jobNumber">工号</th>
-                                        <th data-field="telphone">电话</th>
-                                        <th data-field="email">邮箱</th>
-                                        <th data-field="op" data-formatter="opFormatter">操作</th>
-                                    </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                    </div>
-                </div><!-- /.modal-content -->
-            </div><!-- /.modal -->
-        </div>
 
         <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
             <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>

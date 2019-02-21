@@ -21,20 +21,34 @@
 /**
     已完成节点样式
  */
-.work.node.finished rect{
+.work.node.finished rect,.work.node.finished circle{
     fill: white;
     pointer-events: auto;
     stroke:#71C671;
-    stroke-width: 2;
+    stroke-width: 4;
 }
 /**
     未完成节点样式
  */
-.work.node.unFinished rect{
+.work.node.unFinished rect,.work.node.unFinished circle{
     fill: white;
     pointer-events: auto;
     stroke: #aaa;
     stroke-width: 2;
+}
+
+.work.node.locked rect,.work.node.locked circle{
+    fill: white;
+    pointer-events: auto;
+    stroke:  #333333;
+    stroke-width: 2;
+}
+
+.work.node.template rect,.work.node.template circle{
+    fill: white;
+    pointer-events: auto;
+    stroke:  #00A5E0;
+    stroke-width: 4;
 }
 /**
     工作节点文字
@@ -45,6 +59,7 @@
 .work.node[active=true] rect{
     fill: #E0FFFF;
 }
+
 
 .work.node[pressed=true] rect{
     fill: #ADFF2F;
@@ -136,18 +151,29 @@
     fill: white;
     pointer-events: auto;
     stroke:#71C671;
-    stroke-width: 1;
+    stroke-width: 2;
 }
-.stepnode.finished.template {
-    stroke:#00A5E0;
-}
+
+
+
+
 /* 未完成的节点样式 */
 .stepnode.unfinished {
     fill: white;
     pointer-events: auto;
     stroke: #aaa;
-    stroke-width: 1;
+    stroke-width: 2;
 }
+
+.stepnode.template {
+    stroke:#00A5E0;
+    stroke-width: 2;
+}
+.stepnode.locked {
+    stroke:#71C671;
+    stroke-width: 2;
+}
+
 .stepnode:hover{
     stroke:#7eeeee;
     stroke-width: 3;

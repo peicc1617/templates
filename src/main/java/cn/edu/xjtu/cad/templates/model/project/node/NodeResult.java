@@ -23,6 +23,27 @@ public class NodeResult {
      */
     private long userID;
 
+
+    /**
+     * 当前结果的状态
+     */
+    private NodeResultState state = NodeResultState.UN_BIND;
+
+    /**
+     * 更新时间
+     */
+    private Date editTime;
+
+    /**
+     * 结果绑定的数据名称
+     */
+    private String resultName;
+
+    /**
+     * 结果的消息
+     */
+    private String message;
+
     public final static String DISABLE_MESSAGE = "原数据丢失，请重新绑定";
     public final static String EDIT_MESSAGE = "原数据更新，请重新审阅";
     public final static String APPLY_MESSAGE = "数据绑定，请审阅";
@@ -30,18 +51,13 @@ public class NodeResult {
     public final static String PASSED_MESSAGE = "数据已通过";
 
     /**
-     * 是否绑定
+     * 结果绑定的数据key
      */
-    private NodeResultState state;
-
-    private Date editTime;
-
-    private String resultName;
-
-    private String message;
-
     private String resultKey;
 
+    /**
+     * 结果绑定的数据ID
+     */
     private int resultID;
 
     public NodeResult() {

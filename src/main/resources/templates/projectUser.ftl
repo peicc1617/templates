@@ -17,60 +17,6 @@
     <script>
         PROJECT_ID = ${project.projectID};
 
-        var ANALYSIS_MSG = {
-            projectID: PROJECT_ID,
-            type: 0,
-            content: ""
-        };
-        const MSG_TYPE_TABLE = {
-            "PROJECT": 1,
-            "NODE": 2,
-            "USER": 3,
-            "RESULT": 4
-        }
-        const STATE_ERROR = {
-            button: {
-                style: "btn-danger",
-                text: "错误",
-            },
-            li: []
-        }
-        const STATE_DIV = {
-            "0": {
-                button: {
-                    style: "btn-light",
-                    text: "待绑定",
-                },
-            },
-            "1": {
-                button: {
-                    style: "btn-grey",
-                    text: "待审阅",
-                },
-                li: [
-                    {text: "接受", state: 3},
-                    {text: "待修改", state: 2},
-                ]
-            },
-            "2": {
-                button: {
-                    style: "btn-warning",
-                    text: "待修改"
-                },
-                li: [
-                    {text: "接受", state: 3},
-                ]
-            },
-            "3": {
-                button: {
-                    style: "btn-success",
-                    text: "已接受"
-                },
-                li: [
-                    {text: "待修改", state: 2},
-                ]
-            },
-        };
     </script>
 </head>
 <body class="no-skin">
@@ -334,21 +280,7 @@
                         editable: {
                             type: 'select',
                             title: '修改项目内的角色',
-                            source: function () {
-                                var result = [];
-                                $.ajax({
-                                    url: '/templates/api/project/projectRoleType.json',
-                                    async: false,
-                                    type: "get",
-                                    success: function (data, status) {
-                                        for (let role in data) {
-                                            result.push({value: role, text: data[role]});
-                                        }
-
-                                    }
-                                });
-                                return result;
-                            }
+                            source: JSON.parse('${projectRoleMap}')
                         }
                     }, {
                         field:'op',
