@@ -103,7 +103,85 @@
                     <div class="col-xs-12 col-sm-12">
 
 
-                        <div class="space-12"></div>
+                        <div class="widget-box transparent">
+                            <div class="widget-header widget-header-small">
+                                <h4 class="widget-title blue smaller">
+                                    <i class="ace-icon fa fa-rss orange"></i>
+                                    项目信息
+                                </h4>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main padding-8">
+                                    <div class="row">
+                                        <div class="center">
+                                                        <span class="btn btn-app btn-sm btn-default  no-hover">
+													<span class="line-height-1 bigger-170" id="project-user-num">${memberCnt}</span>
+													<br>
+													<span class="line-height-1 smaller-90"> 用户数目 </span>
+												</span>
+
+                                            <span class="btn btn-app btn-sm btn-primary no-hover">
+													<span class="line-height-1 bigger-170" id="project-step-num">${stepCnt}</span>
+
+													<br>
+													<span class="line-height-1 smaller-90"> 阶段数目 </span>
+												</span>
+                                            <span class="btn btn-app btn-sm btn-success no-hover">
+													<span class="line-height-1 bigger-170" id="project-step-num">${nodeCnt}</span>
+
+													<br>
+													<span class="line-height-1 smaller-90"> 工作节点数 </span>
+												</span>
+                                            <span class="btn btn-app btn-sm btn-yellow no-hover">
+													<span class="line-height-1 bigger-170" id="project-step-num">${appCnt}</span>
+
+													<br>
+													<span class="line-height-1 smaller-90"> 创新方法个数 </span>
+												</span>
+                                            <span class="btn btn-app btn-sm btn-info no-hover">
+													<span class="line-height-1 bigger-170">${score1}</span>
+
+													<br>
+													<span class="line-height-1 smaller-90"> 集成度 </span>
+												</span>
+
+                                            <span class="btn btn-app btn-sm btn-purple no-hover">
+													<span class="line-height-1 bigger-170">${score2}</span>
+
+													<br>
+													<span class="line-height-1 smaller-90"> 融合度 </span>
+												</span>
+                                            <span class="btn btn-app btn-sm btn-pink no-hover">
+													<span class="line-height-1 bigger-170" id="project-step-num">${score3}</span>
+
+													<br>
+													<span class="line-height-1 smaller-90"> 组合度 </span>
+												</span>
+                                            <span class="btn btn-app btn-sm btn-inverse  no-hover">
+													<span class="line-height-1 bigger-170">${score4}</span>
+
+													<br>
+													<span class="line-height-1 smaller-90"> 活跃度 </span>
+												</span>
+
+
+                                            <span class="btn btn-app btn-sm btn-light  no-hover">
+													<span class="line-height-1 bigger-170"
+                                                          id="project-value">${score5}</span>
+
+													<br>
+													<span class="line-height-1 smaller-90"> 应用效果 </span>
+												</span>
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-20"></div>
 
                         <div class="profile-user-info profile-user-info-striped">
                             <div class="profile-info-row">
@@ -153,77 +231,6 @@
                                 <div class="profile-info-name">删除项目</div>
                                 <div class="profile-info-value">
                                     <a onclick="deleteProject()"><span class="red">删除</span></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="space-20"></div>
-
-                        <div class="widget-box transparent">
-                            <div class="widget-header widget-header-small">
-                                <h4 class="widget-title blue smaller">
-                                    <i class="ace-icon fa fa-rss orange"></i>
-                                    项目统计
-                                </h4>
-                            </div>
-
-                            <div class="widget-body">
-                                <div class="widget-main padding-8">
-                                    <div class="row">
-                                        <div class="center">
-                                                        <span class="btn btn-app btn-sm btn-yellow no-hover">
-													<span class="line-height-1 bigger-170" id="project-user-num"></span>
-
-													<br>
-													<span class="line-height-1 smaller-90"> 用户数目 </span>
-												</span>
-
-                                            <span class="btn btn-app btn-sm btn-pink no-hover">
-													<span class="line-height-1 bigger-170" id="project-step-num"></span>
-
-													<br>
-													<span class="line-height-1 smaller-90"> 阶段数目 </span>
-												</span>
-
-                                            <span class="btn btn-app btn-sm btn-pink no-hover">
-													<span class="line-height-1 bigger-170" id="project-step-num"></span>
-
-													<br>
-													<span class="line-height-1 smaller-90"> 创新方法个数 </span>
-												</span>
-                                            <span class="btn btn-app btn-sm btn-grey no-hover">
-													<span class="line-height-1 bigger-170"
-                                                          id="project-integration"></span>
-
-													<br>
-													<span class="line-height-1 smaller-90"> 集成度 </span>
-												</span>
-
-                                            <span class="btn btn-app btn-sm btn-success no-hover">
-													<span class="line-height-1 bigger-170"
-                                                          id="project-amalgamation"></span>
-
-													<br>
-													<span class="line-height-1 smaller-90"> 融合度 </span>
-												</span>
-
-                                            <span class="btn btn-app btn-sm btn-primary no-hover">
-													<span class="line-height-1 bigger-170"
-                                                          id="project-value"> 55 </span>
-
-													<br>
-													<span class="line-height-1 smaller-90"> 应用效果 </span>
-												</span>
-                                            <span class="btn btn-app btn-sm btn-primary no-hover">
-													<span class="line-height-1 bigger-170"
-                                                          id="project-value"> 55 </span>
-
-													<br>
-													<span class="line-height-1 smaller-90"> 活跃度 </span>
-												</span>
-                                        </div>
-                                    </div>
-
-
                                 </div>
                             </div>
                         </div>

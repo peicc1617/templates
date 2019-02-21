@@ -18,6 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -147,6 +148,25 @@ public class ViewController {
     @RequestMapping("/project/{projectID}/info.html")
     public String viewProjectInfo(Model model,@PathVariable long projectID) {
         addProjectLog(model,logService.getProjectLogCut(projectID,1000));
+        Project project = (Project) model.asMap().get("project");
+        //成员个数
+        model.addAttribute("memberCnt",project.getMembers().size());
+        //阶段个数
+        model.addAttribute("stepCnt",project.getStepMap().size());
+        //节点个数
+        model.addAttribute("nodeCnt",project.getNodeMap().size());
+        //创新方法个数
+        model.addAttribute("appCnt",project.getNodeMap().values().stream().filter(node -> StringUtils.isEmpty(node.getAppPath())).count());
+        //集成度
+        model.addAttribute("score1",33);
+        //融合度
+        model.addAttribute("score2",66);
+        //组合度
+        model.addAttribute("score3",77);
+        //活跃度
+        model.addAttribute("score4",88);
+        //应用效果
+        model.addAttribute("score5",98);
         return "projectInfo";
     }
 
