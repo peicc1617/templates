@@ -103,8 +103,8 @@ public class Node {
 
     private boolean lockState;
 
-    private List<String> preNodeIndexList ;
-    private List<String> nextNodeIndexList ;
+    private List<String> preNodeIndexList = new ArrayList<>() ;
+    private List<String> nextNodeIndexList = new ArrayList<>();
     /**
      * 阶段包含的成员
      */
