@@ -67,6 +67,12 @@
         set invitationCode = #{invitationCode}
         where projectID = #{projectID}
     </update>
+    <update id="updateProjectStartTime">
+        UPDATE project
+        set startTime =  now()
+        where projectID = #{projectID}
+    </update>
+
     <delete id="deleteProject">
         DELETE FROM project WHERE projectID = #{projectID}
     </delete>

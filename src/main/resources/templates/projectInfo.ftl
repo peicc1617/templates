@@ -220,6 +220,16 @@
                                     <span id="project-editTime">${project.editTime?string('yyyy-MM-dd hh:mm:ss')}</span>
                                 </div>
                             </div>
+                            <#if project.startTime??>
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name">项目开始</div>
+
+                                    <div class="profile-info-value">
+                                        <span id="project-editTime">${project.startTime?string('yyyy-MM-dd hh:mm:ss')}</span>
+                                    </div>
+                                </div>
+                            </#if>
+
                             <div class="profile-info-row">
                                 <div class="profile-info-name">创建人</div>
                                 <div class="profile-info-value">
@@ -227,11 +237,13 @@
                                 </div>
                             </div>
                             <div class="profile-info-row">
-                                <div class="profile-info-name">删除项目</div>
+                                <div class="profile-info-name">项目管理</div>
                                 <div class="profile-info-value">
-                                    <a onclick="deleteProject()"><span class="red">删除</span></a>
+                                    <a onclick="startProject()"><span class="blue">开始执行</span></a>
+                                    <a onclick="deleteProject()"><span class="red">删除项目</span></a>
                                 </div>
                             </div>
+
                         </div>
                         <div class="space-20"></div>
 
@@ -441,7 +453,8 @@
             const API={
                 updateProjectInfo:"/templates/api/project/${project.projectID}/",
                 deleteProject:"/templates/api/project/${project.projectID}",
-                updateProjectInCode:"/templates/api/project/${project.projectID}/invitationCode"
+                updateProjectInCode:"/templates/api/project/${project.projectID}/invitationCode",
+                startProject:"/templates/api/project/${project.projectID}/doStart"
             }
             $(function () {
                 $("#project-name").editable({
@@ -540,7 +553,21 @@
                     }
                 }
             }
-
+            function startProject() {
+                if(confirm("确定开始项目(开始后无法停止)")){
+                    $.ajax({
+                        url:API.startProject,
+                        type:"PUT",
+                        success:function (data) {
+                            if(data.code===1){
+                                alert("开始项目成功")
+                            }else {
+                                alert("删除失败")
+                            }
+                        }
+                    })
+                }
+            }
             function generateKey() {
                 $.ajax({
                     url:API.updateProjectInCode,

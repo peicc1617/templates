@@ -14,8 +14,12 @@
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-skins.min.css"/>
     <link rel="stylesheet" href="/webresources/bootstrap/bootstrap-table/bootstrap-table.css">
     <link rel="stylesheet" href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css">
-    <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap-duallistbox.min.css" />
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap-duallistbox.min.css"/>
     <link rel="stylesheet" href="/templates/project/assets/css/step.css">
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap-datetimepicker.min.css" />
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/daterangepicker.min.css" />
+
+
     <script>
         //定义API接口
         const API = {
@@ -42,12 +46,13 @@
             nodeResultDisable: "/templates/api/project/${project.projectID}/node/result/list/disable",
             nodeResultOutDate: "/templates/api/project/${project.projectID}/node/result/list/outDate",
             nodeResultUnbind: "/templates/api/project/${project.projectID}/node/result/unbinding",
-            nodeResultMy:"/templates/api/project/${project.projectID}/node/result/my",
-            nodeRoleList:"/templates/api/project/${project.projectID}/node/role/list",
-            nodeRole:"/templates/api/project/${project.projectID}/node/role",
-            path:"/templates/api/project/${project.projectID}/node/path",
+            nodeResultMy: "/templates/api/project/${project.projectID}/node/result/my",
+            nodeRoleList: "/templates/api/project/${project.projectID}/node/role/list",
+            nodeRole: "/templates/api/project/${project.projectID}/node/role",
+            path: "/templates/api/project/${project.projectID}/node/path",
         };
-        PROJECT_ID =${project.projectID}
+        PROJECT_ID =
+        ${project.projectID}
         const STATE_DIV = JSON.parse('${nodeResultStateMap}');
         const NODE_ROLE = JSON.parse('${nodeRoleMap}');
     </script>
@@ -115,27 +120,27 @@
                                          preserveAspectRatio="xMidYMin meet" width="100%"
                                          height="40" viewBox="0 0 430 40">
                                         <g class="work node finished" nodeIndex="2">
-                                            <circle cx="20" r="10" cy="20" ></circle>
+                                            <circle cx="20" r="10" cy="20"></circle>
                                             <text x="40" y="20" class="node-text" font-size="1.25em" text-anchor="start"
                                                   dominant-baseline="middle">已完成
                                             </text>
                                         </g>
                                         <g class="work node unFinished" nodeIndex="2">
-                                            <circle cx="120" r="10" cy="20" ></circle>
+                                            <circle cx="120" r="10" cy="20"></circle>
                                             <text x="140" y="20" class="node-text" font-size="1.25em"
                                                   text-anchor="start"
                                                   dominant-baseline="middle">未完成
                                             </text>
                                         </g>
                                         <g class="work node locked" nodeIndex="2">
-                                            <circle cx="220" r="10" cy="20" ></circle>
+                                            <circle cx="220" r="10" cy="20"></circle>
                                             <text x="240" y="20" class="node-text" font-size="1.25em"
                                                   text-anchor="start"
                                                   dominant-baseline="middle">锁定
                                             </text>
                                         </g>
                                         <g class="work node template" nodeIndex="2">
-                                            <circle cx="320" r="10" cy="20" ></circle>
+                                            <circle cx="320" r="10" cy="20"></circle>
                                             <text x="340" y="20" class="node-text" font-size="1.25em"
                                                   text-anchor="start"
                                                   dominant-baseline="middle">已连接模板
@@ -584,24 +589,33 @@
                                                 模板
                                             </a>
                                         </li>
-                                    </ul>
-                                    <div class="tab-content no-border padding-24">
-                                        <div id="tool-tab" class="tab-pane active">
-                                            <div class="row">
-                                                <div class="col-xs-12 col-sm-2 center">
-															<span class="profile-picture">
-																<img id="cur-node-app-img"
-                                                                     class="editable img-responsive" width="100"
-                                                                     height="100" alt="创新方法APP" id="avatar2"
-                                                                     src="/templates/project/assets/img/app.png">
-															</span>
+                                        <li class="pull-right">
+                                            <a data-toggle="modal" data-target="#date-modal" class="">
+                                         <i class="blue ace-icon fa fa-calendar bigger-120"></i>
+                                         工期安排 <span class="badge badge-warning">
+                         10%
+                    </span>
+                                     </a>
+                                 </li>
+                             </ul>
 
-                                                    <p>
-                                                        <a id="app-name"
-                                                              class="label label-lg arrowed-in arrowed-in-right">
-                                                            无</a>
-                                                    </p>
-                                                </div><!-- /.col -->
+                             <div class="tab-content no-border padding-24">
+                                 <div id="tool-tab" class="tab-pane active">
+                                     <div class="row">
+                                         <div class="col-xs-12 col-sm-2 center">
+                                                     <span class="profile-picture">
+                                                         <img id="cur-node-app-img"
+                                                              class="editable img-responsive" width="100"
+                                                              height="100" alt="创新方法APP" id="avatar2"
+                                                              src="/templates/project/assets/img/app.png">
+                                                     </span>
+
+                                             <p>
+                                                 <a id="app-name"
+                                                    class="label label-lg arrowed-in arrowed-in-right">
+                                                     无</a>
+                                             </p>
+                                         </div><!-- /.col -->
 
 
                                                 <div class="col-xs-12 col-sm-8">
@@ -634,6 +648,7 @@
 
                                                     </div>
 
+
                                                 </div><!-- /.col -->
                                                 <div class="col-xs-12 col-sm-2">
                                                     <a type="button" class="btn btn-sm btn-white btn-block btn-success"
@@ -656,11 +671,19 @@
                                                         <span>成员管理</span>
                                                     </a>
                                                     <a href="#" type="button"
-                                                       class="btn btn-sm btn-white btn-block btn-dark"
-                                                       id="cur-node-lock-btn" onclick="lockNode()">
+                                                            class="btn btn-sm btn-white btn-block btn-dark"
+                                                            id="cur-node-lock-btn" onclick="lockNode()">
                                                         <i class="ace-icon fa fa-envelope-o"></i>
                                                         <span>锁定节点</span>
                                                     </a>
+
+                                                    <#--<a href="#" type="button"-->
+                                                       <#--class="btn btn-sm btn-white btn-block btn-dark"-->
+                                                       <#--id="cur-node-date-btn" data-toggle="modal"-->
+                                                       <#--data-target="#date-modal">-->
+                                                        <#--<i class="ace-icon fa fa-calendar"></i>-->
+                                                        <#--<span class="badge badge-warning">日期安排</span>-->
+                                                    <#--</a>-->
                                                 </div>
                                             </div><!-- /.row -->
 
@@ -687,7 +710,8 @@
                                                                 该节点还没有绑定APP,请绑定APP后在查看相关数据
                                                                 <br>
                                                             </div>
-                                                            <div id="cur-node-result-info-2" class="widget-main padding-16">
+                                                            <div id="cur-node-result-info-2"
+                                                                 class="widget-main padding-16">
                                                                 <#--<div class="clearfix">-->
                                                                 <#--<div class="grid3 center">-->
                                                                 <#--<div class="easy-pie-chart percentage" data-percent="45" data-color="#CA5952" style="height: 72px; width: 72px; line-height: 71px; color: rgb(202, 89, 82);">-->
@@ -1092,16 +1116,16 @@
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <#--<select multiple="multiple" size="10" name="duallistbox_demo1[]" id="duallist">-->
-                                    <#--<option value="option1">Option 1</option>-->
-                                    <#--<option value="option2">Option 2</option>-->
-                                    <#--<option value="option3" selected="selected">Option 3</option>-->
-                                    <#--<option value="option4">Option 4</option>-->
-                                    <#--<option value="option5">Option 5</option>-->
-                                    <#--<option value="option6" selected="selected">Option 6</option>-->
-                                    <#--<option value="option7">Option 7</option>-->
-                                    <#--<option value="option8">Option 8</option>-->
-                                    <#--<option value="option9">Option 9</option>-->
-                                    <#--<option value="option0">Option 10</option>-->
+                                <#--<option value="option1">Option 1</option>-->
+                                <#--<option value="option2">Option 2</option>-->
+                                <#--<option value="option3" selected="selected">Option 3</option>-->
+                                <#--<option value="option4">Option 4</option>-->
+                                <#--<option value="option5">Option 5</option>-->
+                                <#--<option value="option6" selected="selected">Option 6</option>-->
+                                <#--<option value="option7">Option 7</option>-->
+                                <#--<option value="option8">Option 8</option>-->
+                                <#--<option value="option9">Option 9</option>-->
+                                <#--<option value="option0">Option 10</option>-->
                                 <#--</select>-->
 
                                 <#--<div class="hr hr-16 hr-dotted"></div>-->
@@ -1188,6 +1212,55 @@
         </div>
         <!-- /.modal -->
     </div>
+    <div class="modal fade" id="date-modal" tabindex="-1" role="dialog"
+         aria-labelledby="date-modal-label"
+         aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="date-modal-label">工作节点日期选择</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <!-- PAGE CONTENT BEGINS -->
+                            <div class="row">
+                                <div class="alert alert-warning">
+                                    <button type="button" class="close" data-dismiss="alert">
+                                        <i class="ace-icon fa fa-times"></i>
+                                    </button>
+                                    <strong>警告!</strong>
+                                    修改会影响整个项目的进度
+                                    <br>
+                                </div>
+                                <div class="form-group" >
+                                    <label class="col-sm-3 control-label no-padding-right" for="date-spinner"> 工期选择</label>
+
+                                    <div class="col-sm-9">
+                                        <input type="text" id="date-spinner" />
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- PAGE CONTENT ENDS -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                    <button type="button" class="btn btn-success">确认
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal -->
+    </div>
     <!-- #dialog-message -->
     <!-- 关联模板模态框 modal end -->
     <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
@@ -1203,6 +1276,11 @@
     <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
     <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
     <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
+    <script src="/webresources/ace-master/assets/js/moment.min.js"></script>
+
+    <script src="/webresources/ace-master/assets/js/daterangepicker.min.js"></script>
+    <script src="/webresources/ace-master/assets/js/spinbox.min.js"></script>
+
 
     <script src="/templates/project/assets/js/work.js"></script>
     <script src="/templates/project/assets/js/appStore.js"></script>
@@ -1222,6 +1300,17 @@
             $('[data-rel=tooltip]').tooltip({
                 container: 'body'
             });
+            //to translate the daterange picker, please copy the "examples/daterange-fr.js" contents here before initialization
+            $('input[name=date-range-picker]').daterangepicker({
+                'applyClass' : 'btn-sm btn-success',
+                'cancelClass' : 'btn-sm btn-default',
+                locale: {
+                    applyLabel: '应用',
+                    cancelLabel: '取消',
+                }
+            })
+
+
         });
     </script>
 </div>

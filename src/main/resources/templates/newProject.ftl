@@ -126,6 +126,7 @@
                                                   style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 52px;"></textarea>
                                     </div>
                                 </div>
+
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label no-padding-right"
                                            for="project-tags">描述关键词</label>

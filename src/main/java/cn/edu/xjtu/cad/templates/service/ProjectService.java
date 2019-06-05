@@ -420,4 +420,12 @@ public class ProjectService {
         return newCode;
     }
 
+    /**
+     * 函数存在的问题，没有考虑权限，没有验证projectID
+     * @param user
+     * @param projectID
+     */
+    public void startProject(User user, long projectID) {
+        projectMapper.updateProjectStartTime(projectID);
+    }
 }

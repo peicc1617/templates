@@ -25,6 +25,7 @@ public class Project {
      */
     private Date editTime;
 
+    private Date startTime;
     /**
      * 项目的基本描述
      */
@@ -201,5 +202,13 @@ public class Project {
 
     public void setProjectRole(ProjectRoleType projectRole) {
         this.projectRole = projectRole;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 }

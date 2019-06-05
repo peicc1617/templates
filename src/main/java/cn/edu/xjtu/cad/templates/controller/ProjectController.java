@@ -194,6 +194,12 @@ public class ProjectController {
          projectService.deleteProject(user,projectID);
     }
 
+    @SystemControllerLog(content = "开始项目监控", logType = LogType.PROJECT, methodType = MethodType.UPDATE)
+    @RequestMapping(value = "/{projectID}/doStart", method = RequestMethod.PUT)
+    public void startProject(@PathVariable long projectID) {
+        projectService.startProject(user,projectID);
+    }
+
     @RequestMapping(value = "/{projectID}/role/userList", method = RequestMethod.GET)
     public List<ProjectRole> getProjectRoleListByProjectID(@PathVariable long projectID) {
         return projectService.getUserListInProject(user,projectID);

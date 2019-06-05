@@ -55,4 +55,6 @@ public interface ProjectMapper {
     long updateProjectInCode(@Param("projectID")long projectID,@Param("invitationCode") String invitationCode);
 
     List<Project> getProjectListByUserAndRole(@Param("userID")long userID,@Param("projectRole") ProjectRoleType creator);
+
+    void updateProjectStartTime(long projectID);
 }

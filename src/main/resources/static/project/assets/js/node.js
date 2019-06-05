@@ -159,6 +159,12 @@ function refreshNodeRow() {
     $("#cur-node-name-href").editable("setValue", CUR_NODE.nodeName);
     //节点的描述
     $("#cur-node-description-href").editable("setValue", CUR_NODE.nodeDesc);
+
+    $('#date-spinner').ace_spinner({value:CUR_NODE.workTime,min:0,max:365,step:1, btn_up_class:'btn-info' , btn_down_class:'btn-info'})
+        .closest('.ace-spinner')
+        .on('changed.fu.spinbox', function(){
+            CUR_NODE.workTime = $('#spinner1').val()
+        });
     if (!CUR_NODE.templateProjectID >0) {
         //显示工具页面
         $("a[href=#tool-tab]")[0].click();
