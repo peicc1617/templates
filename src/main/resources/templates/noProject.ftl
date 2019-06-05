@@ -16,7 +16,6 @@
     <!-- page specific plugin styles -->
 
     <!-- text fonts -->
-    <link rel="stylesheet" href="/webresources/ace-master/assets/css/fonts.googleapis.com.css"/>
 
     <!-- ace styles -->
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace.min.css" class="ace-main-stylesheet"

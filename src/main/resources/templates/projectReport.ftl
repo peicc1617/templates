@@ -223,7 +223,7 @@
                             </h1>
 
                             <p class="MsoNormal" style="text-indent:24.0pt"><span
-                                        style='font-family:宋体;&#10;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'>${project.projectDesc?}</span>
+                                        style='font-family:宋体;&#10;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'>${project.projectDesc}</span>
                             </p>
 
                             <h1 style="margin-top:6.0pt;margin-right:0cm;margin-bottom:6.0pt;margin-left:&#10;0cm;text-indent:0cm;mso-list:l27 level1 lfo2">

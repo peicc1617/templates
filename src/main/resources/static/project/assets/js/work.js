@@ -456,7 +456,7 @@ $(document).ready(function () {
          * 根据路径，计算整个网格的大小
          */
         initGrid: function () {
-            this.nodeHorDis = this.options.nodeWidth * 3; //节点间距
+            this.nodeHorDis = this.options.nodeWidth * 1.5; //节点间距
             this.nodeVerDis = this.options.nodeHeight * 2 //节点垂直间
             this.stepBarHeight = this.options.nodeHeight; //阶段标题高度
             this.refreshViewBox();
@@ -667,12 +667,7 @@ $(document).ready(function () {
                 }
             }
         },
-        /**
-         * 绑定菜单按钮对应的事件
-         */
-        bindStepMenuListener: function () {
-
-        },
+      
         refreshStepMenu: function () {
             const width = this.stepBarHeight * 2 / 3,//图标的宽度
                 xStart = width / 3,//按钮组的开始坐标
@@ -961,7 +956,7 @@ $(document).ready(function () {
                 }
             } else if (pathid == undefined && $(this.pathMenu).attr('class') !== "active") {
                 //如果之前没有点击过节点并且处于关闭状态
-                this.pathMenuOpen(workPath.nodeI + workPath.nodeJ, workPath.midPos.x, workPath.midPos.y)
+                this.pathMenuOpen(workPath.nodeI +','+ workPath.nodeJ, workPath.midPos.x, workPath.midPos.y)
             }
         },
         stepMenuOpen: function (stepindex, x, y) {
@@ -989,16 +984,22 @@ $(document).ready(function () {
             $(this.nodeMenuID).removeAttr("class").removeAttr("nodeindex",);
         },
         pathMenuOpen: function (pathid, x, y) {
+            const workFlow = this;
             $(this.pathMenu).attr({
                 class: "active",
                 "pathid": pathid,
                 transform: "translate(" + x + ", " + y + ")",
-            });
+            })
+                .on('click',function () {
+                    const ids = $(this).attr('pathid').split(',');
+                    workFlow.deleteWorkPath(ids[0],ids[1]);
+                    workFlow.pathMenuClose();
+                });
             this.nodeMenuClose();
             this.stepMenuClose();
         },
         pathMenuClose: function () {
-            $(this.pathMenu).removeAttr("class").removeAttr("pathid");
+            $(this.pathMenu).removeAttr("class").removeAttr("pathid").off('click');
         },
         refreshData: function () {
             //更新数据
@@ -1299,7 +1300,10 @@ $(document).ready(function () {
                 nodeJ:workNode2.node.nodeIndex
             }
             this.trigger('before.add-path', path);
+            workNode1.node.nextNodeIndexList.push(workNode2.node.nodeIndex);
+            workNode2.node.preNodeIndexList.push(workNode1.node.nodeIndex);
             this.trigger('after.add-path', path);
+            this.hideVirtualPath();
             this.refreshView();
         },
         deleteWorkPath(nodeI,nodeJ){
@@ -1309,6 +1313,14 @@ $(document).ready(function () {
                 nodeJ:nodeJ
             }
             this.trigger('before.remove-path', path);
+            let remove = function(arr,nodeIndex){
+                const index = arr.indexOf(nodeIndex);
+                if(index>-1){
+                    arr.splice(index,1)
+                }
+            }
+            remove( this.options.nodeMap.get(nodeI).nextNodeIndexList,nodeJ);
+            remove( this.options.nodeMap.get(nodeJ).preNodeIndexList,nodeI);
             this.trigger('after.remove-path', path);
             this.refreshView();
         }
@@ -1677,7 +1689,9 @@ $(document).ready(function () {
                     class: this.getPathClass(),
                     d: this.getPathD(),
                     'stroke': "#B7B7B7",
-                    'stroke-width': 3
+                    'stroke-width': 3,
+                    'stroke-dasharray':"5,5"
+
                 })
             }else {
                 const path = svg("path", this.$container, undefined, {
@@ -1685,8 +1699,8 @@ $(document).ready(function () {
                     nodeJ: this.nodeJ,
                     class: this.getPathClass(),
                     d: this.getPathD(),
-                    'stroke': "#9AC0CD",
-                    'stroke-width': 4
+                    'stroke': "#1874CD",
+                    'stroke-width': 4,
                 })
             }
 

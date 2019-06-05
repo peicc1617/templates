@@ -1,6 +1,7 @@
 package cn.edu.xjtu.cad.templates.dao;
 
 import cn.edu.xjtu.cad.templates.model.project.Edge;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
@@ -27,5 +28,5 @@ public interface EdgeMapper {
     void deleteEdgeOfNode(long projectID,String nodeIndex);
 
 
-    void deleteEdge(long projectID,String nodeI,String nodeJ);
+    void deleteEdge(@Param("projectID") long projectID,@Param("nodeI")  String nodeI,@Param("nodeJ")  String nodeJ);
 }

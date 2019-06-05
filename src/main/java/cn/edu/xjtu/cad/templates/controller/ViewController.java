@@ -22,9 +22,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,6 +74,11 @@ public class ViewController {
         }
     }
 
+    @RequestMapping("/")
+    public ModelAndView viewIndex(){
+        ModelAndView modelAndView = new ModelAndView("redirect:project/my.html");
+        return modelAndView;
+    }
     /**
      * 查看新建项目页面
      *

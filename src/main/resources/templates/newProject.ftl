@@ -16,7 +16,6 @@
     <!-- page specific plugin styles -->
 
     <!-- text fonts -->
-    <link rel="stylesheet" href="/webresources/ace-master/assets/css/fonts.googleapis.com.css"/>
 
     <!-- ace styles -->
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace.min.css" class="ace-main-stylesheet"
@@ -77,7 +76,7 @@
 
             <div class="page-content">
                 <div class="page-header">
-                    <h1>
+                    <h1 onclick="testForXGK()">
                         新建创新方法模板
                     </h1>
                 </div>
@@ -211,9 +210,9 @@
                         <th data-field="referName">名称</th>
                         <!--<th data-field="description"  data-formatter="descriptionFormatter">描述</th>-->
                         <th data-field="tags">标签</th>
-                        <th data-field="recommend" data-formatter="recommendFormatter">推荐度</th>
-                        <th data-field="cases" data-formatter="caseFormatter">案例</th>
-                        <th data-action="view" data-formatter="viewFormatter">预览</th>
+                        <#--<th data-field="recommend" data-formatter="recommendFormatter">推荐度</th>-->
+                        <#--<th data-field="cases" data-formatter="caseFormatter">案例</th>-->
+                        <#--<th data-action="view" data-formatter="viewFormatter">预览</th>-->
 
                     </tr>
                     </thead>
@@ -343,6 +342,27 @@
                 }
             }
         })
+    }
+
+
+
+    //西高开演示函数
+    function testForXGK(){
+        let testName = '表面车间油漆喷涂质量改善',
+            testDesc = '表面处理车间主要承担产品零部件的涂装和电镀任务，由于涉及工序众多，涂装过程难以整体把控，使得零件油漆内表面存在油漆颗粒、油漆的流挂等问题，影响油漆表面的粗糙度，下线零件要再次进行清理、造成人力、材料的浪费，且影响交检合格率',
+            testTags = '表面处理,油漆,电镀,质量'
+        //填充项目名
+        $('#project-name').val(testName)
+        //填充工程描述
+        $('#project-description').val(testDesc)
+        //填充项目标签
+        testTags.split(',').forEach(tag=>{
+            $('#project-tags').data('tag').add(tag)
+        })
+        //选择参考模板
+        $('#project-refer-check').click()
+        //弹出参考模板选择页面
+        $('#project-refer').click()
     }
 </script>
 </body>

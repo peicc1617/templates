@@ -246,6 +246,7 @@ function timeFormatter(value) {
 }
 
 function refreshProjectTable(){
+    $(RESULT_ELS.toolProjectTable).bootstrapTable('load', []);
     return Promise.all([getMyNodeResultData(),getToolProjectData()]).then(function (data) {
         $(RESULT_ELS.toolProjectTable).bootstrapTable('load', data[1]);
     })
@@ -318,7 +319,7 @@ function disableNodeResult(disableResultArr){
             data: {
                 projectID: PROJECT_ID,
                 nodeIndex: CUR_NODE.nodeIndex,
-                userIDList: disableResultArr.map(result => result.username).join()
+                userIDList: disableResultArr.map(result => result.userID)
             },
             success: function (data) {
                 if(data.code==1){

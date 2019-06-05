@@ -22,6 +22,6 @@
     </delete>
 
     <delete id="deleteEdge" >
-      DELETE  FROM project_edge WHERE projectID = #{projectID} AND nodeI = #{nodeIndex} AND nodeJ = #{nodeIndex}
+      DELETE  FROM project_edge WHERE projectID = #{projectID} AND nodeI = #{nodeI} AND nodeJ = #{nodeJ}
     </delete>
 </mapper>

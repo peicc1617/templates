@@ -273,11 +273,14 @@ public class NodeController {
      */
     @SystemControllerLog(content = "处于节点${nodeIndex}下的属于用户${userID}的数据已经失效",logType = LogType.RESULT,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/result/list/disable",method = RequestMethod.PUT)
-    public List<NodeResult> disableResult(@PathVariable long projectID,String nodeIndex,@RequestParam("userIDList")List<Long> userIDList){
+    public List<NodeResult> disableResult(@PathVariable long projectID,String nodeIndex,@RequestParam(value = "userIDList[]")List<Long> userIDList){
         List<NodeResult> nodeResultList = nodeResultMapper.getResultListByNodeIndexAndUserIDList(projectID,nodeIndex,userIDList);
         nodeResultList.forEach(nodeResult -> {
             nodeResult.setState(NodeResultState.UN_BIND);
             nodeResult.setMessage(NodeResult.DISABLE_MESSAGE);
+            nodeResult.setResultID(0);
+            nodeResult.setResultKey(null);
+            nodeResult.setResultName(null);
         });
        
         for (NodeResult nodeResult : nodeResultList) {
@@ -295,7 +298,7 @@ public class NodeController {
      */
     @SystemControllerLog(content = "处于节点${nodeIndex}下的属于用户${userID}的数据已经更新",logType = LogType.RESULT,methodType = MethodType.DELETE)
     @RequestMapping(value = "/result/list/outDate",method = RequestMethod.PUT)
-    public List<NodeResult> outDateResult(@PathVariable long projectID,String nodeIndex,@RequestParam("userIDList")List<Long> userIDList){
+    public List<NodeResult> outDateResult(@PathVariable long projectID,String nodeIndex,@RequestParam("userIDList[]")List<Long> userIDList){
         List<NodeResult> nodeResultList = nodeResultMapper.getResultListByNodeIndexAndUserIDList(projectID,nodeIndex,userIDList);
         nodeResultList.forEach(nodeResult -> {
             nodeResult.setState(NodeResultState.PENDING_CONFIRM);
