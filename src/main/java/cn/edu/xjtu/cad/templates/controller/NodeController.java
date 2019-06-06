@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -158,6 +159,17 @@ public class NodeController {
         }
     }
 
+    @SystemControllerLog(content = "修改了工作节点的工期，为${workTime}",logType = LogType.NODE,methodType = MethodType.UPDATE)
+    @RequestMapping(value = "/workTime",method = RequestMethod.PUT)
+    public void updateNodeWorkTime(@PathVariable long projectID,String nodeIndex,int workTime){
+        Node node = nodeMapper.getNode(projectID,nodeIndex);
+        if(node!=null){
+            node.setWorkTime(workTime);
+            nodeMapper.updateNode(node);
+        }
+    }
+
+
 
     /**
      * 更新节点绑定的APP
@@ -169,7 +181,7 @@ public class NodeController {
      * @return
      */
     @SystemControllerLog(content = "节点绑定了${appName}",logType = LogType.NODE,methodType = MethodType.UPDATE)
-    @RequestMapping(value = "/app",method = RequestMethod.PUT)
+    @RequestMapping(value = "/app",method = RequestMethod.PUT  )
     public void updateNodeApp(@PathVariable long projectID,String nodeIndex,String appName,String appPath,String appIcon){
         Node node = nodeMapper.getNode(projectID,nodeIndex);
         if(node!=null){
@@ -194,6 +206,10 @@ public class NodeController {
         Node node = nodeMapper.getNode(projectID,nodeIndex);
         if(node!=null){
             node.setState(state);
+            if(state){
+                //如果状态是已经完成，那么设置完成时间
+                node.setEndTime(new Date());
+            }
             nodeMapper.updateNode(node);
         }
     }

@@ -16,9 +16,9 @@
     <link rel="stylesheet" href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css">
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap-duallistbox.min.css"/>
     <link rel="stylesheet" href="/templates/project/assets/css/step.css">
-    <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap-datetimepicker.min.css" />
-    <link rel="stylesheet" href="/webresources/ace-master/assets/css/daterangepicker.min.css" />
-
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap-datetimepicker.min.css"/>
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/daterangepicker.min.css"/>
+    <link rel="stylesheet" href="/webresources/ace-master/assets/assets/css/bootstrap-datepicker3.min.css"/>
 
     <script>
         //定义API接口
@@ -33,6 +33,7 @@
             deleteNode: "/templates/api/project/${project.projectID}/node",
             editNode: "/templates/api/project/${project.projectID}/node/",
             editNodeSummary: "/templates/api/project/${project.projectID}/node/summary",
+            editWorkTime: "/templates/api/project/${project.projectID}/node/workTime",
             nodeTemplate: "/templates/api/project/${project.projectID}/node/template",
             nodeState: "/templates/api/project/${project.projectID}/node/state",
             nodeLock: "/templates/api/project/${project.projectID}/node/lock",
@@ -589,20 +590,23 @@
                                                 模板
                                             </a>
                                         </li>
-                                        <li class="pull-right">
-                                            <a data-toggle="modal" data-target="#date-modal" class="">
-                                         <i class="blue ace-icon fa fa-calendar bigger-120"></i>
-                                         工期安排 <span class="badge badge-warning">
-                         10%
-                    </span>
-                                     </a>
-                                 </li>
-                             </ul>
+                                        <#if project.startTime??>
+                                            <li class="pull-right">
+                                                <a data-toggle="modal" data-target="#date-modal" class="">
+                                                    <i class="blue ace-icon fa fa-calendar bigger-120"></i>
+                                                    <span id="date-delay"class="badge ">
+                                                    工期安排
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        </#if>
 
-                             <div class="tab-content no-border padding-24">
-                                 <div id="tool-tab" class="tab-pane active">
-                                     <div class="row">
-                                         <div class="col-xs-12 col-sm-2 center">
+                                    </ul>
+
+                                    <div class="tab-content no-border padding-24">
+                                        <div id="tool-tab" class="tab-pane active">
+                                            <div class="row">
+                                                <div class="col-xs-12 col-sm-2 center">
                                                      <span class="profile-picture">
                                                          <img id="cur-node-app-img"
                                                               class="editable img-responsive" width="100"
@@ -610,12 +614,12 @@
                                                               src="/templates/project/assets/img/app.png">
                                                      </span>
 
-                                             <p>
-                                                 <a id="app-name"
-                                                    class="label label-lg arrowed-in arrowed-in-right">
-                                                     无</a>
-                                             </p>
-                                         </div><!-- /.col -->
+                                                    <p>
+                                                        <a id="app-name"
+                                                           class="label label-lg arrowed-in arrowed-in-right">
+                                                            无</a>
+                                                    </p>
+                                                </div><!-- /.col -->
 
 
                                                 <div class="col-xs-12 col-sm-8">
@@ -671,18 +675,18 @@
                                                         <span>成员管理</span>
                                                     </a>
                                                     <a href="#" type="button"
-                                                            class="btn btn-sm btn-white btn-block btn-dark"
-                                                            id="cur-node-lock-btn" onclick="lockNode()">
+                                                       class="btn btn-sm btn-white btn-block btn-dark"
+                                                       id="cur-node-lock-btn" onclick="lockNode()">
                                                         <i class="ace-icon fa fa-envelope-o"></i>
                                                         <span>锁定节点</span>
                                                     </a>
 
                                                     <#--<a href="#" type="button"-->
-                                                       <#--class="btn btn-sm btn-white btn-block btn-dark"-->
-                                                       <#--id="cur-node-date-btn" data-toggle="modal"-->
-                                                       <#--data-target="#date-modal">-->
-                                                        <#--<i class="ace-icon fa fa-calendar"></i>-->
-                                                        <#--<span class="badge badge-warning">日期安排</span>-->
+                                                    <#--class="btn btn-sm btn-white btn-block btn-dark"-->
+                                                    <#--id="cur-node-date-btn" data-toggle="modal"-->
+                                                    <#--data-target="#date-modal">-->
+                                                    <#--<i class="ace-icon fa fa-calendar"></i>-->
+                                                    <#--<span class="badge badge-warning">日期安排</span>-->
                                                     <#--</a>-->
                                                 </div>
                                             </div><!-- /.row -->
@@ -1236,13 +1240,41 @@
                                     修改会影响整个项目的进度
                                     <br>
                                 </div>
-                                <div class="form-group" >
-                                    <label class="col-sm-3 control-label no-padding-right" for="date-spinner"> 工期选择</label>
 
-                                    <div class="col-sm-9">
-                                        <input type="text" id="date-spinner" />
-                                    </div>
+                                <div class="input-group">
+																<span class="input-group-addon">
+																	工期选择
+																</span>
+
+                                    <input type="text" id="date-spinner"/>
                                 </div>
+                                <div class="input-group">
+																<span class="input-group-addon">
+																	计划开始时间
+																</span>
+
+                                    <input readonly="" type="text" class="col-xs-10 col-sm-5" id="plan-start-time-input" >
+                                </div>
+                                <div class="input-group">
+																<span class="input-group-addon">
+																	计划结束时间
+																</span>
+
+                                    <input readonly="" type="text" class="col-xs-10 col-sm-5" id="plan-end-time-input" >
+                                </div>
+                                <div class="input-group">
+																<span class="input-group-addon">
+																	设置结束时间
+																</span>
+
+                                    <input class="form-control date-picker" id="date-select" type="text"
+                                           data-date-format="yyyy-mm-dd"/>
+                                    <span class="input-group-addon">
+												<i class="fa fa-calendar bigger-110"></i>
+											</span>
+                                </div>
+
+
                             </div>
                             <!-- PAGE CONTENT ENDS -->
                         </div>
@@ -1253,7 +1285,7 @@
                     <button type="button" class="btn btn-default"
                             data-dismiss="modal">关闭
                     </button>
-                    <button type="button" class="btn btn-success">确认
+                    <button type="button" class="btn btn-success" onclick="saveWorkTime()">确认
                     </button>
                 </div>
             </div>
@@ -1280,7 +1312,7 @@
 
     <script src="/webresources/ace-master/assets/js/daterangepicker.min.js"></script>
     <script src="/webresources/ace-master/assets/js/spinbox.min.js"></script>
-
+    <script src="/webresources/ace-master/assets/js/bootstrap-datepicker.min.js"></script>
 
     <script src="/templates/project/assets/js/work.js"></script>
     <script src="/templates/project/assets/js/appStore.js"></script>
@@ -1302,14 +1334,25 @@
             });
             //to translate the daterange picker, please copy the "examples/daterange-fr.js" contents here before initialization
             $('input[name=date-range-picker]').daterangepicker({
-                'applyClass' : 'btn-sm btn-success',
-                'cancelClass' : 'btn-sm btn-default',
+                'applyClass': 'btn-sm btn-success',
+                'cancelClass': 'btn-sm btn-default',
                 locale: {
                     applyLabel: '应用',
                     cancelLabel: '取消',
                 }
             })
-
+            $('#date-spinner').ace_spinner({
+                min: 0,
+                max: 365,
+                step: 1,
+                btn_up_class: 'btn-info',
+                btn_down_class: 'btn-info'
+            })
+                .closest('.ace-spinner')
+            $('.date-picker').datepicker({
+                autoclose: true,
+                todayHighlight: true
+            })
 
         });
     </script>

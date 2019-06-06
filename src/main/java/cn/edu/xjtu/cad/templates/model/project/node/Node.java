@@ -81,25 +81,13 @@ public class Node {
      */
     private int templateProjectID;
 
-    /**
-     * 计划开始时间
-     */
+    private int workTime;
+
+
+    private Date endTime;
     private Date planStartTime;
-
-    /**
-     * 实际开始时间
-     */
-    private Date startTime;
-
-    /**
-     * 计划完成时间
-     */
-    private Date planFinishedTime;
-
-    /**
-     * 实际完成时间
-     */
-    private Date finishedTime;
+    private Date planEndTime;
+    private DateDelay delay;
 
     private boolean lockState;
 
@@ -250,36 +238,12 @@ public class Node {
         this.appIcon = appIcon;
     }
 
-    public Date getPlanStartTime() {
-        return planStartTime;
+    public Date getEndTime() {
+        return endTime;
     }
 
-    public void setPlanStartTime(Date planStartTime) {
-        this.planStartTime = planStartTime;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getPlanFinishedTime() {
-        return planFinishedTime;
-    }
-
-    public void setPlanFinishedTime(Date planFinishedTime) {
-        this.planFinishedTime = planFinishedTime;
-    }
-
-    public Date getFinishedTime() {
-        return finishedTime;
-    }
-
-    public void setFinishedTime(Date finishedTime) {
-        this.finishedTime = finishedTime;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public String getNodeName() {
@@ -296,5 +260,37 @@ public class Node {
 
     public void setNodeDesc(String nodeDesc) {
         this.nodeDesc = nodeDesc;
+    }
+
+    public int getWorkTime() {
+        return workTime;
+    }
+
+    public void setWorkTime(int workTime) {
+        this.workTime = workTime;
+    }
+
+    public Date getPlanStartTime() {
+        return planStartTime;
+    }
+
+    public void setPlanStartTime(Date planStartTime) {
+        this.planStartTime = planStartTime;
+    }
+
+    public Date getPlanEndTime() {
+        return planEndTime;
+    }
+
+    public void setPlanEndTime(Date planEndTime) {
+        this.planEndTime = planEndTime;
+    }
+
+    public DateDelay getDelay() {
+        return delay;
+    }
+
+    public void setDelay(DateDelay delay) {
+        this.delay = delay;
     }
 }

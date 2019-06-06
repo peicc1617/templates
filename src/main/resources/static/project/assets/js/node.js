@@ -160,11 +160,25 @@ function refreshNodeRow() {
     //节点的描述
     $("#cur-node-description-href").editable("setValue", CUR_NODE.nodeDesc);
 
-    $('#date-spinner').ace_spinner({value:CUR_NODE.workTime,min:0,max:365,step:1, btn_up_class:'btn-info' , btn_down_class:'btn-info'})
-        .closest('.ace-spinner')
-        .on('changed.fu.spinbox', function(){
-            CUR_NODE.workTime = $('#spinner1').val()
-        });
+
+    $('#date-spinner').val(CUR_NODE.workTime);
+    $('#date-select').datepicker('setDate', CUR_NODE.endTime);
+    $('#plan-start-time-input').val( new Date(CUR_NODE.planStartTime).toLocaleDateString());
+    $('#plan-end-time-input').val( new Date(CUR_NODE.planEndTime).toLocaleDateString());
+    const delay = CUR_NODE.delay;
+    switch (delay) {
+        case "S":
+            $("#date-delay").addClass('badge-success')
+            break;
+        case "W":
+            $("#date-delay").addClass('badge-warning')
+            break;
+        case "D":
+            $("#date-delay").addClass('badge-danger')
+            break;
+        default:
+            break;
+    }
     if (!CUR_NODE.templateProjectID >0) {
         //显示工具页面
         $("a[href=#tool-tab]")[0].click();
@@ -259,6 +273,10 @@ function bindingApp(appName, appPath, appIcon) {
         }
 
     })
+}
+
+function saveWorkTime() {
+    
 }
 
 function swapTemplate() {
@@ -396,6 +414,34 @@ function finish() {
     })))
 }
 
+function saveWorkTime() {
+    updateNode(new Promise(((resolve, reject) => {
+        let workTime = $("#date-spinner").val();
+        let endTime =$("#date-select").datepicker('getDate');
+        $.ajax({
+            url: API.editWorkTime,
+            type: "PUT",
+            data: {
+                nodeIndex: CUR_NODE.nodeIndex,
+                workTime: workTime,
+                endTime:endTime
+            },
+            success: function (data) {
+                if(data.code){
+                    CUR_NODE.workTime = workTime;
+                    $("#date-model").modal("hide")
+
+                    resolve()
+                }else {
+                    reject(data.msg)
+                }
+            },
+            error:function () {
+                reject("网络错误")
+            }
+        })
+    })))
+}
 /**
  * 保存当前工作节点的总结
  */

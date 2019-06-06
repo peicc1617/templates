@@ -42,7 +42,9 @@
         appPath = #{appPath},
         appIcon = #{appIcon},
         templateProjectID = #{templateProjectID},
-        lockState = #{lockState}
+        lockState = #{lockState},
+        workTime = #{workTime},
+        endTime = #{endTime}
         WHERE projectID = #{projectID} AND nodeIndex =#{nodeIndex}
     </update>
 

@@ -8,10 +8,7 @@ import cn.edu.xjtu.cad.templates.dao.*;
 import cn.edu.xjtu.cad.templates.model.Result;
 import cn.edu.xjtu.cad.templates.model.ResultCode;
 import cn.edu.xjtu.cad.templates.model.project.*;
-import cn.edu.xjtu.cad.templates.model.project.node.Node;
-import cn.edu.xjtu.cad.templates.model.project.node.NodeResult;
-import cn.edu.xjtu.cad.templates.model.project.node.NodeRole;
-import cn.edu.xjtu.cad.templates.model.project.node.NodeRoleType;
+import cn.edu.xjtu.cad.templates.model.project.node.*;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.Delayed;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -107,6 +105,7 @@ public class ProjectService {
     }
 
     /**
+     * 2019年6月6日16:02:52 新添加了计算项目甘特图的功能，该功能没有经过验证。
      * @param projectID
      * @return
      */
@@ -145,11 +144,65 @@ public class ProjectService {
             nodeMap.get(nodeI).getNextNodeIndexList().add(nodeJ);
             nodeMap.get(nodeJ).getPreNodeIndexList().add(nodeI);
         }
-        //填充项目的节点
+        //首先项目监控是否开始
+        if(project.getStartTime()!=null){
+            List<Node> startNodeList = new ArrayList<>();//开始节点数组
+            //寻找开始节点
+            for (Node value : nodeMap.values()) {
+                if(value.getPreNodeIndexList().size()==0){
+                    startNodeList.add(value);
+                }
+            }
+            //设置所有开始节点的相应时间
+            for (Node node : startNodeList) {
+                setNodeTime(nodeMap,project.getStartTime(),node);
+            }
+        }
         project.setNodeMap(nodeMap);
         //获取当前项目的用户
         project.setMembers(projectRoleMapper.getRoleOfProject(projectID));
         return project;
+    }
+    private void setNodeTime(Map<String,Node> nodeMap,Date startTime,Node node){
+        //设置开始时间
+        if(node.getPlanStartTime()!=null){
+            //如果开始时间不为空，需要判断开始时间的先后顺序
+            if(node.getPlanStartTime().getTime()>=startTime.getTime()){
+                //不作处理
+                return;
+            }
+        }
+        node.setPlanStartTime(startTime);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startTime);
+        //相对开始时间延后相应的结束时间
+        calendar.add(Calendar.DAY_OF_YEAR,node.getWorkTime());
+        //计划结束时间与实际结束时间进行对比
+        Calendar endCalendar = Calendar.getInstance();
+        if(node.getEndTime()==null){
+            //如果实际结束时间为空，那么与当前时间对比
+        }else {
+            endCalendar.setTime(node.getEndTime());
+        }
+        if (calendar.before(endCalendar)) {
+            //如果实际结束时间超过计划结束时间，说明已经超期了
+            node.setDelay(DateDelay.D);
+        }else {
+            int dayDelta = calendar.get(Calendar.DAY_OF_YEAR)-endCalendar.get(Calendar.DAY_OF_YEAR);
+            if(dayDelta<node.getWorkTime()/3){
+                node.setDelay(DateDelay.D);
+            }else if(dayDelta<node.getWorkTime()*2/3){
+                node.setDelay(DateDelay.W);
+            }else {
+                node.setDelay(DateDelay.S);
+            }
+        }
+        //设置结束时间
+        node.setPlanEndTime(calendar.getTime());
+        //处理所有的后续节点
+        for (String nodeIndex : node.getNextNodeIndexList()) {
+            setNodeTime(nodeMap,node.getPlanEndTime(), nodeMap.get(nodeIndex));
+        }
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
