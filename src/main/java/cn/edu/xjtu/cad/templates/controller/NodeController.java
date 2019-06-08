@@ -161,10 +161,11 @@ public class NodeController {
 
     @SystemControllerLog(content = "修改了工作节点的工期，为${workTime}",logType = LogType.NODE,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/workTime",method = RequestMethod.PUT)
-    public void updateNodeWorkTime(@PathVariable long projectID,String nodeIndex,int workTime){
+    public void updateNodeWorkTime(@PathVariable long projectID,String nodeIndex,int workTime,Date endTime){
         Node node = nodeMapper.getNode(projectID,nodeIndex);
         if(node!=null){
             node.setWorkTime(workTime);
+            node.setEndTime(endTime);
             nodeMapper.updateNode(node);
         }
     }

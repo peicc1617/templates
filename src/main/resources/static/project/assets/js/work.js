@@ -1822,11 +1822,13 @@ $(document).ready(function () {
                     data = data.data;
                     workOptions['nodeMap'] = new Map();
                     workOptions['stepMap'] = new Map();
+                    for (let stepIndex in data.stepMap) {
+                        data.stepMap[stepIndex].nodeMap = new Map();
+                        workOptions['stepMap'].set(stepIndex, data.stepMap[stepIndex]);
+                    }
                     for (let nodeIndex in data.nodeMap) {
                         workOptions['nodeMap'].set(nodeIndex, data.nodeMap[nodeIndex]);
-                    }
-                    for (let stepIndex in data.stepMap) {
-                        workOptions['stepMap'].set(stepIndex, data.stepMap[stepIndex]);
+                        data.stepMap[data.nodeMap[nodeIndex].stepIndex].nodeMap.set(nodeIndex,data.nodeMap[nodeIndex])
                     }
                     $(SVG_DOM).workFlow(workOptions);
                     break;

@@ -4,6 +4,7 @@ import cn.edu.xjtu.cad.templates.dao.LogMapper;
 import cn.edu.xjtu.cad.templates.model.log.Log;
 import cn.edu.xjtu.cad.templates.model.log.LogType;
 import cn.edu.xjtu.cad.templates.model.log.ProjectLog;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,5 +30,9 @@ public class LogService {
 
     public List<ProjectLog> getProjectLog(long projectID) {
         return logMapper.getAllProjectLog( projectID,LogType.PROJECT.getDataBaseName());
+    }
+
+    public List<ProjectLog>  getStepLog(long projectID, String stepIndex){
+        return logMapper.getStepLog(projectID,stepIndex,LogType.PROJECT.getDataBaseName());
     }
 }

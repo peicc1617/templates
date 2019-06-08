@@ -3,6 +3,7 @@ package cn.edu.xjtu.cad.templates.dao;
 import cn.edu.xjtu.cad.templates.model.log.LogType;
 import cn.edu.xjtu.cad.templates.model.log.Log;
 import cn.edu.xjtu.cad.templates.model.log.ProjectLog;
+import cn.edu.xjtu.cad.templates.model.project.Project;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -35,4 +36,6 @@ public interface LogMapper {
     List<ProjectLog> getProjectLogCut(@Param("projectID")long projectID,@Param("limit") long limit,@Param("tableName") String logTableName);
 
     List<ProjectLog> getAllProjectLog(@Param("projectID") long projectID,@Param("tableName") String dataBaseName);
+
+    List<ProjectLog> getStepLog(@Param("projectID") long projectID,@Param("stepIndex")String stepIndex,@Param("tableName") String dataBaseName);
 }

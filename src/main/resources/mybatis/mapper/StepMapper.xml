@@ -38,6 +38,7 @@
         SELECT * FROM project_step WHERE projectID = #{projectID}  AND stepIndex = #{stepIndex} ORDER by pos
     </select>
 
+
     <update id="updateStep" parameterType="cn.edu.xjtu.cad.templates.model.project.Step">
         UPDATE project_step SET
         stepName = #{stepName},stepDesc = #{stepDesc},summary = #{summary}

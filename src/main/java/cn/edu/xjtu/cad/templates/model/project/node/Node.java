@@ -83,7 +83,7 @@ public class Node {
 
     private int workTime;
 
-
+    private Date startTime;
     private Date endTime;
     private Date planStartTime;
     private Date planEndTime;
@@ -292,5 +292,13 @@ public class Node {
 
     public void setDelay(DateDelay delay) {
         this.delay = delay;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 }

@@ -53,6 +53,14 @@ public class Project {
 
     private int num;
 
+    private double maturity;
+
+    private double dea;
+
+    private ProjectIndex projectIndex;
+
+    private String problemID;
+
     /**
      * 参考模板ID
      */
@@ -210,5 +218,37 @@ public class Project {
 
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
+    }
+
+    public double getMaturity() {
+        return maturity;
+    }
+
+    public void setMaturity(double maturity) {
+        this.maturity = maturity;
+    }
+
+    public double getDea() {
+        return dea;
+    }
+
+    public void setDea(double dea) {
+        this.dea = dea;
+    }
+
+    public ProjectIndex getProjectIndex() {
+        return projectIndex;
+    }
+
+    public void setProjectIndex(ProjectIndex projectIndex) {
+        this.projectIndex = projectIndex;
+    }
+
+    public String getProblemID() {
+        return problemID;
+    }
+
+    public void setProblemID(String problemID) {
+        this.problemID = problemID;
     }
 }

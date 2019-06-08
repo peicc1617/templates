@@ -1,6 +1,7 @@
 package cn.edu.xjtu.cad.templates.dao;
 
 import cn.edu.xjtu.cad.templates.model.project.Project;
+import cn.edu.xjtu.cad.templates.model.project.ProjectIndex;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
 import org.apache.ibatis.annotations.*;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface ProjectMapper {
@@ -57,4 +59,22 @@ public interface ProjectMapper {
     List<Project> getProjectListByUserAndRole(@Param("userID")long userID,@Param("projectRole") ProjectRoleType creator);
 
     void updateProjectStartTime(long projectID);
+
+    void updateProjectIndex(ProjectIndex projectIndex);
+
+    ProjectIndex getProjectIndex(@Param("projectID")long projectID);
+
+    void addProjectIndex(ProjectIndex projectIndex);
+
+    List<ProjectIndex> getAllProjectIndex();
+
+    void saveNormalizeIndex(@Param("projectID")long projectID,@Param("map") Map<String, Double> outputIndexMap);
+
+    void updateDea(@Param("projectID") Long i, @Param("dea")double v);
+
+    Double getProjectDea(@Param("projectID") long projectID);
+
+    Project getProjectByProblemID(@Param("problemID") String problemID );
+
+    void unbindProblemID(@Param("projectID")long  projectID);
 }

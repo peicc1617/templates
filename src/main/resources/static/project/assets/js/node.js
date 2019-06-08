@@ -162,21 +162,24 @@ function refreshNodeRow() {
 
 
     $('#date-spinner').val(CUR_NODE.workTime);
-    $('#date-select').datepicker('setDate', CUR_NODE.endTime);
+    $('#date-select').datepicker('setDate', new Date(CUR_NODE.endTime));
     $('#plan-start-time-input').val( new Date(CUR_NODE.planStartTime).toLocaleDateString());
     $('#plan-end-time-input').val( new Date(CUR_NODE.planEndTime).toLocaleDateString());
+    $('#start-time-input').val( new Date(CUR_NODE.startTime).toLocaleDateString());
+
     const delay = CUR_NODE.delay;
     switch (delay) {
         case "S":
-            $("#date-delay").addClass('badge-success')
+            $("#date-delay").attr('class','badge badge-success')
             break;
         case "W":
-            $("#date-delay").addClass('badge-warning')
+            $("#date-delay").attr('class','badge badge-warning')
             break;
         case "D":
-            $("#date-delay").addClass('badge-danger')
+            $("#date-delay").attr('class','badge badge-danger')
             break;
         default:
+            $("#date-delay").attr('class','badge')
             break;
     }
     if (!CUR_NODE.templateProjectID >0) {

@@ -5,16 +5,20 @@ import cn.edu.xjtu.cad.templates.annotation.UserRoleFilter;
 import cn.edu.xjtu.cad.templates.aop.MyException;
 import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.dao.*;
+import cn.edu.xjtu.cad.templates.dea.Dea;
 import cn.edu.xjtu.cad.templates.model.Result;
 import cn.edu.xjtu.cad.templates.model.ResultCode;
 import cn.edu.xjtu.cad.templates.model.project.*;
 import cn.edu.xjtu.cad.templates.model.project.node.*;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Key;
 import java.util.*;
 import java.util.concurrent.Delayed;
 import java.util.function.Function;
@@ -22,6 +26,8 @@ import java.util.stream.Collectors;
 
 @Service("projectService")
 public class ProjectService {
+    static Map<String, double[]> indexMaxAndMin = null;
+
 
     @Autowired
     ReferMapper referMapper;
@@ -47,10 +53,14 @@ public class ProjectService {
     @Autowired
     NodeRoleMapper nodeRoleMapper;
 
+    @Autowired
+    Dea dea;
+
 
     public List<Project> getOwnedProjectList(User user) {
-        return projectMapper.getProjectListByUserAndRole(user.getUserID(),ProjectRoleType.CREATOR);
+        return projectMapper.getProjectListByUserAndRole(user.getUserID(), ProjectRoleType.CREATOR);
     }
+
     public List<Project> getMyProjectList(long userID) {
         return projectMapper.getAllProjectListByUserID(userID);
     }
@@ -59,12 +69,19 @@ public class ProjectService {
     public List<Project> getOpenProjectList(long userID) {
         List<Project> publicProjectList = projectMapper.getOpenProject(userID);
         for (Project project : publicProjectList) {
-            project.setProjectRole(projectRoleMapper.getProjectRoleType(project.getProjectID(),userID));
+            project.setProjectRole(projectRoleMapper.getProjectRoleType(project.getProjectID(), userID));
         }
         return publicProjectList;
     }
 
-    public long newProject(Project project, long userID, long referID) throws MyException {
+    public long newProject(Project project, long userID, long referID,String problemID) throws MyException {
+        if(problemID!=null&&problemID.trim().length()>0){
+            Project old = projectMapper.getProjectByProblemID(problemID);
+            if(old!=null){
+                projectMapper.unbindProblemID(old.getProjectID());
+            }
+            project.setProblemID(problemID);
+        }
         long projectID = 0;
         project.setCreatorID(userID);
         project.setInvitationCode(generateInvitationCode());
@@ -106,6 +123,7 @@ public class ProjectService {
 
     /**
      * 2019年6月6日16:02:52 新添加了计算项目甘特图的功能，该功能没有经过验证。
+     *
      * @param projectID
      * @return
      */
@@ -126,12 +144,12 @@ public class ProjectService {
             String nodeI = edge.getNodeI();
             String nodeJ = edge.getNodeJ();
             //如果边的两个点有失效的，那么删除该边
-            if(!nodeMap.containsKey(edge.getNodeI())){
-                edgeMapper.deleteEdgeOfNode(projectID,edge.getNodeI());
+            if (!nodeMap.containsKey(edge.getNodeI())) {
+                edgeMapper.deleteEdgeOfNode(projectID, edge.getNodeI());
                 break;
             }
-            if(!nodeMap.containsKey(edge.getNodeJ())){
-                edgeMapper.deleteEdgeOfNode(projectID,edge.getNodeJ());
+            if (!nodeMap.containsKey(edge.getNodeJ())) {
+                edgeMapper.deleteEdgeOfNode(projectID, edge.getNodeJ());
                 break;
             }
 
@@ -145,64 +163,173 @@ public class ProjectService {
             nodeMap.get(nodeJ).getPreNodeIndexList().add(nodeI);
         }
         //首先项目监控是否开始
-        if(project.getStartTime()!=null){
+        if (project.getStartTime() != null) {
             List<Node> startNodeList = new ArrayList<>();//开始节点数组
+            List<Node> endNodeList = new ArrayList<>();//尾节点数组
             //寻找开始节点
             for (Node value : nodeMap.values()) {
-                if(value.getPreNodeIndexList().size()==0){
+                if (value.getPreNodeIndexList().size() == 0) {
                     startNodeList.add(value);
                 }
+                if (value.getNextNodeIndexList().size() == 0) {
+                    endNodeList.add(value);
+                }
             }
-            //设置所有开始节点的相应时间
             for (Node node : startNodeList) {
-                setNodeTime(nodeMap,project.getStartTime(),node);
+                //将开始节点的计划开始时间都设置为项目监控开始的时间
+                node.setStartTime(project.getStartTime());
+                setPlanTimeForward(nodeMap, project.getStartTime(), node);
+            }
+            for (Node node : endNodeList) {
+                setPlanTimeBackward(nodeMap, node.getPlanEndTime(), node);
+            }
+            for (Node node : startNodeList) {
+                setNodeTime(nodeMap, project.getStartTime(), node);
             }
         }
+
         project.setNodeMap(nodeMap);
         //获取当前项目的用户
         project.setMembers(projectRoleMapper.getRoleOfProject(projectID));
+        project.setDea(getProjectDea(project));
         return project;
     }
-    private void setNodeTime(Map<String,Node> nodeMap,Date startTime,Node node){
+
+    /**
+     * 获取项目的指标值
+     * @param project
+     * @return
+     */
+    public ProjectIndex getProjectIndex(Project project){
+        ProjectIndex projectIndex = projectMapper.getProjectIndex(project.getProjectID());
+        boolean insertFlag = false;
+        if (projectIndex == null) {
+            projectIndex = new ProjectIndex();
+            projectIndex.setProjectID(project.getProjectID());
+            insertFlag = true;
+        }
+        setIndexDefault(projectIndex, project);
+        if (insertFlag) {
+            projectMapper.addProjectIndex(projectIndex);
+        } else {
+            projectMapper.updateProjectIndex(projectIndex);
+        }
+        preNormalizeIndex(projectIndex);
+        calDea();
+        return projectIndex;
+    }
+
+    public double getProjectDea(Project project){
+        Double d =  projectMapper.getProjectDea(project.getProjectID());
+
+        return d==null?0:d;
+    }
+    /**
+     * 设置部分指标的默认值
+     * 成员数
+     * 工作节点数
+     * 参与指数
+     * 完工率
+     *
+     * @param project
+     */
+    private void setIndexDefault(ProjectIndex projectIndex, Project project) {
+        //根据系统设置成员数目指标
+        projectIndex.setMemberN(project.getMembers().size());
+        //根据系统设置节点数目指标
+        projectIndex.setNodeN(project.getNodeMap().size());
+        //根据系统设置人员参与指数
+        projectIndex.setParticipationIndex(Math.random());
+        //根据系统设置完工率指标
+        projectIndex.setCompletionRate(Math.random());
+    }
+
+
+    /**
+     * 从前至后计算计划时间
+     *
+     * @param nodeMap
+     * @param planStartTime
+     * @param node
+     */
+    private void setPlanTimeForward(Map<String, Node> nodeMap, Date planStartTime, Node node) {
         //设置开始时间
-        if(node.getPlanStartTime()!=null){
+        if (node.getPlanStartTime() != null) {
             //如果开始时间不为空，需要判断开始时间的先后顺序
-            if(node.getPlanStartTime().getTime()>=startTime.getTime()){
+            if (node.getPlanStartTime().getTime() >= planStartTime.getTime()) {
                 //不作处理
                 return;
             }
         }
-        node.setPlanStartTime(startTime);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(startTime);
-        //相对开始时间延后相应的结束时间
-        calendar.add(Calendar.DAY_OF_YEAR,node.getWorkTime());
-        //计划结束时间与实际结束时间进行对比
-        Calendar endCalendar = Calendar.getInstance();
-        if(node.getEndTime()==null){
-            //如果实际结束时间为空，那么与当前时间对比
-        }else {
-            endCalendar.setTime(node.getEndTime());
-        }
-        if (calendar.before(endCalendar)) {
-            //如果实际结束时间超过计划结束时间，说明已经超期了
-            node.setDelay(DateDelay.D);
-        }else {
-            int dayDelta = calendar.get(Calendar.DAY_OF_YEAR)-endCalendar.get(Calendar.DAY_OF_YEAR);
-            if(dayDelta<node.getWorkTime()/3){
-                node.setDelay(DateDelay.D);
-            }else if(dayDelta<node.getWorkTime()*2/3){
-                node.setDelay(DateDelay.W);
-            }else {
-                node.setDelay(DateDelay.S);
-            }
-        }
+        node.setPlanStartTime(planStartTime);
+        Calendar planEndTimeCal = Calendar.getInstance();
+        planEndTimeCal.setTime(planStartTime);
+        planEndTimeCal.add(Calendar.DAY_OF_YEAR, node.getWorkTime());
         //设置结束时间
-        node.setPlanEndTime(calendar.getTime());
+        node.setPlanEndTime(planEndTimeCal.getTime());
         //处理所有的后续节点
         for (String nodeIndex : node.getNextNodeIndexList()) {
-            setNodeTime(nodeMap,node.getPlanEndTime(), nodeMap.get(nodeIndex));
+            setPlanTimeForward(nodeMap, node.getPlanEndTime(), nodeMap.get(nodeIndex));
         }
+    }
+
+    /**
+     * 从后到前计算计划时间，主要目的是调整计划时间的空余
+     *
+     * @param nodeMap
+     * @param planEndTime
+     * @param node
+     */
+    private void setPlanTimeBackward(Map<String, Node> nodeMap, Date planEndTime, Node node) {
+        //重新计算计划结束时间
+        if (node.getPlanEndTime().before(planEndTime)) {
+            //如果原来的计划结束时间小于原来的时间，那么重新调整
+            node.setPlanEndTime(planEndTime);
+        }
+        for (String nodeIndex : node.getNextNodeIndexList()) {
+            setPlanTimeBackward(nodeMap, node.getPlanStartTime(), nodeMap.get(nodeIndex));
+        }
+    }
+
+    private void setNodeTime(Map<String, Node> nodeMap, Date startTime, Node node) {
+        //设置开始时间
+        if (node.getStartTime() != null) {
+            //如果开始时间不为空，需要判断开始时间的先后顺序
+            if (node.getStartTime().after(startTime)) {
+                //如果当前节点的实际开始时间已经存在并且在前序节点的实际结束时间之后，那么不作处理
+                return;
+            }
+        }
+        //设置当前节点的实际开始时间为前序节点的实际结束时间
+        node.setStartTime(startTime);
+        //计算到当前节点的一个延误情况
+        Calendar endCalendar = Calendar.getInstance();
+        if (node.getEndTime() != null) {
+            //如果当前节点设置了结束时间，那么对比的是以实际结束时间与预期时间的对比，否则为当前系统时间与预期时间的对比
+            endCalendar.setTime(node.getEndTime());
+        }
+        Calendar planEndCalendar = Calendar.getInstance();
+        planEndCalendar.setTime(node.getPlanEndTime());
+        //计算日期差
+        int dayDelta = planEndCalendar.get(Calendar.DAY_OF_YEAR) - endCalendar.get(Calendar.DAY_OF_YEAR);
+        if (dayDelta < node.getWorkTime() / 6) {
+            //如果小于1/3，这里还考虑了日期差是负的，也就是已经延期了的
+            node.setDelay(DateDelay.D);
+        } else if (dayDelta < node.getWorkTime() * 1 / 3) {
+            //如果小于2/3
+            node.setDelay(DateDelay.W);
+        } else {
+            node.setDelay(DateDelay.S);
+        }
+        if (node.getEndTime() == null) {
+            //如果当前节点没有结束，那么后续节点无需计算。
+            return;
+        }
+        //将当前节点的实际结束时间作为后续节点的实际开始时间
+        for (String nodeIndex : node.getNextNodeIndexList()) {
+            setNodeTime(nodeMap, node.getEndTime(), nodeMap.get(nodeIndex));
+        }
+
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -257,7 +384,7 @@ public class ProjectService {
                 }
             case APPLY:
             case MEMBER:
-                throw  new MyException(ResultCode.PERMISSION_NO_ACCESS);
+                throw new MyException(ResultCode.PERMISSION_NO_ACCESS);
         }
         projectRoleMapper.updateProjectRole(projectID, userID, newProjectRole);
     }
@@ -294,7 +421,7 @@ public class ProjectService {
     public void updateProjectInfo(@CurUser User user, long projectID, String projectName, String projectDesc, String projectTags) throws MyException {
         Project project = projectMapper.getProjectByID(projectID);
         if (project == null) {
-            throw  new MyException(ResultCode.RESUTL_DATA_NONE);
+            throw new MyException(ResultCode.RESUTL_DATA_NONE);
         }
         boolean flag = false;
         if (projectName != null) {
@@ -311,7 +438,7 @@ public class ProjectService {
         }
         projectMapper.updateProjectInfo(project);
         if (!flag) {
-            throw  new MyException(ResultCode.PARAM_NOT_COMPLETE);
+            throw new MyException(ResultCode.PARAM_NOT_COMPLETE);
         }
     }
 
@@ -342,10 +469,11 @@ public class ProjectService {
 
     /**
      * 添加用户到项目内
-     * @param curUserProjectRoleType         操作用户
-     * @param projectID       项目ID
-     * @param userID          被操作用户ID
-     * @param projectRoleType 新用户的Type
+     *
+     * @param curUserProjectRoleType 操作用户
+     * @param projectID              项目ID
+     * @param userID                 被操作用户ID
+     * @param projectRoleType        新用户的Type
      * @return
      */
     public void appendUser2Project(ProjectRoleType curUserProjectRoleType, long projectID, long userID, ProjectRoleType projectRoleType) throws MyException {
@@ -355,14 +483,14 @@ public class ProjectService {
                 || curUserProjectRoleType == null
                 || curUserProjectRoleType == ProjectRoleType.APPLY
                 || curUserProjectRoleType == ProjectRoleType.MEMBER) {
-            throw  new MyException(ResultCode.PERMISSION_NO_ACCESS);
+            throw new MyException(ResultCode.PERMISSION_NO_ACCESS);
         }
 //        组织新的权限
         ProjectRole newProjectRole = new ProjectRole(projectID, userID, projectRoleType);
 //        获取旧权限
         ProjectRoleType oldProjectRole = projectRoleMapper.getProjectRoleType(projectID, userID);
         if (oldProjectRole != null) {
-            throw  new MyException(ResultCode.DATA_ALREADY_EXISTED);
+            throw new MyException(ResultCode.DATA_ALREADY_EXISTED);
         }
         projectRoleMapper.addProjectRole(newProjectRole);
     }
@@ -376,20 +504,20 @@ public class ProjectService {
      * @return
      */
     public void deleteUserFromProject(User user, long projectID, long userID) throws MyException {
-        if(user.getUserID()==userID){
-            if(user.getProjectRoleType()==ProjectRoleType.CREATOR){
+        if (user.getUserID() == userID) {
+            if (user.getProjectRoleType() == ProjectRoleType.CREATOR) {
                 //创建者自己不可以退出
                 throw new MyException(ResultCode.PERMISSION_NO_ACCESS);
             }
-        }else {
+        } else {
             ProjectRoleType type1 = user.getProjectRoleType();
-            ProjectRoleType type2 = projectRoleMapper.getProjectRoleType(projectID,userID);
-            if(type1==ProjectRoleType.CREATOR||(type1==ProjectRoleType.SUPER_MANAGER&&(type2!=ProjectRoleType.CREATOR&&type2!=ProjectRoleType.SUPER_MANAGER))){
-            }else {
+            ProjectRoleType type2 = projectRoleMapper.getProjectRoleType(projectID, userID);
+            if (type1 == ProjectRoleType.CREATOR || (type1 == ProjectRoleType.SUPER_MANAGER && (type2 != ProjectRoleType.CREATOR && type2 != ProjectRoleType.SUPER_MANAGER))) {
+            } else {
                 throw new MyException(ResultCode.PERMISSION_NO_ACCESS);
             }
         }
-        projectRoleMapper.deleteProjectRole(projectID,userID);
+        projectRoleMapper.deleteProjectRole(projectID, userID);
     }
 
     /**
@@ -401,11 +529,11 @@ public class ProjectService {
     public Project getProjectInfoByProjectID(long userID, long projectID) throws MyException {
         //首先获取用户信息
         Project project = projectMapper.getProjectByID(projectID);
-        if(project==null){
+        if (project == null) {
             throw new MyException(ResultCode.RESUTL_DATA_NONE);
         }
-        ProjectRoleType projectRoleType= projectRoleMapper.getProjectRoleType(projectID,userID);
-        if(!project.isOpenState()&&(projectRoleType==null||projectRoleType==ProjectRoleType.APPLY)){
+        ProjectRoleType projectRoleType = projectRoleMapper.getProjectRoleType(projectID, userID);
+        if (!project.isOpenState() && (projectRoleType == null || projectRoleType == ProjectRoleType.APPLY)) {
             throw new MyException(ResultCode.PERMISSION_NO_ACCESS);
         }
         project.setProjectRole(projectRoleType);
@@ -418,15 +546,15 @@ public class ProjectService {
      * @param invitationCode
      * @return
      */
-    public Project getProjectInfoByCode(long userID,String invitationCode) throws MyException {
+    public Project getProjectInfoByCode(long userID, String invitationCode) throws MyException {
         Project project = projectMapper.getProjectByCode(invitationCode);
         if (project == null)
-            throw  new MyException(ResultCode.RESUTL_DATA_NONE);
-        ProjectRoleType projectRole = projectRoleMapper.getProjectRoleType(project.getProjectID(),userID);
-        if(projectRole!=null){
+            throw new MyException(ResultCode.RESUTL_DATA_NONE);
+        ProjectRoleType projectRole = projectRoleMapper.getProjectRoleType(project.getProjectID(), userID);
+        if (projectRole != null) {
             project.setProjectRole(projectRole);
         }
-        return  project;
+        return project;
     }
 
     /**
@@ -440,7 +568,7 @@ public class ProjectService {
         Project project = getProjectByCode(invitationCode);
         if (project == null)
             //如果根据code没有找到项目，那么返回错误信息
-           throw  new MyException(ResultCode.RESUTL_DATA_NONE);
+            throw new MyException(ResultCode.RESUTL_DATA_NONE);
         //将用户添加到项目内，这里因为使用的是邀请码，所以直接成为普通用户
         appendUser2Project(ProjectRoleType.SUPER_MANAGER, project.getProjectID(), userID, ProjectRoleType.MEMBER);
     }
@@ -453,32 +581,198 @@ public class ProjectService {
      * @return
      */
     public void applyToProject(long userID, long projectID) throws MyException {
-        Project project = getProjectByID( projectID);
+        Project project = getProjectByID(projectID);
         if (project == null)
             //如果根据用户ID没有找到项目，那么返回错误信息
-            throw  new MyException(ResultCode.RESUTL_DATA_NONE);
+            throw new MyException(ResultCode.RESUTL_DATA_NONE);
         appendUser2Project(ProjectRoleType.SUPER_MANAGER, projectID, userID, ProjectRoleType.APPLY);
     }
 
-    private String generateInvitationCode(){
+    private String generateInvitationCode() {
         return UUID.randomUUID().toString();
     }
 
-    public String updateProjectInCode(User user,long projectID) throws MyException {
+    public String updateProjectInCode(User user, long projectID) throws MyException {
         String newCode = generateInvitationCode();
-        long lineN = projectMapper.updateProjectInCode(projectID,newCode);
-        if(lineN==0){
-            throw  new MyException(ResultCode.RESUTL_DATA_NONE);
+        long lineN = projectMapper.updateProjectInCode(projectID, newCode);
+        if (lineN == 0) {
+            throw new MyException(ResultCode.RESUTL_DATA_NONE);
         }
         return newCode;
     }
 
     /**
      * 函数存在的问题，没有考虑权限，没有验证projectID
+     *
      * @param user
      * @param projectID
      */
     public void startProject(User user, long projectID) {
         projectMapper.updateProjectStartTime(projectID);
+    }
+
+
+    /**
+     * 函数存在的问题，没有考虑权限，没有验证projectID
+     *
+     * @param user
+     * @param projectIndex
+     */
+    public void updateProjectIndex(User user, ProjectIndex projectIndex) {
+        ProjectIndex index = projectMapper.getProjectIndex(projectIndex.getProjectID());
+        if (index == null) {
+            projectMapper.addProjectIndex(projectIndex);
+        }
+        projectMapper.updateProjectIndex(projectIndex);
+        preNormalizeIndex(projectIndex);
+        calDea();
+    }
+
+    /**
+     * 计算所有的项目的效率
+     */
+    private void calDea() {
+        List<ProjectIndex> projectIndices = projectMapper.getAllProjectIndex();
+        if(projectIndices==null||projectIndices.size()==0){
+            return;
+        }
+        List<Long> names= new ArrayList<>();
+        Map<Long,double[]> inputsMap = new HashMap<>();
+        Map<Long,double[]> outputsMap = new HashMap<>();
+        Set<String> inputKey = projectIndices.get(0).getInputIndexMap().keySet();
+        Set<String> outputKey = projectIndices.get(0).getOutputIndexMap().keySet();
+        for (ProjectIndex projectIndex : projectIndices) {
+            names.add(projectIndex.getProjectID());
+            double[] input = new double[inputKey.size()];
+            Map<String,Double> inputMap = projectIndex.getInputIndexMap();
+            int i =0;
+            for (String s : inputKey) {
+                input[i++]= inputMap.get(s);
+            }
+            double[] output = new double[outputKey.size()];
+            Map<String,Double> outputMap = projectIndex.getOutputIndexMap();
+            i=0;
+            for (String s : outputKey) {
+                output[i++]= outputMap.get(s);
+            }
+            inputsMap.put(projectIndex.getProjectID(),input);
+            outputsMap.put(projectIndex.getProjectID(),output);
+        }
+        Map<Long, Double> result = dea.depotsEfficiency(names,inputsMap,outputsMap);
+        if(result!=null){
+            result.forEach((i,v)->{
+                projectMapper.updateDea(i,v);
+            });
+        }
+    }
+
+
+    private void preNormalizeIndex(ProjectIndex projectIndex) {
+        Map<String, Double> indexMap = projectIndex.getIndexMap();
+        //如果标准化的区间未初始化，首先初始化标准化区间
+        if (indexMaxAndMin == null) {
+            getAllIndexMaxAndMin(false);
+        }
+        //得到标准化的区间后，判断当前标准化区间的正确性
+        if (valuateMaxAndMin(indexMap)) {
+            //如果超过了区间，需要重新初始化区间
+            getAllIndexMaxAndMin(true);
+        }
+        normalizeIndex(projectIndex, indexMap);
+
+    }
+
+    /**
+     * 获取所有项目指标值的最大值和最小值
+     */
+    private synchronized void getAllIndexMaxAndMin(boolean reset) {
+        if (indexMaxAndMin != null && !reset) {
+            return;
+        }
+        indexMaxAndMin = new HashMap<>();
+        List<ProjectIndex> projectIndices = projectMapper.getAllProjectIndex();
+        projectIndices.stream()
+                .map(projectIndex -> new ArrayList<>(projectIndex.getIndexMap().entrySet()))
+                .flatMap(list -> list.stream())
+                .collect(Collectors.groupingBy(e -> e.getKey(), Collectors.mapping(Map.Entry::getValue, Collectors.toList())))
+                .forEach((k, v) ->
+                        indexMaxAndMin.put(k, new double[]{Collections.max(v), Collections.min(v)})
+                );
+        if (reset) {
+            projectIndices.forEach(pi->normalizeIndex(pi,pi.getIndexMap()));
+        }
+
+    }
+
+    /**
+     * 验证指标是否超过了区间
+     *
+     * @param indexMap
+     * @return
+     */
+    private boolean valuateMaxAndMin(Map<String, Double> indexMap) {
+        return indexMap.entrySet()
+                .stream()
+                .filter(e -> compareMaxAndMin(indexMaxAndMin.get(e.getKey()), e.getValue()))
+                .count() > 0;
+    }
+
+    /**
+     * 判断当前指标值是否超出了标准化的范围
+     *
+     * @param maxAndMin
+     * @param d
+     * @return
+     */
+    private boolean compareMaxAndMin(double[] maxAndMin, double d) {
+        return maxAndMin[0] < d || d < maxAndMin[1];
+    }
+
+
+    private void normalizeIndex(ProjectIndex projectIndex, Map<String, Double> indexMap) {
+        Map<String, Double> inputIndexMap = projectIndex.getInputIndexMap();
+        Map<String, Double> outputIndexMap = projectIndex.getOutputIndexMap();
+
+        //得到正确的区间以后，标准化指标
+        indexMap.forEach((k, v) -> {
+            double value = normalizeIndex(indexMaxAndMin.get(k), v);
+            if (inputIndexMap.containsKey(k)) {
+                inputIndexMap.put(k, value);
+            } else {
+                outputIndexMap.put(k, value);
+            }
+        });
+        //得到标准化指标后，保存
+        saveNormalizeProjectIndex(projectIndex.getProjectID(), inputIndexMap, outputIndexMap);
+    }
+
+    /**
+     * 根据最大值和最小值将指标值进行标准化
+     *
+     * @param maxAndMin
+     * @param d
+     * @return
+     */
+    private double normalizeIndex(double[] maxAndMin, double d) {
+        if (maxAndMin[0] == maxAndMin[1])
+            return 0;
+        return (d - maxAndMin[1]) / (maxAndMin[0] - maxAndMin[1]);
+    }
+
+
+    /**
+     * 保存序列化后的指标值
+     * @param projectID
+     * @param inputIndexMap
+     * @param outputIndexMap
+     */
+    private void saveNormalizeProjectIndex(long projectID, Map<String, Double> inputIndexMap, Map<String, Double> outputIndexMap) {
+        projectMapper.saveNormalizeIndex(projectID, inputIndexMap);
+        projectMapper.saveNormalizeIndex(projectID, outputIndexMap);
+    }
+
+
+    public Project getProjectByProblemID(String problemID) {
+        return projectMapper.getProjectByProblemID(problemID);
     }
 }

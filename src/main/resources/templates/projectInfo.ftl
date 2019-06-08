@@ -9,9 +9,11 @@
 
     <!-- bootstrap & fontawesome -->
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap.min.css"/>
+
     <link rel="stylesheet" href="/webresources/ace-master/assets/font-awesome/4.5.0/css/font-awesome.min.css"/>
 
     <!-- page specific plugin styles -->
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/fullcalendar.min.css" />
 
     <!-- text fonts -->
 
@@ -25,7 +27,6 @@
     <![endif]-->
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-skins.min.css"/>
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/ace-rtl.min.css"/>
-
 
     <!--[if lte IE 9]>
     <link rel="stylesheet" href="assets/css/ace-ie.min.css"/>
@@ -57,13 +58,16 @@
         },
     </style>
     <script>
-        //首先获取ID
-        function getQueryString(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-            var r = window.location.search.substr(1).match(reg);
-            if (r != null) return unescape(r[2]);
-            return null;
+        const API={
+            updateProjectInfo:"/templates/api/project/${project.projectID}/",
+            deleteProject:"/templates/api/project/${project.projectID}",
+            updateProjectInCode:"/templates/api/project/${project.projectID}/invitationCode",
+            startProject:"/templates/api/project/${project.projectID}/doStart",
+            updateProjectIndex:"/templates/api/project/${project.projectID}/index"
         }
+        ProcessStaticDate = ${processStatic!"[]"};
+        CalendarData = ${calendarData!"[]"};
+        DayLog = ${dayLog!"[]"};
 
         PROJECT_ID = ${project.projectID};
     </script>
@@ -138,36 +142,16 @@
 													<br>
 													<span class="line-height-1 smaller-90"> 创新方法个数 </span>
 												</span>
-                                            <span class="btn btn-app btn-sm btn-info no-hover">
-													<span class="line-height-1 bigger-170">${score1}</span>
-
-													<br>
-													<span class="line-height-1 smaller-90"> 集成度 </span>
-												</span>
-
-                                            <span class="btn btn-app btn-sm btn-purple no-hover">
-													<span class="line-height-1 bigger-170">${score2}</span>
-
-													<br>
-													<span class="line-height-1 smaller-90"> 融合度 </span>
-												</span>
-                                            <span class="btn btn-app btn-sm btn-pink no-hover">
-													<span class="line-height-1 bigger-170" id="project-step-num">${score3}</span>
-
-													<br>
-													<span class="line-height-1 smaller-90"> 组合度 </span>
-												</span>
                                             <span class="btn btn-app btn-sm btn-inverse  no-hover">
-													<span class="line-height-1 bigger-170">${score4}</span>
+													<span class="line-height-1 bigger-170">${activity}</span>
 
 													<br>
 													<span class="line-height-1 smaller-90"> 活跃度 </span>
 												</span>
 
-
-                                            <span class="btn btn-app btn-sm btn-light  no-hover">
+                                            <span class="btn btn-app btn-sm btn-light  no-hover" data-toggle="modal" data-target="#rateModal">
 													<span class="line-height-1 bigger-170"
-                                                          id="project-value">${score5}</span>
+                                                          id="project-value">${projectIndex.dea?string("#.##")}</span>
 
 													<br>
 													<span class="line-height-1 smaller-90"> 应用效果 </span>
@@ -222,10 +206,10 @@
                             </div>
                             <#if project.startTime??>
                                 <div class="profile-info-row">
-                                    <div class="profile-info-name">项目开始</div>
+                                    <div class="profile-info-name">监控开始时间</div>
 
                                     <div class="profile-info-value">
-                                        <span id="project-editTime">${project.startTime?string('yyyy-MM-dd hh:mm:ss')}</span>
+                                        <span id="project-editTime">${project.startTime?string('yyyy-MM-dd')}</span>
                                     </div>
                                 </div>
                             </#if>
@@ -239,12 +223,37 @@
                             <div class="profile-info-row">
                                 <div class="profile-info-name">项目管理</div>
                                 <div class="profile-info-value">
-                                    <a onclick="startProject()"><span class="blue">开始执行</span></a>
+                                    <#--<a onclick="startProject()"><span class="blue">开始执行</span></a>-->
                                     <a onclick="deleteProject()"><span class="red">删除项目</span></a>
                                 </div>
                             </div>
 
                         </div>
+                        <div class="space-20"></div>
+                        <div class="widget-box transparent">
+                            <div class="widget-header widget-header-small">
+                                <h4 class="widget-title blue smaller">
+                                    <i class="ace-icon fa fa-rss orange"></i>
+                                    项目进度
+                                </h4>
+
+                                <div class="widget-toolbar">
+                                    <a onclick="startProject()">
+                                        <span class="badge badge-purple" >开始进度管理</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main padding-8">
+                                    <div class="col-xs-12">
+                                        <div id="process-static"
+                                             style="width: 100%;height:300px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="space-20"></div>
 
                         <div class="widget-box transparent">
@@ -287,10 +296,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="space-20"></div>
 
                         <div class="space-20"></div>
-
                         <div class="widget-box transparent">
                             <div class="widget-header widget-header-small">
                                 <h4 class="widget-title blue smaller">
@@ -302,103 +309,174 @@
                             <div class="widget-body">
                                 <div class="widget-main padding-8">
                                     <div class="row">
-                                        <div class="col-xs-12 col-sm-10 col-sm-offset-1">
-                                            <#--今天记录-->
-                                            <#if todayActivity?? && todayActivity?size!=0>
-                                            <div class="timeline-container">
-                                            <div class="timeline-label">
-													<span class="label label-primary arrowed-in-right label-lg">
-														<b>今天</b>
-													</span>
-                                            </div>
-                                            <div class="timeline-items">
-                                                <#list todayActivity as activity>
-                                                    <div class="timeline-item clearfix">
-                                                        <#include "/common/activityIconFormatter.ftl">
-                                                        <div class="widget-box transparent">
-                                                            <div class="widget-body">
-                                                                <div class="widget-main">
-                                                                    <span class="bolder blue">${activity.userID}:</span>
-                                                                    ${activity.content?replace("[", "<span class=\"green bolder\">")?replace("]", "</span>")}
-                                                                    <div class="pull-right">
-                                                                        <i class="ace-icon fa fa-clock-o bigger-110"></i>
-                                                                        今天,${activity.operateDate?string('hh:mm:ss')}
+                                        <div class="col-sm-12">
+                                            <div class="tabbable">
+                                                <ul class="nav nav-tabs" id="myTab">
+                                                    <li class="active">
+                                                        <a data-toggle="tab" href="#calendar-view">
+                                                            <i class="green ace-icon fa fa-home bigger-120"></i>
+                                                            日历视图
+                                                        </a>
+                                                    </li>
+
+                                                    <li>
+                                                        <a data-toggle="tab" href="#time-view">
+                                                            时间轴视图
+                                                        </a>
+                                                    </li>
+
+                                                </ul>
+
+                                                <div class="tab-content">
+                                                    <div id="calendar-view" class="tab-pane fade in active">
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-sm-4">
+                                                                    <div class="space"></div>
+
+                                                                    <div id="calendar"></div>
+                                                                </div>
+
+                                                                <div class="col-sm-8">
+                                                                    <div class="widget-box transparent">
+                                                                        <div class="widget-header">
+                                                                            <h4>事件详情</h4>
+                                                                        </div>
+
+                                                                        <div class="widget-body">
+                                                                            <div class="widget-main no-padding">
+                                                                                <div>
+                                                                                    <div class="col-xs-12">
+
+                                                                                        <ul class="list-unstyled spaced2"  id="external-events">
+                                                                                            <#if todayLog?? && todayActivity?size!=0>
+                                                                                                <#list todayLog as log>
+                                                                                                    <li><i class="ace-icon fa fa-circle green"></i>${log.content}</li>
+
+                                                                                                </#list>
+                                                                                            </#if>
+
+
+
+                                                                                        </ul>
+                                                                                    </div>
+
+
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
+
                                                     </div>
 
-                                                </#list>
-                                            </div>
-                                            </div>
-                                                </#if>
-                                            <#--昨天的记录-->
-                                                <#if yesterdayActivity?? && yesterdayActivity?size!=0>
-                                                <div class="timeline-container">
-                                                    <div class="timeline-label">
+                                                    <div id="time-view" class="tab-pane fade">
+                                                        <div class="row">
+                                                            <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+                                                                <#--今天记录-->
+                                                                <#if todayActivity?? && todayActivity?size!=0>
+                                                                    <div class="timeline-container">
+                                                                        <div class="timeline-label">
+													<span class="label label-primary arrowed-in-right label-lg">
+														<b>今天</b>
+													</span>
+                                                                        </div>
+                                                                        <div class="timeline-items">
+                                                                            <#list todayActivity as activity>
+                                                                                <div class="timeline-item clearfix">
+                                                                                    <#include "/common/activityIconFormatter.ftl">
+                                                                                    <div class="widget-box transparent">
+                                                                                        <div class="widget-body">
+                                                                                            <div class="widget-main">
+                                                                                                <span class="bolder blue">${activity.userID}:</span>
+                                                                                                ${activity.content?replace("[", "<span class=\"green bolder\">")?replace("]", "</span>")}
+                                                                                                <div class="pull-right">
+                                                                                                    <i class="ace-icon fa fa-clock-o bigger-110"></i>
+                                                                                                    今天,${activity.operateDate?string('hh:mm:ss')}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            </#list>
+                                                                        </div>
+                                                                    </div>
+                                                                </#if>
+                                                                <#--昨天的记录-->
+                                                                <#if yesterdayActivity?? && yesterdayActivity?size!=0>
+                                                                    <div class="timeline-container">
+                                                                        <div class="timeline-label">
 													<span class="label label-primary arrowed-in-right label-lg">
 														<b>昨天</b>
 													</span>
-                                                    </div>
-                                                    <div class="timeline-items">
-                                                        <#list yesterdayActivity as activity>
-                                                            <div class="timeline-item clearfix">
-                                                                <#include "/common/activityIconFormatter.ftl">
-                                                                <div class="widget-box transparent">
-                                                                    <div class="widget-body">
-                                                                        <div class="widget-main">
-                                                                            <span class="bolder blue">${activity.userID}:</span>
-                                                                            ${activity.content?replace("[", "<span class=\"green bolder\">")?replace("]", "</span>")}
-                                                                            <div class="pull-right">
-                                                                                <i class="ace-icon fa fa-clock-o bigger-110"></i>
-                                                                                昨天,${activity.operateDate?string('hh:mm:ss')}
-                                                                            </div>
                                                                         </div>
+                                                                        <div class="timeline-items">
+                                                                            <#list yesterdayActivity as activity>
+                                                                                <div class="timeline-item clearfix">
+                                                                                    <#include "/common/activityIconFormatter.ftl">
+                                                                                    <div class="widget-box transparent">
+                                                                                        <div class="widget-body">
+                                                                                            <div class="widget-main">
+                                                                                                <span class="bolder blue">${activity.userID}:</span>
+                                                                                                ${activity.content?replace("[", "<span class=\"green bolder\">")?replace("]", "</span>")}
+                                                                                                <div class="pull-right">
+                                                                                                    <i class="ace-icon fa fa-clock-o bigger-110"></i>
+                                                                                                    昨天,${activity.operateDate?string('hh:mm:ss')}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </#list>
+                                                                        </div>
+                                                                        <!-- /.timeline-items -->
                                                                     </div>
-                                                                </div>
-                                                            </div>
-                                                        </#list>
-                                                    </div>
-                                                    <!-- /.timeline-items -->
-                                                </div>
-                                                </#if>
-                                            <#--更早的记录-->
-                                            <#if beforeActivity?? && beforeActivity?size!=0>
-                                                <div class="timeline-container">
-                                                    <div class="timeline-label">
+                                                                </#if>
+                                                                <#--更早的记录-->
+                                                                <#if beforeActivity?? && beforeActivity?size!=0>
+                                                                    <div class="timeline-container">
+                                                                        <div class="timeline-label">
                                                 <span class="label label-primary arrowed-in-right label-lg">
                                                     <b>更早</b>
                                                 </span>
-                                                    </div>
-                                                    <div class="timeline-items">
-                                                        <#list yesterdayActivity as activity>
-                                                            <div class="timeline-item clearfix">
-                                                                <#include "/common/activityIconFormatter.ftl">
-                                                                <div class="widget-box transparent">
-                                                                    <div class="widget-body">
-                                                                        <div class="widget-main">
-                                                                            <span class="bolder blue">${activity.userID}:</span>
-                                                                            ${activity.content?replace("[", "<span class=\"green bolder\">")?replace("]", "</span>")}
-                                                                            <div class="pull-right">
-                                                                                <i class="ace-icon fa fa-clock-o bigger-110"></i>
-                                                                                ${activity.operateDate?string('yyyy-MM-dd hh:mm:ss')}
-                                                                            </div>
                                                                         </div>
+                                                                        <div class="timeline-items">
+                                                                            <#list yesterdayActivity as activity>
+                                                                                <div class="timeline-item clearfix">
+                                                                                    <#include "/common/activityIconFormatter.ftl">
+                                                                                    <div class="widget-box transparent">
+                                                                                        <div class="widget-body">
+                                                                                            <div class="widget-main">
+                                                                                                <span class="bolder blue">${activity.userID}:</span>
+                                                                                                ${activity.content?replace("[", "<span class=\"green bolder\">")?replace("]", "</span>")}
+                                                                                                <div class="pull-right">
+                                                                                                    <i class="ace-icon fa fa-clock-o bigger-110"></i>
+                                                                                                    ${activity.operateDate?string('yyyy-MM-dd hh:mm:ss')}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </#list>
+                                                                        </div>
+                                                                        <!-- /.timeline-items -->
                                                                     </div>
-                                                                </div>
+                                                                </#if>
                                                             </div>
-                                                            </#list>
+                                                        </div>
                                                     </div>
-                                                    <!-- /.timeline-items -->
+
                                                 </div>
-                                                </#if>
-                                        </div>
+                                            </div>
+                                        </div><!-- /.col -->
+
                                     </div>
                                 </div>
                             </div>
                         </div>
-
 
                     </div>
 
@@ -436,150 +514,289 @@
                 </div><!-- /.modal-content -->
             </div><!-- /.modal -->
         </div>
+        <div class="modal fade" id="rateModal" tabindex="-1" role="dialog" aria-labelledby="ratModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="ratModalLabel">录入项目评价数据</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="center">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <div class="easy-pie-chart percentage" data-percent=" ${projectIndex.dea*100}" data-color="#87CEEB">
+                                            <span class="percent"> ${projectIndex.dea*100}</span>%
+                                        </div>
+
+                                    </div>
+                                    <div class="col-xs-6">
+<span class="btn btn-app btn-sm btn-light  no-hover" >
+													  <label>
+                                    <input name="switch" id="normalSwitch" class="ace ace-switch ace-switch-2" type="checkbox" />
+                                    <span class="lbl"></span>
+                                </label>
+													<br>
+													<span class="line-height-1 smaller-90 "> 标准值 </span>
+												</span>
+                                    </div>
+                                </div>
+
+
+
+
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">资源</h3>
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        客户数量
+                                    </span>
+
+                                        <input type="number" class="form-control search-query  projectIndex-input" id="customerN-input" name="customerN" value="${projectIndex.customerN}">
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.customerNNorm}
+                                    </span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                <div class="input-group">
+
+                                    <span class="input-group-addon">
+                                        成员数量
+                                    </span>
+
+                                    <input type="number"  class="form-control search-query  projectIndex-input" readonly id="memberN-input" name="memberN" value="${projectIndex.memberN}">
+                                    <span class="input-group-addon normalNumber">
+                                        ${projectIndex.memberNNorm}
+                                    </span>
+                                </div>
+                                </div>
+
+                            </div><!-- /.btn-group -->
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter green">投入</h3>
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+                                    <span class="input-group-addon ">
+                                        活动经费
+                                    </span>
+
+                                        <input type="text" class="form-control search-query projectIndex-input" id="funds-input" name="funds" value="${projectIndex.funds}">
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.fundsNorm}
+                                    </span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+
+                                    <span class="input-group-addon">
+                                        工作节点数目
+                                    </span>
+
+                                        <input type="number"  class="form-control search-query projectIndex-input" readonly id="nodeN-input" name="nodeN" value="${projectIndex.nodeN}">
+                                        <span class="input-group-addon normalNumber">
+                                         ${projectIndex.nodeNNorm}
+                                    </span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        培训数目
+                                    </span>
+
+                                        <input type="number"  class="form-control search-query projectIndex-input" id="trainN-input" name="trainN" value="${projectIndex.trainN}">
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.trainNNorm}
+                                    </span>
+                                    </div>
+
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        会议数目
+                                    </span>
+
+                                        <input type="number" class="form-control search-query projectIndex-input" id="meetingN-input" name="meetingN"  value="${projectIndex.meetingN}">
+
+
+                                    </div>
+                                </div>
+
+
+                            </div><!-- /.btn-group -->
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter orange">产出</h3>
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+                                    <span class="input-group-addon ">
+                                        经济收益
+                                    </span>
+
+                                        <input type="number"  class="form-control search-query projectIndex-input" id="income-input" name="income" value="${projectIndex.income}">
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.incomeNorm}
+                                    </span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+
+                                    <span class="input-group-addon">
+                                        客户满意度
+                                    </span>
+
+                                        <input type="text" class="form-control search-query projectIndex-input" id="satisfaction-input" name="satisfaction" value="${projectIndex.satisfaction}">
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.satisfactionNorm}
+                                    </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        项目完工率
+                                    </span>
+
+                                        <input type="text" class="form-control search-query projectIndex-input" readonly id="completionRate-input" name="completionRate" value="${projectIndex.completionRate}">
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.completionRateNorm}
+                                    </span>
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        人员参与指数
+                                    </span>
+
+                                        <input type="text" class="form-control search-query projectIndex-input" readonly id="participationIndex-input" name="participationIndex" value="${projectIndex.participationIndex}">
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.participationIndexNorm}
+                                    </span>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        创新方掌握程度
+                                    </span>
+
+                                        <input type="text" class="form-control search-query projectIndex-input" id="proficiency-input" name="proficiency" value="${projectIndex.proficiency}">
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.proficiencyNorm}
+                                    </span>
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        案例数
+                                    </span>
+
+                                        <input type="number"  class="form-control search-query projectIndex-input" id="caseN-input" name="caseN"value="${projectIndex.caseN}">
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.caseNNorm}
+                                    </span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        专利数
+                                    </span>
+
+                                        <input type="number" class="form-control search-query projectIndex-input" id="patentN-input" name="patentN"value="${projectIndex.patentN}">
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.patentNNorm}
+                                    </span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        论文数
+                                    </span>
+
+                                        <input type="number"  class="form-control search-query projectIndex-input" id="paperN-input" name="paperN" value="${projectIndex.paperN}" >
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.paperNNorm}
+                                    </span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        有效提案数
+                                    </span>
+
+                                        <input type="number"  class="form-control search-query projectIndex-input"  id="proposalN-input"  name="proposalN" value="${projectIndex.proposalN}">
+                                        <span class="input-group-addon normalNumber">
+                                        ${projectIndex.proposalNNorm}
+                                    </span>
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+
+
+                            </div><!-- /.btn-group -->
+                        </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-success" onclick="saveProjectIndex()">保存修改</button>
+
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
         <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
             <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
         </a>
         <script type="text/javascript" src="/webresources/ace-master/assets/js/jquery-2.1.4.min.js"></script>
         <script type="text/javascript" src="/webresources/ace-master/assets/js/ace.min.js"></script>
-        <script type="text/javascript" src="/webresources/ace-master/assets/js/ace-extra.min.js"></script>
+        <script type="text/javascript"   src="/webresources/ace-master/assets/js/ace-extra.min.js"></script>
         <script type="text/javascript" src="/webresources/ace-master/assets/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="/webresources/ace-master/assets/js/ace-elements.min.js"></script>
+        <#--moment是时间插件，必须在fullcalendaer之前-->
+        <script src="/templates/project/assets/js/moment-with-locales.min.js"></script>
+
         <script src="/webresources/ace-master/assets/js/jquery-ui.min.js"></script>
-        <script src="/webresources/bootstrap/bootstrap-table/bootstrap-table.js"></script>
+        <script src="/webresources/ace-master/assets/js/fullcalendar.min.js"></script>
+    <script src="/webresources/ace-master/assets/js/jquery.easypiechart.min.js"></script>
+
+
+    <script src="/webresources/bootstrap/bootstrap-table/bootstrap-table.js"></script>
+
+        <#--这里需要引用echarts的3.x版本，因为在绘制甘特图的时候，3.x的版本可以支持时间的堆叠，而4.x版本不支持。-->
+        <script src="/templates/project/assets/js/echarts.js"></script>
         <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
         <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
         <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
-        <script>
-            const API={
-                updateProjectInfo:"/templates/api/project/${project.projectID}/",
-                deleteProject:"/templates/api/project/${project.projectID}",
-                updateProjectInCode:"/templates/api/project/${project.projectID}/invitationCode",
-                startProject:"/templates/api/project/${project.projectID}/doStart"
-            }
-            $(function () {
-                $("#project-name").editable({
-                    type: 'text',
-                    title: '输入工程名',
-                    name:'projectName',
-                    url: updateProject,
-                    validate: function (value) { //字段验证
-                        if (!$.trim(value)) {
-                            return '不能为空';
-                        }
-                    },
 
-                })
-                $("#project-description").editable({
-                    type: 'text',
-                    title: '输入工程描述',
-                    name:'projectDesc',
-                    validate: function (value) { //字段验证
-                        if (!$.trim(value)) {
-                            return '不能为空';
-                        }
-                    },
-                    url: updateProject,
-                })
-                var tag_input = $('#project-tags');
-                try {
-                    tag_input.tag(
-                        {
-                            placeholder: tag_input.attr('placeholder'),
-                            //enable typeahead by specifying the source array
-                            source: ace.vars['US_STATES'],//defined in ace.js >> ace.enable_search_ahead
-                            /**
-                             //or fetch data from database, fetch those that match "query"
-                             source: function(query, process) {
-						  $.ajax({url: 'remote_source.php?q='+encodeURIComponent(query)})
-						  .done(function(result_items){
-							process(result_items);
-						  });
-						}
-                             */
-                        }
-                    )
+        <script src="/templates/project/assets/js/projectInfo.js"></script>
 
-                    //programmatically add/remove a tag
-                    var $tag_obj = $('#project-tags').data('tag');
-                    $tag_obj.add('质量问题');
-
-                    var index = $tag_obj.inValues('some tag');
-                    $tag_obj.remove(index);
-                }
-                catch (e) {
-                    //display a textarea for old IE, because it doesn't support this plugin or another one I tried!
-                    tag_input.after('<textarea id="' + tag_input.attr('id') + '" name="' + tag_input.attr('name') + '" rows="3">' + tag_input.val() + '</textarea>').remove();
-                    //autosize($('#form-field-tags'));
-                }
-            })
-            function updateProject(params) {
-                let data = {}
-                var d = new $.Deferred();
-                if (params.value === 'abc') {
-                    return d.reject('error message'); //returning error via deferred object
-                } else {
-                    data[params.name] = params.value
-                    //async saving data in js model
-                    $.ajax({
-                        url:API.updateProjectInfo+params.name,
-                        type: 'PUT',
-                        async: true,
-                        data: data,
-                        success: function (data) {
-                            if(data.code===1){
-                                d.resolve();
-                            }
-                        }
-                    })
-                    return d.promise();
-                }
-            }
-            function deleteProject() {
-                let name = prompt("是否确认删除该项目(删除后不可恢复,该项目的所有数据即将清空),请在输入框输入项目全名并点击删除?");
-                if(name===$("#project-name").text()){
-                    if(confirm("再一次确认")){
-                        $.ajax({
-                            url:API.deleteProject,
-                            type:"DELETE",
-                            success:function (data) {
-                                if(data.code===1){
-                                    alert("删除成功,即将跳转到新建项目页面")
-                                    window.location.href="../new.html"
-                                }else {
-                                    alert("删除失败")
-                                }
-                            }
-                        })
-                    }
-                }
-            }
-            function startProject() {
-                if(confirm("确定开始项目(开始后无法停止)")){
-                    $.ajax({
-                        url:API.startProject,
-                        type:"PUT",
-                        success:function (data) {
-                            if(data.code===1){
-                                alert("开始项目成功")
-                            }else {
-                                alert("删除失败")
-                            }
-                        }
-                    })
-                }
-            }
-            function generateKey() {
-                $.ajax({
-                    url:API.updateProjectInCode,
-                    type:"PUT",
-                    success:function (data) {
-                        if(data.code==1){
-                            $("#project-incode").val(data.data[0])
-                        }
-                    }
-                })
-            }
-        </script>
 
     </div>
 </div>

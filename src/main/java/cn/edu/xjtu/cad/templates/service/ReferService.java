@@ -5,6 +5,7 @@ import cn.edu.xjtu.cad.templates.model.project.Refer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Ref;
 import java.util.List;
 
 @Service
@@ -18,5 +19,9 @@ public class ReferService {
      */
     public List<Refer> getAllRefer(){
         return referMapper.getAllRefer();
+    }
+
+    public Refer getRefer(long referID){
+        return  referMapper.getReferByID(referID);
     }
 }

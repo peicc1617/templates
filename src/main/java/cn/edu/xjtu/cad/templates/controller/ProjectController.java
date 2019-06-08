@@ -4,6 +4,7 @@ import cn.edu.xjtu.cad.templates.annotation.SystemControllerLog;
 import cn.edu.xjtu.cad.templates.aop.MyException;
 import cn.edu.xjtu.cad.templates.model.log.LogType;
 import cn.edu.xjtu.cad.templates.model.log.MethodType;
+import cn.edu.xjtu.cad.templates.model.project.ProjectIndex;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
 import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.service.ProjectService;
@@ -50,6 +51,7 @@ public class ProjectController {
         return null;
     }
 
+
     /**
      * 获取我的项目列表
      * @return
@@ -67,6 +69,7 @@ public class ProjectController {
     public List<Project> getOpenProjectList(){
         return projectService.getOpenProjectList(user.getUserID());
     }
+
 
 
     /**
@@ -135,8 +138,8 @@ public class ProjectController {
             logType = LogType.PROJECT,
             methodType = MethodType.ADD)
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public long createProject(Project project,long referID) throws MyException {
-        return projectService.newProject(project, user.getUserID(),referID);
+    public long createProject(Project project,long referID,String problemID) throws MyException {
+        return projectService.newProject(project, user.getUserID(),referID,problemID);
     }
 
     /**
@@ -183,33 +186,75 @@ public class ProjectController {
          projectService.updateProjectInfo(user,projectID,null,null,projectTags);
     }
 
+
+
+    /**
+     * 修改项目的邀请码
+     * @param projectID
+     * @return
+     * @throws MyException
+     */
     @RequestMapping(value = "/{projectID}/invitationCode", method = RequestMethod.PUT)
     public String[] updateProjectInvitationCode(@PathVariable long projectID) throws MyException {
         return new String[]{projectService.updateProjectInCode(user,projectID)};
     }
 
+    /**删除项目
+     * @param projectID
+     */
     @SystemControllerLog(content = "将项目删除", logType = LogType.PROJECT, methodType = MethodType.DELETE)
     @RequestMapping(value = "/{projectID}", method = RequestMethod.DELETE)
     public void deleteProject(@PathVariable long projectID) {
          projectService.deleteProject(user,projectID);
     }
 
+    /**
+     * 开始项目监控
+     * @param projectID
+     */
     @SystemControllerLog(content = "开始项目监控", logType = LogType.PROJECT, methodType = MethodType.UPDATE)
     @RequestMapping(value = "/{projectID}/doStart", method = RequestMethod.PUT)
     public void startProject(@PathVariable long projectID) {
         projectService.startProject(user,projectID);
     }
 
+    /**
+     * 更新项目的评价指标
+     * @param projectID
+     * @param projectIndex
+     */
+    @SystemControllerLog(content = "更新了项目评价的指标", logType = LogType.PROJECT, methodType = MethodType.UPDATE)
+    @RequestMapping(value = "/{projectID}/index", method = RequestMethod.PUT)
+    public void updateProjectIndex(@PathVariable long projectID, ProjectIndex projectIndex){
+        projectIndex.setProjectID(projectID);
+        projectService.updateProjectIndex(user,projectIndex);
+    }
+
+    /**
+     * 获取成员在项目内的权限
+     * @param projectID
+     * @return
+     */
     @RequestMapping(value = "/{projectID}/role/userList", method = RequestMethod.GET)
     public List<ProjectRole> getProjectRoleListByProjectID(@PathVariable long projectID) {
         return projectService.getUserListInProject(user,projectID);
     }
 
+    /**
+     * 获取权限对应表
+     * @return
+     */
     @RequestMapping(value = "/projectRoleType.json", method = RequestMethod.GET)
     public Map<String, String> getProjectRoleByID() {
         return ProjectRole.getProjectRoleTypeMap();
     }
 
+    /**
+     * 获取单个用户在项目内的权限
+     * @param projectID
+     * @param userID
+     * @return
+     */
     @RequestMapping(value = "/{projectID}/role/member", method = RequestMethod.GET)
     public ProjectRoleType getProjectRole(@PathVariable long projectID, long userID) {
         return projectRoleMapper.getProjectRoleType(projectID, userID);

@@ -2,6 +2,7 @@ package cn.edu.xjtu.cad.templates.controller;
 
 import cn.edu.xjtu.cad.templates.annotation.CurUser;
 import cn.edu.xjtu.cad.templates.config.API;
+import cn.edu.xjtu.cad.templates.model.log.Log;
 import cn.edu.xjtu.cad.templates.model.log.ProjectLog;
 import cn.edu.xjtu.cad.templates.model.project.Project;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRole;
@@ -15,10 +16,12 @@ import cn.edu.xjtu.cad.templates.service.ReferService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.util.comparator.Comparators;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,6 +50,9 @@ public class ViewController {
 
     @Autowired
     LogService logService;
+
+    @Autowired
+    ReferService referService;
 
     @ModelAttribute
     public void addProject(Model model, @PathVariable(required = false) Long projectID) {
@@ -85,7 +92,18 @@ public class ViewController {
      * @return
      */
     @RequestMapping("/project/new.html")
-    public String viewNewProject() {
+    public String viewNewProject(Model model, Long referID, String problemID) {
+        if(referID==null){
+            referID=0L;
+
+        }else {
+            model.addAttribute("referName",   referID+"-"+referService.getRefer(referID).getReferName());
+        }
+        if(problemID==null||problemID.length()==0){
+            problemID="0";
+        }
+        model.addAttribute("referID",referID);
+        model.addAttribute("problemID",problemID);
         return "newProject";
     }
 
@@ -147,6 +165,19 @@ public class ViewController {
         return "project";
     }
 
+    @RequestMapping("/project")
+    public ModelAndView viewProjectInfoByProblemID(String problemID){
+        Project project = projectService.getProjectByProblemID(problemID);
+        ModelAndView model = null;
+        if(project==null){
+            model = new ModelAndView("redirect:/project/noResource.html");//默认forward，可以不用写
+        }else {
+            model = new ModelAndView("redirect:/project/"+project.getProjectID()+"/info.html");//默认forward，可以不用写
+
+        }
+        return model;
+    }
+
     /**
      * 查看项目信息
      *
@@ -155,7 +186,31 @@ public class ViewController {
      */
     @RequestMapping("/project/{projectID}/info.html")
     public String viewProjectInfo(Model model,@PathVariable long projectID) {
-        addProjectLog(model,logService.getProjectLogCut(projectID,1000));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        List<ProjectLog> logs = logService.getProjectLogCut(projectID,1000);
+        addProjectLog(model,logs);
+        Map<String,List<ProjectLog>> dayLog = new HashMap<>();
+        for (ProjectLog log : logs) {
+            String day = simpleDateFormat.format(log.getOperateDate());
+            if(!dayLog.containsKey(day)){
+                dayLog.put(day,new ArrayList<>());
+            }
+            dayLog.get(day).add(log);
+        }
+        List<JSONObject> calendarData = dayLog.entrySet().stream().map(e->{
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("title",e.getValue().size()+"个活动");
+            jsonObject.put("start",e.getKey());
+            jsonObject.put("allDay", true);
+            jsonObject.put("className","label-info");
+            return jsonObject;
+        }).collect(Collectors.toList());
+        String today = simpleDateFormat.format(new Date());
+        List<ProjectLog> todayLog = dayLog.getOrDefault(today,new ArrayList<>());
+
+        model.addAttribute("calendarData",JSON.toJSONString(calendarData));
+        model.addAttribute("dayLog",JSON.toJSONString(dayLog));
+        model.addAttribute("todayLog",todayLog);
         Project project = (Project) model.asMap().get("project");
         //成员个数
         model.addAttribute("memberCnt",project.getMembers().size());
@@ -165,16 +220,25 @@ public class ViewController {
         model.addAttribute("nodeCnt",project.getNodeMap().size());
         //创新方法个数
         model.addAttribute("appCnt",project.getNodeMap().values().stream().filter(node -> StringUtils.isEmpty(node.getAppPath())).count());
-        //集成度
-        model.addAttribute("score1",33);
-        //融合度
-        model.addAttribute("score2",66);
-        //组合度
-        model.addAttribute("score3",77);
+
+
         //活跃度
-        model.addAttribute("score4",88);
-        //应用效果
-        model.addAttribute("score5",98);
+        model.addAttribute("activity",logs.size());
+//        model.addAttribute("maturity ",   );
+
+        model.addAttribute("projectIndex",projectService.getProjectIndex(project));
+
+        if(project.getStartTime()!=null){
+            String process = JSON.toJSONString(project.getNodeMap()
+                    .entrySet()
+                    .stream()
+                    .map(e->e.getValue())
+                    .sorted((n1,n2)->Comparators.comparable().compare(n2.getPlanStartTime(),n1.getPlanStartTime()))
+                    .collect(Collectors.toList()));
+            model.addAttribute("processStatic",process );
+        }
+
+
         return "projectInfo";
     }
 
@@ -189,17 +253,14 @@ public class ViewController {
         List<ProjectLog> yesterdayActivity = new ArrayList<>();
         List<ProjectLog> beforeActivity = new ArrayList<>();
         Calendar targetCalendar = Calendar.getInstance();
-        System.out.println(targetCalendar);
         targetCalendar.setTime(new Date());
         targetCalendar.set(Calendar.HOUR, 0);
         targetCalendar.set(Calendar.HOUR_OF_DAY, 0);
         targetCalendar.set(Calendar.MINUTE, 0);
         targetCalendar.set(Calendar.SECOND, 0);
         Calendar dateCalendar = Calendar.getInstance();
-        System.out.println(dateCalendar);
         projectLogs.forEach(projectLog -> {
             dateCalendar.setTime(projectLog.getOperateDate());
-            System.out.println(dateCalendar);
             if (dateCalendar.after(targetCalendar)) {
                 todayActivity.add(projectLog);
             } else {

@@ -17,8 +17,7 @@
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap-duallistbox.min.css"/>
     <link rel="stylesheet" href="/templates/project/assets/css/step.css">
     <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap-datetimepicker.min.css"/>
-    <link rel="stylesheet" href="/webresources/ace-master/assets/css/daterangepicker.min.css"/>
-    <link rel="stylesheet" href="/webresources/ace-master/assets/assets/css/bootstrap-datepicker3.min.css"/>
+    <link rel="stylesheet" href="/webresources/ace-master/assets/css/bootstrap-datepicker3.min.css"/>
 
     <script>
         //定义API接口
@@ -27,6 +26,7 @@
             stepURL: "/templates/api/project/${project.projectID}/step/{}",
             addStep: "/templates/api/project/${project.projectID}/step",
             deleteStep: "/templates/api/project/${project.projectID}/step",
+            getStepActivation:'/templates/api/project/${project.projectID}/step',
             editStep: "/templates/api/project/${project.projectID}/step/",
             editStepSummary: "/templates/api/project/${project.projectID}/step/summary",
             addNode: "/templates/api/project/${project.projectID}/node",
@@ -52,8 +52,7 @@
             nodeRole: "/templates/api/project/${project.projectID}/node/role",
             path: "/templates/api/project/${project.projectID}/node/path",
         };
-        PROJECT_ID =
-        ${project.projectID}
+        PROJECT_ID =  ${project.projectID}
         const STATE_DIV = JSON.parse('${nodeResultStateMap}');
         const NODE_ROLE = JSON.parse('${nodeRoleMap}');
     </script>
@@ -299,7 +298,6 @@
                                                         <div class="col-xs-6 col-sm-6">
                                                             <div id="cur-step-result-static"
                                                                  style="width: 100%;height:300px;"></div>
-
                                                         </div>
 
                                                         <div class="col-xs-6 col-sm-6">
@@ -1253,18 +1251,25 @@
 																	计划开始时间
 																</span>
 
-                                    <input readonly="" type="text" class="col-xs-10 col-sm-5" id="plan-start-time-input" >
+                                    <input readonly="" type="text"  id="plan-start-time-input" >
                                 </div>
                                 <div class="input-group">
 																<span class="input-group-addon">
 																	计划结束时间
 																</span>
 
-                                    <input readonly="" type="text" class="col-xs-10 col-sm-5" id="plan-end-time-input" >
+                                    <input readonly="" type="text" id="plan-end-time-input" >
                                 </div>
                                 <div class="input-group">
 																<span class="input-group-addon">
-																	设置结束时间
+																	实际开始时间
+																</span>
+
+                                    <input readonly="" type="text" id="start-time-input" >
+                                </div>
+                                <div class="input-group">
+																<span class="input-group-addon">
+																	设置实际结束时间
 																</span>
 
                                     <input class="form-control date-picker" id="date-select" type="text"
@@ -1308,9 +1313,7 @@
     <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
     <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
     <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
-    <script src="/webresources/ace-master/assets/js/moment.min.js"></script>
 
-    <script src="/webresources/ace-master/assets/js/daterangepicker.min.js"></script>
     <script src="/webresources/ace-master/assets/js/spinbox.min.js"></script>
     <script src="/webresources/ace-master/assets/js/bootstrap-datepicker.min.js"></script>
 
@@ -1321,7 +1324,7 @@
     <script src="/templates/project/assets/js/result.js"></script>
     <#--这里需要引用echarts的3.x版本，因为在绘制甘特图的时候，3.x的版本可以支持时间的堆叠，而4.x版本不支持。-->
     <script src="/templates/project/assets/js/echarts.js"></script>
-    <script src="http://innovation.xjtu.edu.cn/webresources/ace-master/assets/js/bootbox.js"></script>
+    <script src="/webresources/ace-master/assets/js/bootbox.js"></script>
     <#--引入日期处理插件-->
     <script src="/templates/project/assets/js/moment-with-locales.min.js"></script>
     <script src="/webresources/ace-master/assets/js/jquery.bootstrap-duallistbox.min.js"></script>
@@ -1333,14 +1336,7 @@
                 container: 'body'
             });
             //to translate the daterange picker, please copy the "examples/daterange-fr.js" contents here before initialization
-            $('input[name=date-range-picker]').daterangepicker({
-                'applyClass': 'btn-sm btn-success',
-                'cancelClass': 'btn-sm btn-default',
-                locale: {
-                    applyLabel: '应用',
-                    cancelLabel: '取消',
-                }
-            })
+
             $('#date-spinner').ace_spinner({
                 min: 0,
                 max: 365,

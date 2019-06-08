@@ -55,4 +55,7 @@
         SELECT * FROM ${tableName} where projectID = #{projectID} ORDER BY operateDate
     </select>
 
+    <select id="getStepLog" resultType="cn.edu.xjtu.cad.templates.model.log.ProjectLog">
+        SELECT * FROM ${tableName} where projectID = #{projectID} AND stepIndex = #{stepIndex} ORDER BY operateDate
+    </select>
 </mapper>

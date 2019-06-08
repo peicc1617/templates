@@ -142,10 +142,10 @@
                                            for="project-refer">模板选择</label>
 
                                     <div class="col-sm-9">
-                                        <input type="text" class="col-xs-10 col-sm-5" id="project-refer" value="无"
+                                        <input type="text" class="col-xs-10 col-sm-5" id="project-refer" value="${referName!'无'}"
                                                disabled="disabled" readonly="true">
                                         <input type="text" class="col-xs-10 col-sm-5" hidden id="project-refer-hidden"
-                                               name="referID" value="0">
+                                               name="referID" value="${referID}">
                                         <span class="help-inline col-xs-12 col-sm-7">
 												<label class="middle">
 													<input class="ace" type="checkbox" id="project-refer-check">
@@ -154,6 +154,8 @@
 											</span>
                                     </div>
                                 </div>
+                                <input type="text"  hidden
+                                       name="problemID" value="${problemID!'0'}">
 
 
                             </form>

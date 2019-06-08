@@ -53,8 +53,19 @@ function refreshStepRow(step){
     $("#cur-step-summary").html(step.summary)
     let resultChart = echarts.init(document.getElementById('cur-step-result-static'));
     let activityChart = echarts.init(document.getElementById('cur-step-activity-static'));
-    resultStaticFill(resultChart,0);
-    activityStaticFill(activityChart,0);
+    let nodeData = [];
+    step.nodeMap.forEach((node,nodeIndex)=>{
+        nodeData.push({
+            nodeName:node.nodeName,
+            planStartTime:node.planStartTime,
+            planEndTime:node.planEndTime,
+            startTime:node.startTime,
+            endTime:node.endTime
+        })
+    })
+
+    resultStaticFill(resultChart,nodeData);
+    activityStaticFill(activityChart,step);
 }
 const STEP_JS = {
     /**
@@ -63,6 +74,7 @@ const STEP_JS = {
      */
     afterViewStep:function (step) {
         CUR_STEP = step;
+
         refreshStepRow(step)
 
     },
@@ -107,7 +119,7 @@ const STEP_JS = {
     }
 }
 
-function resultStaticFill($echart,stepIndex){
+function resultStaticFill($echart,nodeData){
     let option =  {
         tooltip : {
             trigger: 'axis',
@@ -116,7 +128,7 @@ function resultStaticFill($echart,stepIndex){
             }
         },
         legend: {
-            data: ['计划时间', '实际时间']
+            data: ['计划完成时间', '实际完成时间']
         },
         grid: {
             left: '3%',
@@ -129,19 +141,19 @@ function resultStaticFill($echart,stepIndex){
         },
         yAxis: {
             type: 'category',
-            data: ['周一','周二','周三']
+            data: nodeData.map(node=>node.nodeName)
         },
         series: [
             {
                 name: '计划开始时间',
                 type: 'bar',
                 stack: '1',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
+                // label: {
+                //     normal: {
+                //         show: true,
+                //         position: 'insideRight'
+                //     }
+                // },
                 itemStyle: {
                     normal: {
                         barBorderColor: 'rgba(0,0,0,0)',
@@ -152,35 +164,30 @@ function resultStaticFill($echart,stepIndex){
                         color: 'rgba(0,0,0,0)'
                     }
                 },
-                data: [new Date("2018/11/2"),
-                    new Date("2018/11/15"),
-                    new Date("2018/11/15"),
-                ]
-            },
-            {
-                name: '计划时间',
-                type: 'bar',
-                stack: '1',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
-                data: [ new Date("2018/11/12"),
-                    new Date("2018/11/20"),
-                    new Date("2018/11/25")]
+                data: nodeData.map(node=>node.planStartTime)
             },
             {
                 name: '计划完成时间',
                 type: 'bar',
+                stack: '1',
+                // label: {
+                //     normal: {
+                //         show: true,
+                //         position: 'insideRight'
+                //     }
+                // },
+                data: nodeData.map(node=>node.planEndTime)
+            },
+            {
+                name: '实际开始时间',
+                type: 'bar',
                 stack: '2',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
+                // label: {
+                //     normal: {
+                //         show: true,
+                //         position: 'insideRight'
+                //     }
+                // },
                 itemStyle: {
                     normal: {
                         barBorderColor: 'rgba(0,0,0,0)',
@@ -191,28 +198,19 @@ function resultStaticFill($echart,stepIndex){
                         color: 'rgba(0,0,0,0)'
                     }
                 },
-                data: [ new Date("2018/11/2"),
-                    new Date("2018/11/15"),
-                    new Date("2018/11/15")]
+                data: nodeData.map(node=>node.startTime)
             },
             {
-                name: '实际时间',
+                name: '实际完成时间',
                 type: 'bar',
                 stack: '2',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
-                data: [ new Date("2018/11/6"),
-                    new Date("2018/11/20"),
-                    new Date("2018/11/27")]
-            },
-            {
-                name:'平均温度',
-                type:'line',
-                data:[new Date(),new Date(),new Date()]
+                // label: {
+                //     normal: {
+                //         show: true,
+                //         position: 'insideRight'
+                //     }
+                // },
+                data: nodeData.map(node=>node.endTime)
             }
         ]
     };
@@ -220,111 +218,107 @@ function resultStaticFill($echart,stepIndex){
     // 使用刚指定的配置项和数据显示图表。
     $echart.setOption(option);
 }
-function getVirtulData(year) {
-    year = year || '2017';
-    var date = +echarts.number.parseDate(year + '-01-01');
-    var end = +echarts.number.parseDate((+year + 1) + '-01-01');
-    var dayTime = 3600 * 24 * 1000;
-    var data = [];
-    for (var time = date; time < end; time += dayTime) {
-        data.push([
-            echarts.format.formatTime('yyyy-MM-dd', time),
-            Math.floor(Math.random() * 10000)
-        ]);
-    }
-    return data;
+
+
+function activityStaticFill($echart,step) {
+    $.ajax({
+        url: API.getStepActivation,
+        data:{
+          stepIndex:step.stepIndex
+        },
+        success: function (data) {
+            if (data.code == 1) {
+                data=data.data;
+                let option = {
+                    title: {
+                        top: 30,
+                        text: '当前阶段活跃度',
+                        left: 'center',
+                    },
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        top: '30',
+                        left: '100',
+                        data: ['活跃度', 'Top 12'],
+                        textStyle: {
+                            color: '#fff'
+                        }
+                    },
+                    calendar: [{
+                        top: 100,
+                        left: 'center',
+                        range: ['2019-01-01','2019-06-01'],
+                        yearLabel: {
+                            margin: 40
+                        },
+                        monthLabel: {
+                            nameMap: 'cn',
+                            margin: 20
+                        },
+                        dayLabel: {
+                            firstDay: 1,
+                            nameMap: 'cn'
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                color: '#000',
+                                width: 4,
+                                type: 'solid'
+                            }
+                        },
+                    }],
+                    series: [
+                        {
+                            name: '活跃度',
+                            type: 'scatter',
+                            coordinateSystem: 'calendar',
+                            data: data,
+                            symbolSize: function (val) {
+                                return val[1]*2 ;
+                            },
+                            itemStyle: {
+                                normal: {
+                                    color: '#ddb926'
+                                }
+                            }
+                        },
+                        {
+                            name: 'Top 12',
+                            type: 'effectScatter',
+                            coordinateSystem: 'calendar',
+                            data: data.sort(function (a, b) {
+                                return b[1] - a[1];
+                            }).slice(0, 12),
+                            symbolSize: function (val) {
+                                return val[1]*2 ;
+                            },
+                            showEffectOn: 'render',
+                            rippleEffect: {
+                                brushType: 'stroke'
+                            },
+                            hoverAnimation: true,
+                            itemStyle: {
+                                normal: {
+                                    color: '#f4e925',
+                                    shadowBlur: 10,
+                                    shadowColor: '#333'
+                                }
+                            },
+                            zlevel: 1
+                        }
+                    ]
+                };
+                $echart.setOption(option);
+            } else {
+                console.log(data.msg)
+            }
+        }
+    })
 }
 
-function dateRange() {
-    let date = new Date();
-    return [moment().subtract(3,"M").format("YYYY-MM-DD"),moment().add(1,"M").format("YYYY-MM-DD")]
-}
-function activityStaticFill($echart,stepIndex){
-    let data = getVirtulData(2018);
-    let option = {
-        title: {
-            top: 30,
-            text: '当前阶段活跃度',
-            left: 'center',
-        },
-        tooltip : {
-            trigger: 'item'
-        },
-        legend: {
-            top: '30',
-            left: '100',
-            data:['活跃度', 'Top 12'],
-            textStyle: {
-                color: '#fff'
-            }
-        },
-        calendar: [{
-            top: 100,
-            left: 'center',
-            range:dateRange(),
-            yearLabel: {
-                margin: 40
-            },
-            monthLabel: {
-                nameMap: 'cn',
-                margin: 20
-            },
-            dayLabel: {
-                firstDay: 1,
-                nameMap: 'cn'
-            },
-            splitLine: {
-                show: true,
-                lineStyle: {
-                    color: '#000',
-                    width: 4,
-                    type: 'solid'
-                }
-            },
-        }],
-        series : [
-            {
-                name: '步数',
-                type: 'scatter',
-                coordinateSystem: 'calendar',
-                data: data,
-                symbolSize: function (val) {
-                    return val[1] / 500;
-                },
-                itemStyle: {
-                    normal: {
-                        color: '#ddb926'
-                    }
-                }
-            },
-            {
-                name: 'Top 12',
-                type: 'effectScatter',
-                coordinateSystem: 'calendar',
-                data: data.sort(function (a, b) {
-                    return b[1] - a[1];
-                }).slice(0, 12),
-                symbolSize: function (val) {
-                    return val[1] / 500;
-                },
-                showEffectOn: 'render',
-                rippleEffect: {
-                    brushType: 'stroke'
-                },
-                hoverAnimation: true,
-                itemStyle: {
-                    normal: {
-                        color: '#f4e925',
-                        shadowBlur: 10,
-                        shadowColor: '#333'
-                    }
-                },
-                zlevel: 1
-            }
-        ]
-    };
-    $echart.setOption(option);
-}
 
 /**
  * 更新阶段信息的函数

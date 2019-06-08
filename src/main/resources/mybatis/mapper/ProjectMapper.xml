@@ -5,12 +5,13 @@
     <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
     <insert id="addProject" parameterType="cn.edu.xjtu.cad.templates.model.project.Project" useGeneratedKeys="true"
             keyProperty="projectID">
-        INSERT INTO project (projectName, projectDesc, projectTags,openState,invitationCode) VALUES
+        INSERT INTO project (projectName, projectDesc, projectTags,openState,invitationCode,problemID) VALUES
             (#{projectName},
              #{projectDesc},
              #{projectTags},
              #{openState},
-             #{invitationCode})
+             #{invitationCode},
+             #{problemID})
     </insert>
 
     <select id="getAllProjectListByUserID" resultType="cn.edu.xjtu.cad.templates.model.project.Project">
@@ -73,8 +74,70 @@
         where projectID = #{projectID}
     </update>
 
+    <insert id="addProjectIndex">
+        INSERT  INTO project_index (projectID) VALUES
+            (#{projectID})
+    </insert>
+    <update id="updateProjectIndex">
+        UPDATE project_index
+        set funds =  #{funds},
+            customerN =  #{customerN},
+            memberN =  #{memberN},
+            meetingN =  #{meetingN},
+            nodeN =  #{nodeN},
+            trainN =  #{trainN},
+            income =  #{income},
+            satisfaction =  #{satisfaction},
+            completionRate =  #{completionRate},
+            participationIndex =  #{participationIndex},
+            proficiency =  #{proficiency},
+            caseN =  #{caseN},
+            paperN =  #{paperN},
+            patentN =  #{patentN},
+            proposalN =  #{proposalN}
+            where projectID = #{projectID}
+    </update>
+    <select id="getProjectIndex" resultType="cn.edu.xjtu.cad.templates.model.project.ProjectIndex">
+        SELECT * FROM  project_index WHERE projectID = #{projectID}
+    </select>
+    <select id="getAllProjectIndex" resultType="cn.edu.xjtu.cad.templates.model.project.ProjectIndex">
+        SELECT * FROM  project_index
+    </select>
+
     <delete id="deleteProject">
         DELETE FROM project WHERE projectID = #{projectID}
     </delete>
+
+
+    <update id="saveNormalizeIndex" parameterType="java.util.Map">
+        UPDATE project_index
+        set
+        <foreach collection="map.keys" item="key" open="" close=""
+                 separator=",">
+            ${key}Norm = #{map[${key}]}
+        </foreach>
+        where projectID = #{projectID}
+    </update>
+
+
+    <update id="updateDea">
+        UPDATE project
+        set dea = #{dea}
+        where projectID = #{projectID}
+    </update>
+
+    <select id="getProjectDea" resultType="Double">
+        SELECT dea FROM  project where projectID = #{projectID}
+    </select>
+
+    <select id="getProjectByProblemID" resultType="cn.edu.xjtu.cad.templates.model.project.Project">
+        SELECT * FROM  project where problemID = #{problemID}
+    </select>
+
+    <update id="unbindProblemID">
+        UPDATE project
+        set problemID = NULL
+        where projectID = #{projectID}
+    </update>
 
 </mapper>
