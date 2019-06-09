@@ -70,7 +70,7 @@ public interface ProjectMapper {
 
     void saveNormalizeIndex(@Param("projectID")long projectID,@Param("map") Map<String, Double> outputIndexMap);
 
-    void updateDea(@Param("projectID") Long i, @Param("dea")double v);
+    void updateDea(@Param("projectID") long i, @Param("dea")double v);
 
     Double getProjectDea(@Param("projectID") long projectID);
 

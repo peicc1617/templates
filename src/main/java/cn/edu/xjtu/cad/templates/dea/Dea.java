@@ -14,19 +14,22 @@ import java.util.stream.Collectors;
 public class Dea {
 
     public Dea() {
-        System.setProperty("java.library.path", System.getProperty("java.library.path")
-                + ";"+Dea.class.getResource("/").getPath());
-        Field fieldSysPath = null;
-        try {
-            fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
-            fieldSysPath.setAccessible(true);
-            fieldSysPath.set(null, null);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+//        System.setProperty("java.library.path", System.getProperty("java.library.path")
+//                + ";"+Dea.class.getResource("/").getPath());
+//        Field fieldSysPath = null;
+//        try {
+//            fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+//            fieldSysPath.setAccessible(true);
+//            fieldSysPath.set(null, null);
+//
+//        } catch (NoSuchFieldException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
         System.loadLibrary("lpsolve55");
+
+
     }
 
     public Map<Long, Double> depotsEfficiency(List<Long> names,Map<Long,double[]> inputsMap,Map<Long,double[]> outputsMap)  {

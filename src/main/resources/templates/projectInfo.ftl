@@ -151,7 +151,7 @@
 
                                             <span class="btn btn-app btn-sm btn-light  no-hover" data-toggle="modal" data-target="#rateModal">
 													<span class="line-height-1 bigger-170"
-                                                          id="project-value">${projectIndex.dea?string("#.##")}</span>
+                                                          id="project-value">${project.dea?string("#.##")}</span>
 
 													<br>
 													<span class="line-height-1 smaller-90"> 应用效果 </span>
@@ -527,7 +527,7 @@
                                 <div class="col-xs-12">
                                     <div class="col-xs-6">
                                         <div class="easy-pie-chart percentage" data-percent=" ${projectIndex.dea*100}" data-color="#87CEEB">
-                                            <span class="percent"> ${projectIndex.dea*100}</span>%
+                                            <span class="percent"> ${project.dea*100}</span>%
                                         </div>
 
                                     </div>
