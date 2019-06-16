@@ -86,6 +86,7 @@ public class ViewController {
         ModelAndView modelAndView = new ModelAndView("redirect:project/my.html");
         return modelAndView;
     }
+
     /**
      * 查看新建项目页面
      *
@@ -165,6 +166,11 @@ public class ViewController {
         return "project";
     }
 
+    /**
+     * LCUE 跳转到ProblemID绑定的项目监控页面
+     * @param problemID
+     * @return
+     */
     @RequestMapping("/project")
     public ModelAndView viewProjectInfoByProblemID(String problemID){
         Project project = projectService.getProjectByProblemID(problemID);
@@ -173,6 +179,28 @@ public class ViewController {
             model = new ModelAndView("redirect:/project/noResource.html");//默认forward，可以不用写
         }else {
             model = new ModelAndView("redirect:/project/"+project.getProjectID()+"/info.html");//默认forward，可以不用写
+
+        }
+        return model;
+    }
+
+
+    /**
+     * LCUE 跳转到项目页面，如果项目为空，则跳转到创建项目，如果项目不为空，查看项目
+     * @param referID
+     * @param problemID
+     * @return
+     */
+    @RequestMapping("/project/problem.html")
+    public ModelAndView viewProjectByProblemID(Long referID,String problemID){
+        Project project = projectService.getProjectByProblemID(problemID);
+        ModelAndView model = null;
+        if(project==null){
+            //如果 项目为空，那么跳转到新建项目页面
+            model = new ModelAndView("redirect:/project/new.html?referID="+referID+"&problemID="+problemID);//默认forward，可以不用写
+        }else {
+            //如果项目不为空，那么跳转查看项目页面
+            model = new ModelAndView("redirect:/project/"+project.getProjectID()+"/view.html");//默认forward，可以不用写
 
         }
         return model;

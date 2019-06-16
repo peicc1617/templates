@@ -67,10 +67,35 @@ public class Project {
     private long referID;
 
     private ProjectRoleType projectRole;
+
     private Map<String,Step> stepMap = new LinkedHashMap<>();
+    /**
+     * 阶段数
+     */
+    private int stepNum =0;
+    /**
+     * 阶段Map
+     */
     private Map<String,Node> nodeMap = new HashMap<>();
+    /**
+     * 工作节点数
+     */
+    private int nodeNum =0;
+    /**
+     * 节点Map
+     */
     private List<Edge> edges = new ArrayList<>();
+
+    /**
+     * 成员列表
+     */
     private List<ProjectRole> members = new ArrayList<>();
+    /**
+     * 用户数
+     */
+    private int memberNum =0;
+
+    private double activity;
 
     public Project() {
 
@@ -250,5 +275,37 @@ public class Project {
 
     public void setProblemID(String problemID) {
         this.problemID = problemID;
+    }
+
+    public int getStepNum() {
+        return stepNum;
+    }
+
+    public void setStepNum(int stepNum) {
+        this.stepNum = stepNum;
+    }
+
+    public int getNodeNum() {
+        return nodeNum;
+    }
+
+    public void setNodeNum(int nodeNum) {
+        this.nodeNum = nodeNum;
+    }
+
+    public int getMemberNum() {
+        return memberNum;
+    }
+
+    public void setMemberNum(int memberNum) {
+        this.memberNum = memberNum;
+    }
+
+    public double getActivity() {
+        return activity;
+    }
+
+    public void setActivity(double activity) {
+        this.activity = activity;
     }
 }
