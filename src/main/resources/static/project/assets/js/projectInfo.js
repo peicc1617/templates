@@ -91,15 +91,7 @@ $(function () {
     $(".edit-input").on('click',function (e) {
         $($(this).data().target).removeAttr("readonly")
     })
-    $(".normalNumber").hide();
-    $("#normalSwitch").on('change',function (e) {
-        if(this.checked){
-            $(".normalNumber").show();
-        }else {
-            $(".normalNumber").hide();
 
-        }
-    })
     $('.easy-pie-chart.percentage').each(function(){
         $(this).easyPieChart({
             barColor: $(this).data('color'),
@@ -293,3 +285,4 @@ function processFill($echart,nodeData){
     // 使用刚指定的配置项和数据显示图表。
     $echart.setOption(option);
 }
+

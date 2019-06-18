@@ -140,7 +140,7 @@
 													<span class="line-height-1 bigger-170" id="project-step-num">${appCnt}</span>
 
 													<br>
-													<span class="line-height-1 smaller-90"> 创新方法个数 </span>
+													<span class="line-height-1 smaller-90"> 创新方法 </span>
 												</span>
                                             <span class="btn btn-app btn-sm btn-inverse  no-hover">
 													<span class="line-height-1 bigger-170">${activity}</span>
@@ -149,12 +149,20 @@
 													<span class="line-height-1 smaller-90"> 活跃度 </span>
 												</span>
 
-                                            <span class="btn btn-app btn-sm btn-light  no-hover" data-toggle="modal" data-target="#rateModal">
+                                            <span class="btn btn-app btn-sm btn-light  no-hover" onclick="jaavascript:window.location='/templates/project/${project.projectID}/eva.html#'">
 													<span class="line-height-1 bigger-170"
                                                           id="project-value">${project.dea?string("#.##")}</span>
 
 													<br>
 													<span class="line-height-1 smaller-90"> 应用效果 </span>
+												</span>
+
+                                            <span class="btn btn-app btn-sm btn-light  no-hover" onclick="jaavascript:window.location='/templates/project/${project.projectID}/eva.html#'">
+													<span class="line-height-1 bigger-170"
+                                                          id="project-value">${project.dea?string("#.##")}</span>
+
+													<br>
+													<span class="line-height-1 smaller-90"> 自定义指标 </span>
 												</span>
 
                                         </div>
@@ -771,7 +779,35 @@
                 </div><!-- /.modal-content -->
             </div><!-- /.modal -->
         </div>
-        <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+    <div class="modal fade" id="rateModal2" tabindex="-1" role="dialog" aria-labelledby="ratModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="ratModalLabel">自定义评价指标</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <button type="button" class="btn btn-primary btn-xs" onclick="addDiyIndex()">新建评价指标</button>
+                        <button type="button" class="btn btn-danger btn-xs" onclick="deleteDiyIndex()">删除评价指标</button>
+                        <#--自定义评价指标table-->
+                        <table id="diyIndexTable">
+
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-success" onclick="saveProjectIndex()">保存自定义评价指标</button>
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+
+    <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
             <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
         </a>
         <script type="text/javascript" src="/webresources/ace-master/assets/js/jquery-2.1.4.min.js"></script>
@@ -800,6 +836,7 @@
 
     </div>
 </div>
+
 </body>
 
 </html>

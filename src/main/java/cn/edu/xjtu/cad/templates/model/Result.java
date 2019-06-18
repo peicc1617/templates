@@ -2,7 +2,6 @@ package cn.edu.xjtu.cad.templates.model;
 
 
 import cn.edu.xjtu.cad.templates.aop.MyException;
-import com.sun.xml.internal.txw2.output.ResultFactory;
 
 public class Result<T> {
     private Integer code;

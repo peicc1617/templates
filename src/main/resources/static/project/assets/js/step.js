@@ -182,12 +182,7 @@ function resultStaticFill($echart,nodeData){
                 name: '实际开始时间',
                 type: 'bar',
                 stack: '2',
-                // label: {
-                //     normal: {
-                //         show: true,
-                //         position: 'insideRight'
-                //     }
-                // },
+
                 itemStyle: {
                     normal: {
                         barBorderColor: 'rgba(0,0,0,0)',

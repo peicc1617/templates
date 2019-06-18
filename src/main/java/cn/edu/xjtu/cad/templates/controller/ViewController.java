@@ -2,6 +2,7 @@ package cn.edu.xjtu.cad.templates.controller;
 
 import cn.edu.xjtu.cad.templates.annotation.CurUser;
 import cn.edu.xjtu.cad.templates.config.API;
+import cn.edu.xjtu.cad.templates.model.Eva;
 import cn.edu.xjtu.cad.templates.model.log.Log;
 import cn.edu.xjtu.cad.templates.model.log.ProjectLog;
 import cn.edu.xjtu.cad.templates.model.project.Project;
@@ -10,6 +11,7 @@ import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
 import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeResultState;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeRoleType;
+import cn.edu.xjtu.cad.templates.service.EvaService;
 import cn.edu.xjtu.cad.templates.service.LogService;
 import cn.edu.xjtu.cad.templates.service.ProjectService;
 import cn.edu.xjtu.cad.templates.service.ReferService;
@@ -53,6 +55,9 @@ public class ViewController {
 
     @Autowired
     ReferService referService;
+
+    @Autowired
+    EvaService evaService;
 
     @ModelAttribute
     public void addProject(Model model, @PathVariable(required = false) Long projectID) {
@@ -166,6 +171,7 @@ public class ViewController {
         return "project";
     }
 
+
     /**
      * LCUE 跳转到ProblemID绑定的项目监控页面
      * @param problemID
@@ -249,12 +255,9 @@ public class ViewController {
         //创新方法个数
         model.addAttribute("appCnt",project.getNodeMap().values().stream().filter(node -> StringUtils.isEmpty(node.getAppPath())).count());
 
-
         //活跃度
         model.addAttribute("activity",logs.size());
-//        model.addAttribute("maturity ",   );
 
-        model.addAttribute("projectIndex",projectService.getProjectIndex(project));
 
         if(project.getStartTime()!=null){
             String process = JSON.toJSONString(project.getNodeMap()
@@ -265,16 +268,31 @@ public class ViewController {
                     .collect(Collectors.toList()));
             model.addAttribute("processStatic",process );
         }
-
-
         return "projectInfo";
     }
+
+    /**
+     * 查看项目的评估页面
+     * @return
+     */
+    @RequestMapping("/project/{projectID}/eva.html")
+    public String viewProjectEva(Model model,@PathVariable long projectID){
+        //从视图中获取当前项目
+        Project project = (Project) model.asMap().get("project");
+        //获取项目预定义的指标
+        model.addAttribute("projectIndex",projectService.getProjectIndex(project));
+
+        return "projectEva";
+    }
+
+
 
     @RequestMapping("/project/{projectID}/log.html")
     public String viewProjectLog(Model model,@PathVariable long projectID) {
         addProjectLog(model,logService.getProjectLog(projectID));
         return "projectInfo";
     }
+
 
     private void addProjectLog(Model model,List<ProjectLog> projectLogs){
         List<ProjectLog> todayActivity = new ArrayList<>();
@@ -336,6 +354,12 @@ public class ViewController {
         return "projectUser";
     }
 
+    @RequestMapping("/eva/{evaID}/edit.html")
+    public String viewEva(Model model,@PathVariable long evaID){
+        Eva eva = evaService.getEvaByID(evaID,user);
+        model.addAttribute("eva",eva);
+        return "eva";
+    }
     /**
      * 查看项目报告
      *

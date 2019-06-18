@@ -8,7 +8,6 @@ import cn.edu.xjtu.cad.templates.model.project.ProjectRole;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeResult;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeRole;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeRoleType;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.NodeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

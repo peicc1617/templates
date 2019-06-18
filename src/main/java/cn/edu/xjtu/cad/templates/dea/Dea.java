@@ -27,7 +27,7 @@ public class Dea {
 //        } catch (IllegalAccessException e) {
 //            e.printStackTrace();
 //        }
-        System.loadLibrary("lpsolve55");
+//        System.loadLibrary("lpsolve55");
 
 
     }

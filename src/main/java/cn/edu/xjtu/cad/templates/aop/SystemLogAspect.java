@@ -85,7 +85,7 @@ public class SystemLogAspect {
      * @param e
      */
     @AfterThrowing(value = "controllerPointerCut()",throwing = "e")
-    public void doAferThrowing(JoinPoint joinPoin,Throwable e){
+    public void doAfterThrowing(JoinPoint joinPoin,Throwable e){
         Log log = logThreadLocal.get();
         if(log!=null){
             logService.removeLog(log);
