@@ -101,13 +101,14 @@ public class EvaController {
      * 新建新的评估指标同时导入评估指标体系
      * @param evaID
      */
-    @RequestMapping(value = "/{evaID}/index/",method = RequestMethod.POST)
-    public void addIndexAndAdd2Eva(@PathVariable long evaID,
+    @RequestMapping(value = "/{evaID}/index",method = RequestMethod.POST)
+    public long addIndexAndAdd2Eva(@PathVariable long evaID,
                                    EvaIndex evaIndex){
         //首先创建指标，获取创建的评估指标ID
         long indexID = indexService.addEvaIndex(evaIndex,user);
         //然后进行绑定
         evaService.addIndex2Eva(evaID,indexID,user);
+        return indexID;
     }
     /**
      * 将指标导入评估指标体系
@@ -127,7 +128,6 @@ public class EvaController {
     @RequestMapping(value = "/{evaID}/index/{indexID}",method = RequestMethod.DELETE)
     public void deleteIndexFromEva(@PathVariable long evaID,@PathVariable long indexID){
         evaService.deleteIndexFromEva(evaID,indexID,user);
-
     }
 
     /**
@@ -139,5 +139,7 @@ public class EvaController {
     public List<EvaIndex> getEvaIndex(@PathVariable long evaID){
         return evaService.getEvaIndex(evaID,user);
     }
+
+
 
 }

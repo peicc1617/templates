@@ -53,6 +53,7 @@
             evaIndexAddAndGet:"/templates/api/eva/${eva.evaID}/index",
             editEvaIndex:"/templates/api/eva/${eva.evaID}/index",
             editEva:"/templates/api/eva/${eva.evaID}",
+            getAllIndex:"/templates/api/index/list?evaID=${eva.evaID}",
         }
     </script>
 </head>
@@ -126,6 +127,10 @@
                                         删除评价指标
                                     </button>
 
+                                    <button class="btn btn-xs btn-white  bigger btn-danger " onclick="showImportTable()">
+                                        <i class="ace-icon fa fa-link"></i>
+                                        导入评价指标
+                                    </button>
                                 </div>
                             </div>
                             <div class="widget-body">
@@ -133,6 +138,38 @@
                                     <div class="col-lg-12">
                                         <#--自定义评价指标table-->
                                         <table id="diyIndexTable">
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="widget-box transparent">
+                            <div class="widget-header widget-header-small">
+                                <h3 class="widget-title blue smaller">
+                                    <i class="ace-icon fa fa-rss orange"></i>
+                                    可选的评价指标
+                                </h3>
+                                <div class="widget-toolbar no-border">
+
+                                    <button class="btn btn-xs btn-white  btn-primary bigger" onclick="addDiyIndex()">
+                                        <i class="ace-icon fa fa-plus"></i>
+                                        导入
+                                    </button>
+
+                                </div>
+                            </div>
+                            <div class="widget-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <#--自定义评价指标table-->
+                                        <table id="import-table">
 
                                         </table>
                                     </div>

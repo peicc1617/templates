@@ -15,8 +15,6 @@ import java.util.Set;
 @Component
 @Scope(value = "request",proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class User {
-
-
     /**
      * 用户ID
      */

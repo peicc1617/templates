@@ -26,11 +26,17 @@ public class EvaIndex {
      */
     private double rangeR;
 
+    /**
+     * 创建者的ID
+     */
+    private long creator;
 
     /**
      * 评价指标的说明
      */
     private String des;
+
+
 
     public long getIndexID() {
         return indexID;
@@ -80,5 +86,11 @@ public class EvaIndex {
         this.des = des;
     }
 
+    public long getCreator() {
+        return creator;
+    }
 
+    public void setCreator(long creator) {
+        this.creator = creator;
+    }
 }

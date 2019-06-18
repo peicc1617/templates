@@ -89,6 +89,7 @@ public class NodeController {
     public void deletePath(@PathVariable long projectID, Edge path){
         nodeService.deletePath(user,path);
     }
+
     /**
      * 更新节点名称
      * @param projectID 项目ID

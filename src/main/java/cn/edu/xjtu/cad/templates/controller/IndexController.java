@@ -1,6 +1,7 @@
 package cn.edu.xjtu.cad.templates.controller;
 
 import cn.edu.xjtu.cad.templates.config.User;
+import cn.edu.xjtu.cad.templates.model.Eva;
 import cn.edu.xjtu.cad.templates.model.EvaIndex;
 import cn.edu.xjtu.cad.templates.service.IndexService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
+@RequestMapping("/api/index")
 public class IndexController {
 
     @Autowired
@@ -18,41 +22,45 @@ public class IndexController {
     @Autowired
     User user;
 
+    @RequestMapping(value = "/list",method = RequestMethod.GET)
+    public List<EvaIndex> getAllEvaIndex(long evaID){
+        return indexService.getAllEvaIndex(evaID,user);
+    }
+
     /**
      * 添加新的评估指标
      * @param evaIndex
      * @return
      */
-    @RequestMapping(value = "/index",method = RequestMethod.POST)
+    @RequestMapping(value = "",method = RequestMethod.POST)
     public long addProjectEvaIndex(EvaIndex evaIndex){
         return indexService.addEvaIndex(evaIndex,user);
     }
 
     /**
      * 删除评估指标
-     * @param evaID
      * @return
      */
-    @RequestMapping(value = "/{evaID}/index/{indexID}",method = RequestMethod.DELETE)
-    public void deleteProjectEvaIndex(@PathVariable long evaID, @PathVariable long indexID){
-        indexService.deleteEvaIndex(evaID,indexID,user);
+    @RequestMapping(value = "/{indexID}",method = RequestMethod.DELETE)
+    public void deleteProjectEvaIndex( @PathVariable long indexID){
+        indexService.deleteEvaIndex(indexID,user);
     }
 
     /**
      * 更新评估指标
-     * @param evaID
      * @param indexID
      * @param evaIndex
      */
-    @RequestMapping(value = "/{evaID}/index/{indexID}",method = RequestMethod.PUT)
-    public void updateProjectEvaIndex(@PathVariable long evaID,@PathVariable long indexID,EvaIndex evaIndex){
+    @RequestMapping(value = "/{indexID}",method = RequestMethod.PUT)
+    public void updateProjectEvaIndex(@PathVariable long indexID,EvaIndex evaIndex){
         evaIndex.setIndexID(indexID);
         indexService.updateEvaIndex(evaIndex,user);
     }
 
-    @RequestMapping(value = "/{evaID}/index/{indexID}/refreshRange",method = RequestMethod.PUT)
-    public void refreshEvaIndexRange(@PathVariable long evaID,@PathVariable long indexID){
+    @RequestMapping(value = "/{indexID}/refreshRange",method = RequestMethod.PUT)
+    public void refreshEvaIndexRange(@PathVariable long indexID){
         indexService.refreshEvaIndexRange(indexID,user);
     }
+
 
 }

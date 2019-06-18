@@ -1,5 +1,6 @@
 $(()=>{
     initDiyIndexTable();
+    initImportTable();
     $("#eva-name").editable({
         type: 'text',
         title: '修改评价体系名称',
@@ -111,9 +112,6 @@ function initDiyIndexTable() {
         }
     }
     $("#diyIndexTable").bootstrapTable(diyIndexTableLayout)
-
-
-
 }
 
 /**
@@ -207,5 +205,66 @@ function refreshEvaIndexRange(rowIndex) {
             }
         }
     })
+}
+
+
+function showImportTable() {
+    
+}
+
+function initImportTable() {
+    let importTableLayout = {
+        url:API.getAllIndex,
+        columns: [{
+            checkbox: true,
+            visible: true,                  //是否显示复选框
+        }, {
+            field: 'indexID',
+            title: '指标编号',
+        }, {
+            field: 'name',
+            title: '指标名称',
+
+        }, {
+            field: 'w',
+            title: '指标权重',
+
+        }, {
+            field: 'rangeL',
+            title: '指标最小值',
+
+        }, {
+            field: 'rangeR',
+            title: '指标最大值',
+
+        }, {
+            field: 'des',
+            title: '指标说明',
+        }],
+        pagination: true,//启用分页
+        pageNumber: 1,//默认是第一页
+        pageSize: 10,
+        pageList: [10, 20,50],
+        uniqueId:"indexID",
+        onEditableSave: function (field, row, oldValue, $el) {
+            $.ajax({
+                url:API.editEvaIndex+"/"+row.indexID,
+                type:"PUT",
+                data:row,
+                success:function (data) {
+                    if(data.code==1){
+
+                    }else {
+                        $el.text(oldValue)
+                    }
+                },
+                error:function () {
+                    $el.text(oldValue)
+                }
+            })
+        }
+    }
+    $("#import-table").bootstrapTable(importTableLayout)
+
 }
 
