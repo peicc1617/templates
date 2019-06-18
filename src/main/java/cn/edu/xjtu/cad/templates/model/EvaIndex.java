@@ -32,11 +32,16 @@ public class EvaIndex {
     private long creator;
 
     /**
+     * 是否可以编辑
+     */
+    private boolean canEdit;
+
+    /**
      * 评价指标的说明
      */
     private String des;
 
-
+    private double res;
 
     public long getIndexID() {
         return indexID;
@@ -92,5 +97,21 @@ public class EvaIndex {
 
     public void setCreator(long creator) {
         this.creator = creator;
+    }
+
+    public boolean isCanEdit() {
+        return canEdit;
+    }
+
+    public void setCanEdit(boolean canEdit) {
+        this.canEdit = canEdit;
+    }
+
+    public double getRes() {
+        return res;
+    }
+
+    public void setRes(double res) {
+        this.res = res;
     }
 }

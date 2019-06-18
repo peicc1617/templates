@@ -53,6 +53,7 @@ $(() => {
             }
         })
     })
+    initIndexTable();
 })
 
 /**
@@ -167,13 +168,66 @@ function jumpEvaView(evaID) {
     window.open(`/templates/eva/${evaID}/edit.html`)
 }
 
+function initIndexTable() {
+    let indexTableLayout = {
+        uniqueId: "indexID",
+        columns: [ {
+            field: 'indexID',
+            title: '指标编号',
+        }, {
+            field: 'name',
+            title: '指标名称',
+        }, {
+            field: 'des',
+            title: '指标描述',
+
+        },{
+            field: 'rang',
+            title: '指标的取值范围',
+            formatter: function (v, row) {
+                return `[${row.rangeL},${row.rangeR}]`
+            }
+        }, {
+            field: 'res',
+            title: '指标值',
+            editable: {
+                type: "text",
+                validate: function (v) {
+                    if (!v) return '指标值';
+                }
+            }
+        }],
+        onEditableSave:function (field, row, oldValue, $el) {
+            $.ajax({
+                url:`${API.updateIndexRes}${row.indexID}/res/${PROJECT_ID}`,
+                type:"PUT",
+                data:{
+                    res:row[field]
+                },
+                success:function (data) {
+                    if(data.code==1){
+                        $("#refresh-btn").show();
+                    }else {
+                        $el.text(oldValue)
+                    }
+                },
+                error:function () {
+                    $el.text(oldValue)
+                }
+            })
+        }
+    }
+    $("#index-table").bootstrapTable(indexTableLayout)
+    $("#index-table").bootstrapTable('load',INDEX_LIST)
+
+}
 /**
  * 导入相应的评价指标体系
  * @param evaID
  */
 function importNewEva(evaID) {
     $.ajax({
-        url:`${API.bindEva}/${evaID}/bind`,
+        url:`${API.bindEva}${evaID}/bind`,
         method:'POST',
         data:{
             linkID:PROJECT_ID
@@ -203,4 +257,7 @@ function removeEva(evaID) {
         }
     })
 
+}
+
+function refreshPage() {
 }

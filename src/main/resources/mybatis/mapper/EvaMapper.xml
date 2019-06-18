@@ -19,7 +19,7 @@
     </select>
 
     <!-- 创建新的评价体系   -->
-    <insert id="addEva" keyProperty="id" useGeneratedKeys="true" >
+    <insert id="addEva" keyProperty="id" useGeneratedKeys="true">
         INSERT INTO `eva` (`name`,`des`,`tags`,`creator`,`open`)
         VALUES (#{name},#{des},#{tags},#{creator},#{open})
     </insert>
@@ -30,7 +30,7 @@
     </delete>
 
     <!-- 更新现有的评价体系   -->
-    <update id="editEva" >
+    <update id="editEva">
         UPDATE `eva` SET
         `name` = #{name},
         `des` = #{des},
@@ -40,55 +40,59 @@
     </update>
 
     <!-- 添加新的评估指标   -->
-    <insert id="addEvaIndex" keyProperty="indexID" useGeneratedKeys="true" >
-        INSERT INTO `eva_index` (`indexID`,`name`,`des`,`w`,`rangeR`,`rangeL`)
+    <insert id="addEvaIndex" keyProperty="indexID" useGeneratedKeys="true">
+        INSERT INTO eva_index (`indexID`,`name`,`des`,`rangeR`,`rangeL`)
         VALUES (#{indexID},#{name},#{des},#{w},#{rangeR},#{rangeL})
     </insert>
 
     <!-- 删除已有的评估指标  -->
     <delete id="deleteEvaIndex">
-        DELETE FROM `eva_index` WHERE indexID = #{indexID}
+        DELETE FROM eva_index WHERE indexID = #{indexID}
     </delete>
 
     <!-- 更新评估指标的信息   -->
     <update id="updateEvaIndex">
-        UPDATE `eva_index` SET
+        UPDATE eva_index SET
         `name` = #{name},
         `des` = #{des},
-        `w` = #{w},
         `rangeL` = #{rangeL},
         `rangeR` = #{rangeR}
-        where `evaID` = #{evaID} AND `indexID`=#{indexID}
+        where `indexID`=#{indexID};
     </update>
 
     <!-- 获取评估体系下的所有评估指标   -->
     <select id="getEvaIndexByEvaID" resultType="cn.edu.xjtu.cad.templates.model.EvaIndex">
-        SELECT * FROM  `eva_index` WHERE  indexID IN
-        (SELECT indexID FROM `eva_link_index` WHERE evaID = #{evaID})
+        SELECT * FROM  `eva_index`,`eva_link_index` WHERE  `eva_link_index`.evaID  = #{evaID}
+        AND `eva_link_index`.indexID=`eva_index`.indexID
     </select>
 
     <!--  将评估指标添加到评估体系内  -->
     <insert id="addIndex2Eva">
         INSERT INTO `eva_link_index`
-        (`evaID`,`indexID`)
-        VALUES (#{evaID},#{indexID})
+        (`evaID`,`indexID`,`w`)
+        VALUES (#{evaID},#{indexID},1);
     </insert>
+
+    <delete id="deleteIndexFromEva">
+        DELETE FROM `eva_link_index`
+        WHERE `evaID` = #{evaID} AND `indexID` =  #{indexID};
+    </delete>
 
     <!-- 插入新的评估结果   -->
     <insert id="addEvaIndexRes">
-        INSERT INTO `eva_index`
+        INSERT INTO eva_index
         (`indexID`,`linkedID`,`evaIndexID`,`res`,`time`)
         VALUES (#{indexID},#{linkedID},#{evaIndexID},#{res},now())
     </insert>
 
     <!-- 删除评估结果   -->
     <delete id="deleteEvaIndexRes">
-        DELETE FROM  `eva_index` WHERE resID = #{redID}
+        DELETE FROM  eva_index WHERE `resID` = #{redID}
     </delete>
 
     <!--  更新评估结果  -->
     <update id="updateEvaIndexRes">
-        UPDATE `eva_index` SET
+        UPDATE eva_index SET
         `res`  =`res`,
         `tiem` = `time`
         WHERE `linkedID` = #{linkedID},`indexID`=#{indexID}
@@ -96,8 +100,44 @@
 
 
     <select id="getAllEvaIndex" resultType="cn.edu.xjtu.cad.templates.model.EvaIndex">
-        SELECT * FROM `eva_index`
+        SELECT * FROM eva_index
     </select>
+
+    <insert id="addEvaLink">
+        INSERT INTO eva_link `evaID`,`linkID` VALUE (#{evaID},#{linkID})
+            </insert>
+
+    <delete id="deleteEvaLink">
+        DELETE FROM `eva_link`
+        WHERE  `evaID` = #{evaID} AND `linkID` = #{linkID}
+    </delete>
+
+    <select id="getEvaByLinkID" resultType="cn.edu.xjtu.cad.templates.model.Eva">
+        SELECT * FROM `eva` WHERE `evaID` IN (SELECT evaID FROM `eva_link` WHERE linkID = #{linkID})
+    </select>
+
+    <select id="getIndexRes" resultType="cn.edu.xjtu.cad.templates.model.EvaIndexRes">
+        SELECT * FROM `eva_index_res` WHERE `indexID` = #{indexID} AND `linkID` = #{linkID}
+    </select>
+    <insert id="addIndexRes">
+        INSERT INTO `eva_index_res` (`indexID`,`linkID`,`res`)
+        VALUE (#{indexID},#{linkID},#{res})
+    </insert>
+
+    <update id="updateIndexRes">
+        UPDATE `eva_index_res` SET `res` = #{res} WHERE `indexID` =#{indexID} AND `linkID` = #{linkID}
+    </update>
+
+    <select id="getIndexList" resultType="cn.edu.xjtu.cad.templates.model.EvaIndex">
+        SELECT * FROM `eva_index`,`eva_index_res`
+        WHERE `eva_index_res`.`linkID` =  #{linkID}
+        AND `eva_index_res`.`indexID` = `eva_index`.`indexID`
+    </select>
+    <update id="editIndexW">
+        UPDATE `eva_link_index` SET
+        `w` =#{w}
+        WHERE `evaID` = #{evaID} AND `indexID` = #{indexID}
+    </update>
 
 
 </mapper>

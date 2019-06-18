@@ -3,6 +3,7 @@ package cn.edu.xjtu.cad.templates.service;
 import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.dao.EvaMapper;
 import cn.edu.xjtu.cad.templates.model.EvaIndex;
+import cn.edu.xjtu.cad.templates.model.EvaIndexRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class IndexService {
     }
 
     public long addEvaIndex(EvaIndex evaIndex, User user) {
+        evaIndex.setCreator(user.getUserID());
         evaMapper.addEvaIndex(evaIndex);
         return evaIndex.getIndexID();
     }
@@ -52,6 +54,7 @@ public class IndexService {
                         evaIndex.getIndexID())
                 .collect(Collectors.toSet());
         List<EvaIndex> evaIndexList = evaMapper.getAllEvaIndex();
+        evaIndexList.forEach(evaIndex -> evaIndex.setCanEdit(evaIndex.getCreator()==user.getUserID()));
         return evaIndexList
                 .stream()
                 .filter(evaIndex ->
@@ -60,4 +63,14 @@ public class IndexService {
     }
 
 
+    public void updateIndexRest(long indexID, long linkID, double res, User user) {
+        EvaIndexRes evaIndexRes = evaMapper.getIndexRes(indexID,linkID);
+        if(evaIndexRes==null){
+            evaIndexRes = new EvaIndexRes(indexID,linkID,res);
+            evaMapper.addIndexRes(evaIndexRes);
+        }else {
+            evaMapper.updateIndexRes(evaIndexRes);
+        }
+
+    }
 }

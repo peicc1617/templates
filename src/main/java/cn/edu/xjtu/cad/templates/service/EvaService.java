@@ -4,13 +4,11 @@ import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.dao.EvaMapper;
 import cn.edu.xjtu.cad.templates.model.Eva;
 import cn.edu.xjtu.cad.templates.model.EvaIndex;
-import cn.edu.xjtu.cad.templates.model.EvaIndexRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.security.util.Cache;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EvaService {
@@ -72,8 +70,6 @@ public class EvaService {
         return evaMapper.getEvaByID(evaID);
     }
 
-
-
     /**
      * 导入新的评估指标
      * @param evaID 评估体系ID
@@ -97,22 +93,25 @@ public class EvaService {
     /**
      * 评估指标体系导入评估指标
      * @param evaID 评估指标体系ID
-     * @param indexID 评估指标ID
+     * @param indexIDs 评估指标ID数组
      * @param user 当前用户
      */
-    public void addIndex2Eva(long evaID, long indexID, User user) {
-        evaMapper.addIndex2Eva(evaID,indexID);
+    public void addIndex2Eva(long evaID, long[] indexIDs, User user) {
+        for (long indexID : indexIDs) {
+            evaMapper.addIndex2Eva(evaID,indexID);
+        }
     }
-
 
     /**
      * 将评估指标移除当前体系
      * @param evaID 评估指标体系ID
-     * @param indexID 评估指标ID
+     * @param indexIDs 评估指标ID
      * @param user 用户ID
      */
-    public void deleteIndexFromEva(long evaID, long indexID, User user) {
-        evaMapper.deleteIndexFromEva(evaID,indexID);
+    public void deleteIndexFromEva(long evaID, long[] indexIDs, User user) {
+        for (Long indexID : indexIDs) {
+            evaMapper.deleteIndexFromEva(evaID,indexID);
+        }
     }
 
     /**
@@ -122,7 +121,28 @@ public class EvaService {
      * @return
      */
     public List<EvaIndex> getEvaIndex(long evaID, User user) {
-        return evaMapper.getEvaIndexByEvaID(evaID);
+        List<EvaIndex> evaIndexList = evaMapper.getEvaIndexByEvaID(evaID);
+        evaIndexList.forEach(evaIndex -> evaIndex.setCanEdit(evaIndex.getCreator()==user.getUserID()));
+        return evaIndexList;
     }
 
+    public List<Eva> getProjectEvaList(long projectID, User user) {
+        List<Eva> evaList = evaMapper.getEvaByLinkID(projectID);
+        for (Eva eva : evaList) {
+            eva.setEvaIndexList(evaMapper.getEvaIndexByEvaID(eva.getEvaID()));
+        }
+        return evaList;
+    }
+
+    public double getIndexRes(long indexID, long linkID) {
+        return evaMapper.getIndexRes(indexID,linkID).getRes();
+    }
+
+    public  List<EvaIndex> getIndexList(long projectID, User user) {
+        return evaMapper.getIndexList(projectID);
+    }
+
+    public void editIndexW(long evaID, long indexID, double w, User user) {
+        evaMapper.editIndexW(evaID,indexID,w);
+    }
 }

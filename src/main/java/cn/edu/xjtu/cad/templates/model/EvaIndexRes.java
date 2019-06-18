@@ -11,7 +11,7 @@ public class EvaIndexRes {
     /**
      * 关联ID，这里的关联ID可以看作是项目ID
      */
-    private long linkedID;
+    private long linkID;
 
     /**
      * 指标对象
@@ -30,10 +30,9 @@ public class EvaIndexRes {
     public EvaIndexRes() {
     }
 
-    public EvaIndexRes(long indexID, long linkedID, EvaIndex evaIndex, double res) {
+    public EvaIndexRes(long indexID, long linkID, double res) {
         this.indexID = indexID;
-        this.linkedID = linkedID;
-        this.evaIndex = evaIndex;
+        this.linkID = linkID;
         this.res = res;
     }
 
@@ -45,12 +44,12 @@ public class EvaIndexRes {
         this.indexID = indexID;
     }
 
-    public long getLinkedID() {
-        return linkedID;
+    public long getLinkID() {
+        return linkID;
     }
 
-    public void setLinkedID(long linkedID) {
-        this.linkedID = linkedID;
+    public void setLinkID(long linkID) {
+        this.linkID = linkID;
     }
 
     public EvaIndex getEvaIndex() {

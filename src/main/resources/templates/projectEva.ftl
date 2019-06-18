@@ -70,14 +70,12 @@
             updateProjectInCode: "/templates/api/project/${project.projectID}/invitationCode",
             startProject: "/templates/api/project/${project.projectID}/doStart",
             updateProjectIndex: "/templates/api/project/${project.projectID}/index",
-            getEvaList:"/templates/api/eva/user",
-            bindEva:'/templates/api/eva/'
+            getEvaList: "/templates/api/eva/user",
+            bindEva: '/templates/api/eva/',
+            updateIndexRes: '/templates/api/index/'
         }
-        ProcessStaticDate = ${processStatic!"[]"};
-        CalendarData = ${calendarData!"[]"};
-        DayLog = ${dayLog!"[]"};
-
-        PROJECT_ID = ${project.projectID};
+        INDEX_LIST = ${indexList!"[]"}
+            PROJECT_ID = ${project.projectID};
     </script>
 </head>
 <body class="no-skin">
@@ -119,12 +117,14 @@
                                     项目评价
                                 </h4>
                                 <div class="widget-toolbar no-border">
-                                    <button class="btn btn-xs btn-white  btn-info bigger" data-toggle="modal" data-target="#newRateModal">
+                                    <button class="btn btn-xs btn-white  btn-info bigger" data-toggle="modal"
+                                            data-target="#newRateModal">
                                         <i class="ace-icon fa fa-plus"></i>
                                         创建新的评价体系
                                     </button>
 
-                                    <button class="btn btn-xs btn-white  bigger btn-success" data-toggle="modal" data-target="#import-new-eva">
+                                    <button class="btn btn-xs btn-white  bigger btn-success" data-toggle="modal"
+                                            data-target="#import-new-eva">
                                         <i class="ace-icon fa fa-link"></i>
                                         导入新的评价体系
                                     </button>
@@ -136,33 +136,18 @@
                                     <div class="space-6"></div>
 
                                     <div class="col-sm-12 infobox-container">
-                                        <div class="infobox infobox-green">
-                                            <div class="infobox-icon">
-                                                <i class="ace-icon fa fa-comments"></i>
-                                            </div>
+                                        <#list evaList as eva>
 
-                                            <div class="infobox-data">
-                                                <span class="infobox-data-number">${project.dea}</span>
-                                                <div class="infobox-content">规模效率</div>
+                                            <div class="infobox infobox-blue infobox-small infobox-dark">
+                                                <div class="infobox-icon">
+                                                    <i class="ace-icon fa fa-bar-chart"></i>
+                                                </div>
+                                                <div class="infobox-data">
+                                                    <div class="infobox-content">${eva.name}</div>
+                                                    <div class="infobox-content">$32,000</div>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        <div class="infobox infobox-green">
-                                            <div class="infobox-icon">
-                                                <i class="ace-icon fa fa-twitter"></i>
-                                            </div>
-
-                                            <div class="infobox-data">
-                                                <span class="infobox-data-number">11</span>
-                                                <div class="infobox-content">new followers</div>
-                                            </div>
-
-                                            <div class="badge badge-success">
-                                                +32%
-                                                <i class="ace-icon fa fa-arrow-up"></i>
-                                            </div>
-                                        </div>
-
+                                        </#list>
                                     </div>
 
                                 </div>
@@ -173,283 +158,52 @@
                 </div>
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 widget-container-col ui-sortable" id="widget-container-col-3">
-                        <div class="widget-box  ui-sortable-handle" id="widget-box-3">
-                            <div class="widget-header ">
-                                <h4 class="widget-title">
-                                    规模效率
-                                </h4>
+                        <h4 class="row header smaller lighter blue">
+                            <span class="col-xs-6">评价指标</span><!-- /.col -->
+                            <span class="col-xs-6">
+                                <span  class="pull-right inline">
+                                    <label id="refresh-btn" style="display: none" class="btn btn-xs btn-yellow active" onclick="javascript:window.location.reload()">刷新页面</label>
+                                </span>
+                            </span>
+                        </h4>
+                        <table id="index-table">
 
-                                <div class="widget-toolbar">
-                                    <label class="inline">
-                                        <small class="muted smaller-90">显示标准值</small>
-                                        <input checked="checked"
-                                               type="checkbox"
-                                               data-index-id="0"
-                                               class="ace ace-switch ace-switch-5 normal-switch">
-                                        <span class="lbl middle"></span>
-                                    </label>
-                                    <div class="btn-group">
-                                        <a class="btn btn-sm btn-white  btn-black" href="#">
-                                            <span>编辑指标体系&nbsp;</span>
-                                        </a>
-                                    </div>
-                                    <div class="btn-group">
-                                        <a class="btn btn-sm btn-white  btn-black" href="#">
-                                            <span>删除指标体系&nbsp;</span>
-                                        </a>
-                                    </div>
-                                    <div class="btn-group">
-                                        <a class="btn btn-sm btn-white  btn-default" data-action="collapse"">
-                                        <i class="ace-icon fa fa-chevron-up"></i>
-                                        </a>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 widget-container-col ui-sortable" id="widget-container-col-3">
+                        <h4 class="row header smaller lighter blue">
+                            <span class="col-xs-6">评价体系</span><!-- /.col -->
+                        </h4>
+                        <div class="accordion-style1 panel-group">
+                            <#list evaList as eva>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion"
+                                               href="#collapseOne" aria-expanded="true">
+                                                <i class="bigger-110 ace-icon fa fa-angle-down"
+                                                   data-icon-hide="ace-icon fa fa-angle-down"
+                                                   data-icon-show="ace-icon fa fa-angle-right"></i>
+                                                &nbsp;${eva.name}
+                                            </a>
+                                        </h4>
                                     </div>
 
+                                    <div class="panel-collapse collapse in" id="collapseOne" aria-expanded="true"
+                                         style="">
+                                        <div class="panel-body">
+                                            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry
+                                            richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard
+                                            dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon
+                                            tempor, sunt aliqua put a bird on it squid single-origin coffee nulla
+                                            assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore
+                                            wes anderson cred nesciunt sapiente ea proident.
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="widget-body">
-                                <div class="widget-main">
-                                    <div class="row" data-index-id="0">
-                                        <div class="col-xs-12">
-                                            <h5 class="header smaller lighter blue">资源</h5>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        客户数量
-                                    </span>
-
-                                                    <input type="number"
-                                                           class="form-control search-query  projectIndex-input"
-                                                           id="customerN-input" name="customerN"
-                                                           value="${projectIndex.customerN}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.customerNNorm}
-                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-
-                                    <span class="input-group-addon">
-                                        成员数量
-                                    </span>
-
-                                                    <input type="number"
-                                                           class="form-control search-query  projectIndex-input" readonly
-                                                           id="memberN-input" name="memberN"
-                                                           value="${projectIndex.memberN}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.memberNNorm}
-                                    </span>
-                                                </div>
-                                            </div>
-
-                                        </div><!-- /.btn-group -->
-                                        <div class="col-xs-12">
-                                            <h5 class="header smaller lighter green">投入</h5>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-                                    <span class="input-group-addon ">
-                                        活动经费
-                                    </span>
-
-                                                    <input type="text" class="form-control search-query projectIndex-input"
-                                                           id="funds-input" name="funds" value="${projectIndex.funds}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.fundsNorm}
-                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-
-                                    <span class="input-group-addon">
-                                        工作节点数目
-                                    </span>
-
-                                                    <input type="number"
-                                                           class="form-control search-query projectIndex-input" readonly
-                                                           id="nodeN-input" name="nodeN" value="${projectIndex.nodeN}">
-                                                    <span class="input-group-addon normalNumber">
-                                         ${projectIndex.nodeNNorm}
-                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        培训数目
-                                    </span>
-
-                                                    <input type="number"
-                                                           class="form-control search-query projectIndex-input"
-                                                           id="trainN-input" name="trainN" value="${projectIndex.trainN}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.trainNNorm}
-                                    </span>
-                                                </div>
-
-                                            </div>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        会议数目
-                                    </span>
-
-                                                    <input type="number"
-                                                           class="form-control search-query projectIndex-input"
-                                                           id="meetingN-input" name="meetingN"
-                                                           value="${projectIndex.meetingN}">
-
-
-                                                </div>
-                                            </div>
-
-
-                                        </div><!-- /.btn-group -->
-                                        <div class="col-xs-12">
-                                            <h5 class="header smaller lighter orange">产出</h5>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-                                    <span class="input-group-addon ">
-                                        经济收益
-                                    </span>
-
-                                                    <input type="number"
-                                                           class="form-control search-query projectIndex-input"
-                                                           id="income-input" name="income" value="${projectIndex.income}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.incomeNorm}
-                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-
-                                    <span class="input-group-addon">
-                                        客户满意度
-                                    </span>
-
-                                                    <input type="text" class="form-control search-query projectIndex-input"
-                                                           id="satisfaction-input" name="satisfaction"
-                                                           value="${projectIndex.satisfaction}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.satisfactionNorm}
-                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        项目完工率
-                                    </span>
-
-                                                    <input type="text" class="form-control search-query projectIndex-input"
-                                                           readonly id="completionRate-input" name="completionRate"
-                                                           value="${projectIndex.completionRate}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.completionRateNorm}
-                                    </span>
-
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        人员参与指数
-                                    </span>
-
-                                                    <input type="text" class="form-control search-query projectIndex-input"
-                                                           readonly id="participationIndex-input" name="participationIndex"
-                                                           value="${projectIndex.participationIndex}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.participationIndexNorm}
-                                    </span>
-
-                                                </div>
-                                            </div>
-
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        创新方掌握程度
-                                    </span>
-
-                                                    <input type="text" class="form-control search-query projectIndex-input"
-                                                           id="proficiency-input" name="proficiency"
-                                                           value="${projectIndex.proficiency}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.proficiencyNorm}
-                                    </span>
-
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        案例数
-                                    </span>
-
-                                                    <input type="number"
-                                                           class="form-control search-query projectIndex-input"
-                                                           id="caseN-input" name="caseN" value="${projectIndex.caseN}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.caseNNorm}
-                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        专利数
-                                    </span>
-
-                                                    <input type="number"
-                                                           class="form-control search-query projectIndex-input"
-                                                           id="patentN-input" name="patentN"
-                                                           value="${projectIndex.patentN}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.patentNNorm}
-                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-6">
-                                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        论文数
-                                    </span>
-
-                                                    <input type="number"
-                                                           class="form-control search-query projectIndex-input"
-                                                           id="paperN-input" name="paperN" value="${projectIndex.paperN}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.paperNNorm}
-                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-12">
-                                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        有效提案数
-                                    </span>
-
-                                                    <input type="number"
-                                                           class="form-control search-query projectIndex-input"
-                                                           id="proposalN-input" name="proposalN"
-                                                           value="${projectIndex.proposalN}">
-                                                    <span class="input-group-addon normalNumber">
-                                        ${projectIndex.proposalNNorm}
-                                    </span>
-                                                </div>
-                                            </div>
-
-
-                                        </div><!-- /.btn-group -->
-                                    </div>
-
-                                </div>
-                            </div>
+                            </#list>
                         </div>
                     </div>
 
@@ -472,7 +226,8 @@
                         <div class="row">
                             <form class="form-horizontal" role="form">
                                 <div class="form-group">
-                                    <label class="col-sm-3 control-label no-padding-right" for="is-name-input">评价体系的名称</label>
+                                    <label class="col-sm-3 control-label no-padding-right"
+                                           for="is-name-input">评价体系的名称</label>
 
                                     <div class="col-sm-9">
                                         <input type="text" id="is-name-input" class="col-xs-10 col-sm-7">
@@ -485,19 +240,24 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-3 control-label no-padding-right" for="is-des-input">评价体系的说明</label>
+                                    <label class="col-sm-3 control-label no-padding-right"
+                                           for="is-des-input">评价体系的说明</label>
 
                                     <div class="col-sm-9">
-                                        <textarea id="is-des-input" placeholder="您可以在此处输入评价体系的相关备注，包括适合什么项目" class="col-xs-10 col-sm-7"></textarea>
+                                        <textarea id="is-des-input" placeholder="您可以在此处输入评价体系的相关备注，包括适合什么项目"
+                                                  class="col-xs-10 col-sm-7"></textarea>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-3 control-label no-padding-right" for="is-tag-input">评价体系的标签</label>
+                                    <label class="col-sm-3 control-label no-padding-right"
+                                           for="is-tag-input">评价体系的标签</label>
 
                                     <div class="col-sm-9">
                                         <div class="inline">
-                                            <input type="text" name="tags" id="is-tag-input"  placeholder="输入评价体系的标签..." />
-                                        </div>                                    </div>
+                                            <input type="text" name="tags" id="is-tag-input"
+                                                   placeholder="输入评价体系的标签..."/>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </form>

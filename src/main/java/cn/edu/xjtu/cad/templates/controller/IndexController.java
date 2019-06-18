@@ -5,10 +5,7 @@ import cn.edu.xjtu.cad.templates.model.Eva;
 import cn.edu.xjtu.cad.templates.model.EvaIndex;
 import cn.edu.xjtu.cad.templates.service.IndexService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,6 +31,7 @@ public class IndexController {
      */
     @RequestMapping(value = "",method = RequestMethod.POST)
     public long addProjectEvaIndex(EvaIndex evaIndex){
+
         return indexService.addEvaIndex(evaIndex,user);
     }
 
@@ -62,5 +60,10 @@ public class IndexController {
         indexService.refreshEvaIndexRange(indexID,user);
     }
 
+
+    @RequestMapping(value = "/{indexID}/res/{linkID}",method = RequestMethod.PUT)
+    public void updateIndexRes(@PathVariable long indexID,@PathVariable long linkID,double res){
+        indexService.updateIndexRest(indexID,linkID,res,user);
+    }
 
 }

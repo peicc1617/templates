@@ -40,20 +40,34 @@ public interface EvaMapper {
      */
     void addIndex2Eva(@Param("evaID")long evaID,@Param("indexID")long indexID);
 
-    void addEvaIndexRes(EvaIndexRes evaIndexRes);
 
-    void updateEvaIndexRes(EvaIndexRes evaIndexRes);
-
-    void deleteIndexFromEva(long evaID, long indexID);
+    void deleteIndexFromEva(@Param("evaID")long evaID, @Param("indexID")long indexID);
 
 
-    void addEvaLink(long evaID, long linkID);
+    void addEvaLink(@Param("evaID")long evaID, @Param("linkID")long linkID);
 
-    void deleteEvaLink(long evaID, long linkID);
+    void deleteEvaLink(@Param("evaID")long evaID,@Param("linkID") long linkID);
 
     /**
      * 获取所有的指标
      * @return
      */
     List<EvaIndex> getAllEvaIndex();
+
+    /**
+     * 根据LinkID获取评价体系
+     * @param linkID
+     * @return
+     */
+    List<Eva> getEvaByLinkID(@Param("linkID")long linkID);
+
+    EvaIndexRes getIndexRes(@Param("indexID")long indexID, @Param("linkID")long linkID);
+
+    void addIndexRes(EvaIndexRes evaIndexRes);
+
+    void updateIndexRes(EvaIndexRes evaIndexRes);
+
+    List<EvaIndex> getIndexList(@Param("linkID")long linkID);
+
+    void editIndexW(@Param("evaID")long evaID, @Param("indexID")long indexID, @Param("w")double w);
 }

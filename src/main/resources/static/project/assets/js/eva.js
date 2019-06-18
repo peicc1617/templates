@@ -31,10 +31,8 @@ function initDiyIndexTable() {
             title: '指标名称',
             editable: {
                 type: "text",
-                onblur: "submit",
-                showbuttons: false,
                 validate: function (v) {
-                    if (!v) return '姓名不能为空';
+                    if (!v) return '指标名称不能为空';
                 }
             }
         }, {
@@ -42,10 +40,8 @@ function initDiyIndexTable() {
             title: '指标权重',
             editable: {
                 type: "text",
-                onblur: "submit",
-                showbuttons: false,
                 validate: function (v) {
-                    if (!v) return '姓名不能为空';
+                    if (!v) return '指标权重不能为空';
                 }
             }
         }, {
@@ -53,10 +49,8 @@ function initDiyIndexTable() {
             title: '指标最小值',
             editable: {
                 type: "text",
-                onblur: "submit",
-                showbuttons: false,
                 validate: function (v) {
-                    if (!v) return '姓名不能为空';
+                    if (!v) return '指标范围不能为空';
                 }
             }
         }, {
@@ -64,10 +58,8 @@ function initDiyIndexTable() {
             title: '指标最大值',
             editable: {
                 type: "text",
-                onblur: "submit",
-                showbuttons: false,
                 validate: function (v) {
-                    if (!v) return '姓名不能为空';
+                    if (!v) return '指标范围不能为空';
                 }
             }
         }, {
@@ -75,18 +67,10 @@ function initDiyIndexTable() {
             title: '指标说明',
             editable: {
                 type: "text",
-                onblur: "submit",
-                showbuttons: false,
             }
         },{
-            field: 'opt',
-            title: '操作',
-            formatter:function (v,row) {
-                return '<button class="btn btn-xs btn-white btn-success bigger" onclick="refreshEvaIndexRange('+row.indexID+')">\n' +
-                    '                                        <i class="ace-icon fa fa-refresh"></i>\n' +
-                    '                                        自动调整指标的区间\n' +
-                    '                                    </button>'
-            }
+            field: 'creator',
+            title: '创建者'
         }],
         pagination: true,//启用分页
         pageNumber: 1,//默认是第一页
@@ -94,21 +78,48 @@ function initDiyIndexTable() {
         pageList: [10, 20,50],
         uniqueId:"indexID",
         onEditableSave: function (field, row, oldValue, $el) {
-            $.ajax({
-                url:API.editEvaIndex+"/"+row.indexID,
-                type:"PUT",
-                data:row,
-                success:function (data) {
-                    if(data.code==1){
+            if(field=='w'){
+                $.ajax({
+                    url:`${API.editIndexW}${row.indexID}/w`,
+                    type:"PUT",
+                    data:{
+                        w:row[field]
+                    },
+                    success:function (data) {
+                        if(data.code==1){
 
-                    }else {
+                        }else {
+                            $el.text(oldValue)
+                        }
+                    },
+                    error:function () {
                         $el.text(oldValue)
                     }
-                },
-                error:function () {
-                    $el.text(oldValue)
-                }
-            })
+                })
+            }else {
+                $.ajax({
+                    url:`${API.editIndex}/${row.indexID}`,
+                    type:"PUT",
+                    data:row,
+                    success:function (data) {
+                        if(data.code==1){
+
+                        }else {
+                            $el.text(oldValue)
+                        }
+                    },
+                    error:function () {
+                        $el.text(oldValue)
+                    }
+                })
+            }
+
+        },
+        onEditableShown(field, row, $el,t){
+            if(!row.canEdit){
+                t.disable();
+                t.hide();
+            }
         }
     }
     $("#diyIndexTable").bootstrapTable(diyIndexTableLayout)
@@ -144,17 +155,22 @@ function addDiyIndex(){
  * 删除评价指标
  */
 function deleteDiyIndex(){
-    $("#diyIndexTable").bootstrapTable("getSelections").forEach(r=>{
-        $.ajax({
-            url:API.editEvaIndex+"/"+r.indexID,
-            type:"DELETE",
-            success:function (data) {
-                if(data.code==1){
-                    $("#diyIndexTable").bootstrapTable('removeByUniqueId',r.indexID)
-                }
+    const rArr = $("#diyIndexTable").bootstrapTable("getSelections");
+    const indexIDs = rArr.map(r=>r.indexID)
+    $.ajax({
+        url:API.editEvaIndex,
+        type:"DELETE",
+        data:{
+            indexIDs:indexIDs
+        },
+        success:function (data) {
+            if(data.code==1){
+                $("#diyIndexTable").bootstrapTable('refresh')
+                $("#import-table").bootstrapTable('refresh')
             }
-        })
-    });
+        }
+    })
+
 }
 
 /**
@@ -195,6 +211,10 @@ function updateEvaInfo(params) {
     return d.promise();
 }
 
+/**
+ * 刷新
+ * @param rowIndex
+ */
 function refreshEvaIndexRange(rowIndex) {
     $.ajax({
         url:API.editEvaIndex+"/"+rowIndex+"/refreshRange",
@@ -208,38 +228,54 @@ function refreshEvaIndexRange(rowIndex) {
 }
 
 
-function showImportTable() {
-    
-}
-
+/**
+ * 初始化导入指标的表格
+ */
 function initImportTable() {
     let importTableLayout = {
         url:API.getAllIndex,
         columns: [{
             checkbox: true,
-            visible: true,                  //是否显示复选框
+            visible: true                  //是否显示复选框
         }, {
             field: 'indexID',
             title: '指标编号',
         }, {
             field: 'name',
             title: '指标名称',
-
-        }, {
-            field: 'w',
-            title: '指标权重',
-
+            editable: {
+                type: "text",
+                validate: function (v) {
+                    if (!v) return '指标名称不能为空';
+                }
+            }
         }, {
             field: 'rangeL',
             title: '指标最小值',
-
+            editable: {
+                type: "text",
+                validate: function (v) {
+                    if (!v) return '指标范围不能为空';
+                }
+            }
         }, {
             field: 'rangeR',
             title: '指标最大值',
-
+            editable: {
+                type: "text",
+                validate: function (v) {
+                    if (!v) return '指标范围不能为空';
+                }
+            }
         }, {
             field: 'des',
             title: '指标说明',
+            editable: {
+                type: "text",
+            }
+        },{
+            field: 'creator',
+            title: '创建者'
         }],
         pagination: true,//启用分页
         pageNumber: 1,//默认是第一页
@@ -248,7 +284,7 @@ function initImportTable() {
         uniqueId:"indexID",
         onEditableSave: function (field, row, oldValue, $el) {
             $.ajax({
-                url:API.editEvaIndex+"/"+row.indexID,
+                url:`${API.editIndex}/${row.indexID}`,
                 type:"PUT",
                 data:row,
                 success:function (data) {
@@ -262,9 +298,36 @@ function initImportTable() {
                     $el.text(oldValue)
                 }
             })
+        },
+        onEditableShown(field, row, $el,t){
+            if(!row.canEdit){
+                t.disable();
+                t.hide();
+            }
         }
     }
     $("#import-table").bootstrapTable(importTableLayout)
 
+}
+
+/**
+ * 导入选中的指标
+ */
+function importIndex() {
+    const rArr = $("#import-table").bootstrapTable("getSelections");
+    const indexIDs = rArr.map(r=>r.indexID)
+    $.ajax({
+        url:API.editEvaIndex,
+        type:"PUT",
+        data:{
+            indexIDs:indexIDs
+        },
+        success:function (data) {
+            if(data.code==1){
+                $("#diyIndexTable").bootstrapTable('append',rArr)
+                $("#import-table").bootstrapTable('refresh')
+            }
+        }
+    })
 }
 

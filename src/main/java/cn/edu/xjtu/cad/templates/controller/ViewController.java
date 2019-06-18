@@ -3,6 +3,7 @@ package cn.edu.xjtu.cad.templates.controller;
 import cn.edu.xjtu.cad.templates.annotation.CurUser;
 import cn.edu.xjtu.cad.templates.config.API;
 import cn.edu.xjtu.cad.templates.model.Eva;
+import cn.edu.xjtu.cad.templates.model.EvaIndex;
 import cn.edu.xjtu.cad.templates.model.log.Log;
 import cn.edu.xjtu.cad.templates.model.log.ProjectLog;
 import cn.edu.xjtu.cad.templates.model.project.Project;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -278,10 +280,16 @@ public class ViewController {
     @RequestMapping("/project/{projectID}/eva.html")
     public String viewProjectEva(Model model,@PathVariable long projectID){
         //从视图中获取当前项目
-        Project project = (Project) model.asMap().get("project");
+//        Project project = (Project) model.asMap().get("project");
         //获取项目预定义的指标
-        model.addAttribute("projectIndex",projectService.getProjectIndex(project));
+//        model.addAttribute("projectIndex",projectService.getProjectIndex(project));
 
+        List<Eva> evaList = evaService.getProjectEvaList(projectID,user);
+        Map<Long,EvaIndex> evaIndexMap = evaService.getIndexList(projectID,user)
+                .stream()
+                .collect(Collectors.toMap(index->index.getIndexID(), Function.identity()));
+        model.addAttribute("evaList",evaList);
+        model.addAttribute("indexList",JSON.toJSONString(evaIndexMap.values()));
         return "projectEva";
     }
 
@@ -358,6 +366,7 @@ public class ViewController {
     public String viewEva(Model model,@PathVariable long evaID){
         Eva eva = evaService.getEvaByID(evaID,user);
         model.addAttribute("eva",eva);
+
         return "eva";
     }
     /**

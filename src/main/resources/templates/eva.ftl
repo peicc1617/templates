@@ -51,7 +51,8 @@
     <script>
         const API = {
             evaIndexAddAndGet:"/templates/api/eva/${eva.evaID}/index",
-            editEvaIndex:"/templates/api/eva/${eva.evaID}/index",
+            editIndex:"/templates/api/index",
+            editIndexW:"/templates/api/eva/${eva.evaID}/index/",
             editEva:"/templates/api/eva/${eva.evaID}",
             getAllIndex:"/templates/api/index/list?evaID=${eva.evaID}",
         }
@@ -126,11 +127,6 @@
                                         <i class="ace-icon fa fa-link"></i>
                                         删除评价指标
                                     </button>
-
-                                    <button class="btn btn-xs btn-white  bigger btn-danger " onclick="showImportTable()">
-                                        <i class="ace-icon fa fa-link"></i>
-                                        导入评价指标
-                                    </button>
                                 </div>
                             </div>
                             <div class="widget-body">
@@ -158,7 +154,7 @@
                                 </h3>
                                 <div class="widget-toolbar no-border">
 
-                                    <button class="btn btn-xs btn-white  btn-primary bigger" onclick="addDiyIndex()">
+                                    <button class="btn btn-xs btn-white  btn-primary bigger" onclick="importIndex()">
                                         <i class="ace-icon fa fa-plus"></i>
                                         导入
                                     </button>

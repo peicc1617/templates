@@ -8,11 +8,9 @@ import cn.edu.xjtu.cad.templates.service.EvaService;
 import cn.edu.xjtu.cad.templates.service.IndexService;
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -107,27 +105,33 @@ public class EvaController {
         //首先创建指标，获取创建的评估指标ID
         long indexID = indexService.addEvaIndex(evaIndex,user);
         //然后进行绑定
-        evaService.addIndex2Eva(evaID,indexID,user);
+        evaService.addIndex2Eva(evaID, new long[]{indexID},user);
         return indexID;
     }
+
     /**
      * 将指标导入评估指标体系
      * @param evaID
-     * @param indexID
+     * @param indexIDs
      */
-    @RequestMapping(value = "/{evaID}/index/{indexID}",method = RequestMethod.PUT)
-    public void addIndex2Eva(@PathVariable long evaID,@PathVariable long indexID){
-        evaService.addIndex2Eva(evaID,indexID,user);
+    @RequestMapping(value = "/{evaID}/index",method = RequestMethod.PUT)
+    public void addIndex2Eva(@PathVariable long evaID, @RequestParam("indexIDs[]") long[] indexIDs){
+        evaService.addIndex2Eva(evaID,indexIDs,user);
+    }
+
+    @RequestMapping(value = "/{evaID}/index/{indexID}/w",method = RequestMethod.PUT)
+    public void editIndexW(@PathVariable long evaID, @PathVariable long indexID, double w){
+        evaService.editIndexW(evaID,indexID,w,user);
     }
 
     /**
      * 将指标从体系内删除
      * @param evaID
-     * @param indexID
+     * @param indexIDs
      */
-    @RequestMapping(value = "/{evaID}/index/{indexID}",method = RequestMethod.DELETE)
-    public void deleteIndexFromEva(@PathVariable long evaID,@PathVariable long indexID){
-        evaService.deleteIndexFromEva(evaID,indexID,user);
+    @RequestMapping(value = "/{evaID}/index",method = RequestMethod.DELETE)
+    public void deleteIndexFromEva(@PathVariable long evaID,@RequestParam("indexIDs[]") long[] indexIDs){
+        evaService.deleteIndexFromEva(evaID,indexIDs,user);
     }
 
     /**
