@@ -1,14 +1,10 @@
 package cn.edu.xjtu.cad.templates.dao;
 
 import cn.edu.xjtu.cad.templates.model.project.Project;
-import cn.edu.xjtu.cad.templates.model.project.ProjectIndex;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
 import org.apache.ibatis.annotations.*;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -60,19 +56,11 @@ public interface ProjectMapper {
 
     void updateProjectStartTime(long projectID);
 
-    void updateProjectIndex(ProjectIndex projectIndex);
-
-    ProjectIndex getProjectIndex(@Param("projectID")long projectID);
-
-    void addProjectIndex(ProjectIndex projectIndex);
-
-    List<ProjectIndex> getAllProjectIndex();
 
     void saveNormalizeIndex(@Param("projectID")long projectID,@Param("map") Map<String, Double> outputIndexMap);
 
     void updateDea(@Param("projectID") long i, @Param("dea")double v);
 
-    Double getProjectDea(@Param("projectID") long projectID);
 
     Project getProjectByProblemID(@Param("problemID") String problemID );
 

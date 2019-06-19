@@ -74,35 +74,35 @@
         where projectID = #{projectID}
     </update>
 
-    <insert id="addProjectIndex">
-        INSERT  INTO project_index (projectID) VALUES
-            (#{projectID})
-    </insert>
-    <update id="updateProjectIndex">
-        UPDATE project_index
-        set funds =  #{funds},
-            customerN =  #{customerN},
-            memberN =  #{memberN},
-            meetingN =  #{meetingN},
-            nodeN =  #{nodeN},
-            trainN =  #{trainN},
-            income =  #{income},
-            satisfaction =  #{satisfaction},
-            completionRate =  #{completionRate},
-            participationIndex =  #{participationIndex},
-            proficiency =  #{proficiency},
-            caseN =  #{caseN},
-            paperN =  #{paperN},
-            patentN =  #{patentN},
-            proposalN =  #{proposalN}
-            where projectID = #{projectID}
-    </update>
-    <select id="getProjectIndex" resultType="cn.edu.xjtu.cad.templates.model.project.ProjectIndex">
-        SELECT * FROM  project_index WHERE projectID = #{projectID}
-    </select>
-    <select id="getAllProjectIndex" resultType="cn.edu.xjtu.cad.templates.model.project.ProjectIndex">
-        SELECT * FROM  project_index
-    </select>
+<!--    <insert id="addProjectIndex">-->
+<!--        INSERT  INTO project_index (projectID) VALUES-->
+<!--            (#{projectID})-->
+<!--    </insert>-->
+<!--    <update id="updateProjectIndex">-->
+<!--        UPDATE project_index-->
+<!--        set funds =  #{funds},-->
+<!--            customerN =  #{customerN},-->
+<!--            memberN =  #{memberN},-->
+<!--            meetingN =  #{meetingN},-->
+<!--            nodeN =  #{nodeN},-->
+<!--            trainN =  #{trainN},-->
+<!--            income =  #{income},-->
+<!--            satisfaction =  #{satisfaction},-->
+<!--            completionRate =  #{completionRate},-->
+<!--            participationIndex =  #{participationIndex},-->
+<!--            proficiency =  #{proficiency},-->
+<!--            caseN =  #{caseN},-->
+<!--            paperN =  #{paperN},-->
+<!--            patentN =  #{patentN},-->
+<!--            proposalN =  #{proposalN}-->
+<!--            where projectID = #{projectID}-->
+<!--    </update>-->
+<!--    <select id="getProjectIndex" resultType="cn.edu.xjtu.cad.templates.model.project.ProjectIndex">-->
+<!--        SELECT * FROM  project_index WHERE projectID = #{projectID}-->
+<!--    </select>-->
+<!--    <select id="getAllProjectIndex" resultType="cn.edu.xjtu.cad.templates.model.project.ProjectIndex">-->
+<!--        SELECT * FROM  project_index-->
+<!--    </select>-->
 
     <delete id="deleteProject">
         DELETE FROM project WHERE projectID = #{projectID}
@@ -119,16 +119,6 @@
         where projectID = #{projectID}
     </update>
 
-
-    <update id="updateDea">
-        UPDATE project
-        set dea = #{dea}
-        where projectID = #{projectID}
-    </update>
-
-    <select id="getProjectDea" resultType="Double">
-        SELECT dea FROM  project where projectID = #{projectID}
-    </select>
 
     <select id="getProjectByProblemID" resultType="cn.edu.xjtu.cad.templates.model.project.Project">
         SELECT * FROM  project where problemID = #{problemID}

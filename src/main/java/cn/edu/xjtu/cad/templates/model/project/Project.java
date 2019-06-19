@@ -57,7 +57,6 @@ public class Project {
 
     private double dea;
 
-    private ProjectIndex projectIndex;
 
     private String problemID;
 
@@ -259,14 +258,6 @@ public class Project {
 
     public void setDea(double dea) {
         this.dea = dea;
-    }
-
-    public ProjectIndex getProjectIndex() {
-        return projectIndex;
-    }
-
-    public void setProjectIndex(ProjectIndex projectIndex) {
-        this.projectIndex = projectIndex;
     }
 
     public String getProblemID() {

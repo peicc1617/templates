@@ -5,7 +5,6 @@ import cn.edu.xjtu.cad.templates.annotation.UserRoleFilter;
 import cn.edu.xjtu.cad.templates.aop.MyException;
 import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.dao.*;
-import cn.edu.xjtu.cad.templates.dea.Dea;
 import cn.edu.xjtu.cad.templates.model.Result;
 import cn.edu.xjtu.cad.templates.model.ResultCode;
 import cn.edu.xjtu.cad.templates.model.project.*;
@@ -52,10 +51,6 @@ public class ProjectService {
 
     @Autowired
     NodeRoleMapper nodeRoleMapper;
-
-    @Autowired
-    Dea dea;
-
 
     public List<Project> getOwnedProjectList(User user) {
         return projectMapper.getProjectListByUserAndRole(user.getUserID(), ProjectRoleType.CREATOR);
@@ -191,58 +186,9 @@ public class ProjectService {
         project.setNodeMap(nodeMap);
         //获取当前项目的用户
         project.setMembers(projectRoleMapper.getRoleOfProject(projectID));
-        project.setDea(getProjectDea(project));
         return project;
     }
 
-    /**
-     * 获取项目的指标值
-     * @param project
-     * @return
-     */
-    public ProjectIndex getProjectIndex(Project project){
-        ProjectIndex projectIndex = projectMapper.getProjectIndex(project.getProjectID());
-        boolean insertFlag = false;
-        if (projectIndex == null) {
-            projectIndex = new ProjectIndex();
-            projectIndex.setProjectID(project.getProjectID());
-            insertFlag = true;
-        }
-        setIndexDefault(projectIndex, project);
-        if (insertFlag) {
-            projectMapper.addProjectIndex(projectIndex);
-        } else {
-            projectMapper.updateProjectIndex(projectIndex);
-        }
-        preNormalizeIndex(projectIndex);
-        calDea();
-        return projectIndex;
-    }
-
-    public double getProjectDea(Project project){
-        Double d =  projectMapper.getProjectDea(project.getProjectID());
-
-        return d==null?0:d;
-    }
-    /**
-     * 设置部分指标的默认值
-     * 成员数
-     * 工作节点数
-     * 参与指数
-     * 完工率
-     *
-     * @param project
-     */
-    private void setIndexDefault(ProjectIndex projectIndex, Project project) {
-        //根据系统设置成员数目指标
-        projectIndex.setMemberN(project.getMembers().size());
-        //根据系统设置节点数目指标
-        projectIndex.setNodeN(project.getNodeMap().size());
-        //根据系统设置人员参与指数
-        projectIndex.setParticipationIndex(Math.random());
-        //根据系统设置完工率指标
-        projectIndex.setCompletionRate(Math.random());
-    }
 
 
     /**
@@ -611,140 +557,6 @@ public class ProjectService {
         projectMapper.updateProjectStartTime(projectID);
     }
 
-
-    /**
-     * 函数存在的问题，没有考虑权限，没有验证projectID
-     *
-     * @param user
-     * @param projectIndex
-     */
-    public void updateProjectIndex(User user, ProjectIndex projectIndex) {
-        ProjectIndex index = projectMapper.getProjectIndex(projectIndex.getProjectID());
-        if (index == null) {
-            projectMapper.addProjectIndex(projectIndex);
-        }
-        projectMapper.updateProjectIndex(projectIndex);
-        preNormalizeIndex(projectIndex);
-        calDea();
-    }
-
-    /**
-     * 计算所有的项目的效率
-     */
-    private void calDea() {
-        List<ProjectIndex> projectIndices = projectMapper.getAllProjectIndex();
-        if(projectIndices==null||projectIndices.size()==0){
-            return;
-        }
-        List<Long> names= new ArrayList<>();
-        Map<Long,double[]> inputsMap = new HashMap<>();
-        Map<Long,double[]> outputsMap = new HashMap<>();
-        Set<String> inputKey = projectIndices.get(0).getInputIndexMap().keySet();
-        Set<String> outputKey = projectIndices.get(0).getOutputIndexMap().keySet();
-        for (ProjectIndex projectIndex : projectIndices) {
-            names.add(projectIndex.getProjectID());
-            double[] input = new double[inputKey.size()];
-            Map<String,Double> inputMap = projectIndex.getInputIndexMap();
-            int i =0;
-            for (String s : inputKey) {
-                input[i++]= inputMap.get(s);
-            }
-            double[] output = new double[outputKey.size()];
-            Map<String,Double> outputMap = projectIndex.getOutputIndexMap();
-            i=0;
-            for (String s : outputKey) {
-                output[i++]= outputMap.get(s);
-            }
-            inputsMap.put(projectIndex.getProjectID(),input);
-            outputsMap.put(projectIndex.getProjectID(),output);
-        }
-        Map<Long, Double> result = dea.depotsEfficiency(names,inputsMap,outputsMap);
-        if(result!=null){
-            result.forEach((i,v)->{
-                projectMapper.updateDea(i,v);
-            });
-        }
-    }
-
-
-    private void preNormalizeIndex(ProjectIndex projectIndex) {
-        Map<String, Double> indexMap = projectIndex.getIndexMap();
-        //如果标准化的区间未初始化，首先初始化标准化区间
-        if (indexMaxAndMin == null) {
-            getAllIndexMaxAndMin(false);
-        }
-        //得到标准化的区间后，判断当前标准化区间的正确性
-        if (valuateMaxAndMin(indexMap)) {
-            //如果超过了区间，需要重新初始化区间
-            getAllIndexMaxAndMin(true);
-        }
-        normalizeIndex(projectIndex, indexMap);
-
-    }
-
-    /**
-     * 获取所有项目指标值的最大值和最小值
-     */
-    private synchronized void getAllIndexMaxAndMin(boolean reset) {
-        if (indexMaxAndMin != null && !reset) {
-            return;
-        }
-        indexMaxAndMin = new HashMap<>();
-        List<ProjectIndex> projectIndices = projectMapper.getAllProjectIndex();
-        projectIndices.stream()
-                .map(projectIndex -> new ArrayList<>(projectIndex.getIndexMap().entrySet()))
-                .flatMap(list -> list.stream())
-                .collect(Collectors.groupingBy(e -> e.getKey(), Collectors.mapping(Map.Entry::getValue, Collectors.toList())))
-                .forEach((k, v) ->
-                        indexMaxAndMin.put(k, new double[]{Collections.max(v), Collections.min(v)})
-                );
-        if (reset) {
-            projectIndices.forEach(pi->normalizeIndex(pi,pi.getIndexMap()));
-        }
-
-    }
-
-    /**
-     * 验证指标是否超过了区间
-     *
-     * @param indexMap
-     * @return
-     */
-    private boolean valuateMaxAndMin(Map<String, Double> indexMap) {
-        return indexMap.entrySet()
-                .stream()
-                .filter(e -> compareMaxAndMin(indexMaxAndMin.get(e.getKey()), e.getValue()))
-                .count() > 0;
-    }
-
-    /**
-     * 判断当前指标值是否超出了标准化的范围
-     *
-     * @param maxAndMin
-     * @param d
-     * @return
-     */
-    private boolean compareMaxAndMin(double[] maxAndMin, double d) {
-        return maxAndMin[0] < d || d < maxAndMin[1];
-    }
-
-
-    private void normalizeIndex(ProjectIndex projectIndex, Map<String, Double> indexMap) {
-        Map<String, Double> inputIndexMap = projectIndex.getInputIndexMap();
-        Map<String, Double> outputIndexMap = projectIndex.getOutputIndexMap();
-
-        //得到正确的区间以后，标准化指标
-        indexMap.forEach((k, v) -> {
-            double value = normalizeIndex(indexMaxAndMin.get(k), v);
-            if (inputIndexMap.containsKey(k)) {
-                inputIndexMap.put(k, value);
-            } else {
-                outputIndexMap.put(k, value);
-            }
-        });
-        //得到标准化指标后，保存
-        saveNormalizeProjectIndex(projectIndex.getProjectID(), inputIndexMap, outputIndexMap);
-    }
 
     /**
      * 根据最大值和最小值将指标值进行标准化

@@ -4,7 +4,6 @@ import cn.edu.xjtu.cad.templates.annotation.SystemControllerLog;
 import cn.edu.xjtu.cad.templates.aop.MyException;
 import cn.edu.xjtu.cad.templates.model.log.LogType;
 import cn.edu.xjtu.cad.templates.model.log.MethodType;
-import cn.edu.xjtu.cad.templates.model.project.ProjectIndex;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
 import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.service.ProjectService;
@@ -218,17 +217,6 @@ public class ProjectController {
         projectService.startProject(user,projectID);
     }
 
-    /**
-     * 更新项目的评价指标
-     * @param projectID
-     * @param projectIndex
-     */
-    @SystemControllerLog(content = "更新了项目评价的指标", logType = LogType.PROJECT, methodType = MethodType.UPDATE)
-    @RequestMapping(value = "/{projectID}/index", method = RequestMethod.PUT)
-    public void updateProjectIndex(@PathVariable long projectID, ProjectIndex projectIndex){
-        projectIndex.setProjectID(projectID);
-        projectService.updateProjectIndex(user,projectIndex);
-    }
 
     /**
      * 获取成员在项目内的权限

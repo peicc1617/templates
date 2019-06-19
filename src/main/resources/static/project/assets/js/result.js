@@ -323,7 +323,7 @@ function disableNodeResult(disableResultArr){
             },
             success: function (data) {
                 if(data.code==1){
-                    CUR_NODE['results'] = CUR_NODE['results'].concat(data);
+                    CUR_NODE['results'] = CUR_NODE['results'].concat(data.data);
                     resolve()
                 }else {
                     reject(data.msg)
