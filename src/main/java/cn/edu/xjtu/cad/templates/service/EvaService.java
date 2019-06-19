@@ -34,18 +34,22 @@ public class EvaService {
      */
     public void deleteEva(long evaID, User user) {
         evaMapper.deleteEva(evaID);
+        evaMapper.deleteEvaLinkByEvaID(evaID);
     }
 
     /**
      * 获取用户可见的评价体系
+     *
+     * @param linkID
      * @param user
      * @return
      */
-    public List<Eva> getUserEvaList(User user) {
-        List<Eva>  list = evaMapper.getUserEvaList(user.getUserID());
+    public List<Eva> getUserEvaList(long linkID, User user) {
+        List<Eva>  list = evaMapper.getUserEvaList(linkID,user.getUserID());
         list.forEach(eva->{
             List<EvaIndex> evaIndexList = evaMapper.getEvaIndexByEvaID(eva.getEvaID());
             eva.setEvaIndexList(evaIndexList);
+            eva.setCanEdit(eva.getCreator()==user.getUserID());
         });
         return list;
     }
@@ -88,6 +92,7 @@ public class EvaService {
      */
     public void unbindEva(long evaID, long linkID, User user) {
         evaMapper.deleteEvaLink(evaID,linkID);
+        evaMapper.deleteEvaRes(evaID,linkID);
     }
 
     /**
@@ -134,9 +139,6 @@ public class EvaService {
         return evaList;
     }
 
-    public double getIndexRes(long indexID, long linkID) {
-        return evaMapper.getIndexRes(indexID,linkID).getRes();
-    }
 
     public  List<EvaIndex> getIndexList(long projectID, User user) {
         return evaMapper.getIndexList(projectID);

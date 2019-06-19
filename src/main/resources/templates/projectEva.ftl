@@ -47,21 +47,27 @@
     <link rel="stylesheet" href="/webresources/bootstrap/bootstrap-table/bootstrap-table.css">
     <link rel="stylesheet" href="/webresources/bootstrap/bootstrap3-editable/css/bootstrap-editable.css">
     <style>
-        span.label.MEMBER {
-            background: MediumAquaMarine
+        .webs polygon,
+        .lines line {
+            fill: white;
+            fill-opacity: 0.5;
+            stroke: gray;
+            stroke-dasharray: 10 5;
         }
 
-        ,
-        span.label.CREATOR {
-            background: LimeGreen
+        .webs polygon:nth-child(odd) {
+            fill: lightgray;
         }
 
-        ,
-        span.label.SUPER_ADMIN {
-            background: LightSeaGreen
+        .areas polygon {
+            fill-opacity: 0.5;
+            stroke-width: 3;
         }
 
-        ,
+        .areas circle {
+            fill: white;
+            stroke-width: 3;
+        }
     </style>
     <script>
         const API = {
@@ -70,12 +76,14 @@
             updateProjectInCode: "/templates/api/project/${project.projectID}/invitationCode",
             startProject: "/templates/api/project/${project.projectID}/doStart",
             updateProjectIndex: "/templates/api/project/${project.projectID}/index",
-            getEvaList: "/templates/api/eva/user",
+            getEvaList: "/templates/api/eva/list?linkID=${project.projectID}",
             bindEva: '/templates/api/eva/',
+            deleteEva: '/templates/api/eva/',
             updateIndexRes: '/templates/api/index/'
         }
         INDEX_LIST = ${indexList!"[]"}
-            PROJECT_ID = ${project.projectID};
+        PROJECT_ID = ${project.projectID};
+        EVA_LIST = ${evaListJSONString!"[]"}
     </script>
 </head>
 <body class="no-skin">
@@ -137,16 +145,19 @@
 
                                     <div class="col-sm-12 infobox-container">
                                         <#list evaList as eva>
-
-                                            <div class="infobox infobox-blue infobox-small infobox-dark">
-                                                <div class="infobox-icon">
-                                                    <i class="ace-icon fa fa-bar-chart"></i>
+                                            <div class="infobox infobox-blue">
+                                                <div class="infobox-progress">
+                                                    <div class="easy-pie-chart percentage" data-percent="${(eva.res*100)?string("0")}" data-size="46">
+                                                        <span class="percent">${(eva.res)?string("0.##")}</span>
+                                                    </div>
                                                 </div>
+
                                                 <div class="infobox-data">
-                                                    <div class="infobox-content">${eva.name}</div>
-                                                    <div class="infobox-content">$32,000</div>
+                                                    <div class="infobox-content">${eva.name}
+                                                    </div>
                                                 </div>
                                             </div>
+
                                         </#list>
                                     </div>
 
@@ -157,58 +168,138 @@
 
                 </div>
                 <div class="row">
-                    <div class="col-xs-12 col-sm-12 widget-container-col ui-sortable" id="widget-container-col-3">
-                        <h4 class="row header smaller lighter blue">
-                            <span class="col-xs-6">评价指标</span><!-- /.col -->
-                            <span class="col-xs-6">
-                                <span  class="pull-right inline">
-                                    <label id="refresh-btn" style="display: none" class="btn btn-xs btn-yellow active" onclick="javascript:window.location.reload()">刷新页面</label>
-                                </span>
-                            </span>
-                        </h4>
-                        <table id="index-table">
+                    <div class="col-sm-12 widget-container-col ui-sortable">
+                        <div class="widget-box transparent ui-sortable-handle" >
+                            <div class="widget-header">
+                                <h4 class="widget-title lighter">&nbsp;评价指标</h4>
 
-                        </table>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-12 col-sm-12 widget-container-col ui-sortable" id="widget-container-col-3">
-                        <h4 class="row header smaller lighter blue">
-                            <span class="col-xs-6">评价体系</span><!-- /.col -->
-                        </h4>
-                        <div class="accordion-style1 panel-group">
-                            <#list evaList as eva>
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h4 class="panel-title">
-                                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion"
-                                               href="#collapseOne" aria-expanded="true">
-                                                <i class="bigger-110 ace-icon fa fa-angle-down"
-                                                   data-icon-hide="ace-icon fa fa-angle-down"
-                                                   data-icon-show="ace-icon fa fa-angle-right"></i>
-                                                &nbsp;${eva.name}
-                                            </a>
-                                        </h4>
-                                    </div>
+                                <div class="widget-toolbar no-border">
+                                    <a href="#" onclick="location.reload()" id="refresh-btn" style="display: none">
+                                        <i class="ace-icon fa fa-refresh"></i>
+                                        刷新页面
+                                    </a>
+                                    <a href="#" data-action="fullscreen" >
+                                        <i class="ace-icon fa fa-expand"></i>
+                                    </a>
+                                    <a href="#" data-action="collapse">
+                                        <i class="ace-icon fa fa-chevron-up"></i>
+                                    </a>
 
-                                    <div class="panel-collapse collapse in" id="collapseOne" aria-expanded="true"
-                                         style="">
-                                        <div class="panel-body">
-                                            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry
-                                            richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard
-                                            dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon
-                                            tempor, sunt aliqua put a bird on it squid single-origin coffee nulla
-                                            assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore
-                                            wes anderson cred nesciunt sapiente ea proident.
+                                </div>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main padding-6 no-padding-left no-padding-right">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <table id="index-table">
+
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
-                            </#list>
+                            </div>
                         </div>
                     </div>
 
                 </div>
+                <#list evaList as eva>
+                    <div class="row">
+                        <div class="col-sm-12 widget-container-col ui-sortable">
+                            <div class="widget-box transparent ui-sortable-handle" >
+                                <div class="widget-header">
+                                    <h4 class="widget-title lighter">&nbsp;评价体系：${eva.name}</h4>
 
+                                    <div class="widget-toolbar no-border">
+                                        <a href="#" onclick="deleteEva(${eva.evaID},${eva.linkID})" >
+                                            <i class="ace-icon fa fa-trash"></i>
+                                            移除评估体系
+                                        </a>
+                                        <a href="#" data-action="fullscreen" >
+                                            <i class="ace-icon fa fa-expand"></i>
+                                        </a>
+                                        <a href="#" data-action="collapse">
+                                            <i class="ace-icon fa fa-chevron-up"></i>
+                                        </a>
+
+                                    </div>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main padding-6 no-padding-left no-padding-right">
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <div class="widget-box transparent">
+                                                    <div class="widget-header widget-header-flat">
+                                                        <h5 class="widget-title lighter">
+                                                            <i class="ace-icon fa fa-star orange"></i>
+                                                            指标及其标准值
+                                                        </h5>
+                                                    </div>
+                                                    <div class="widget-body">
+                                                        <div class="widget-main no-padding">
+                                                            <table class="table table-bordered table-striped" id="eva-index-table-${eva.evaID}">
+                                                                <thead class="thin-border-bottom">
+                                                                <tr>
+                                                                    <th class="hidden-480">
+                                                                        <i class="ace-icon fa fa-caret-right blue"></i>指标编号
+                                                                    </th>
+
+                                                                    <th>
+                                                                        <i class="ace-icon fa fa-caret-right blue"></i>指标名称
+                                                                    </th>
+
+                                                                    <th >
+                                                                        <i class="ace-icon fa fa-caret-right blue"></i>指标权重
+                                                                    </th>
+                                                                    <th >
+                                                                        <i class="ace-icon fa fa-caret-right blue"></i>标准值
+                                                                    </th>
+                                                                </tr>
+                                                                </thead>
+
+                                                                <tbody>
+                                                                <#list eva.evaIndexList as evaIndex>
+                                                                    <tr>
+                                                                        <td>${evaIndex.indexID}</td>
+                                                                        <td>${evaIndex.name}</td>
+                                                                        <td>${evaIndex.w}</td>
+                                                                        <td>
+                                                                            <b class="green">${evaIndex.res}</b>
+                                                                        </td>
+                                                                    </tr>
+                                                                </#list>
+                                                                </tbody>
+                                                            </table>
+                                                        </div><!-- /.widget-main -->
+                                                    </div><!-- /.widget-body -->
+                                                </div><!-- /.widget-box -->
+                                            </div><!-- /.col -->
+
+                                            <div class="col-sm-7">
+                                                <div class="widget-box transparent">
+                                                    <div class="widget-header widget-header-flat">
+                                                        <h5 class="widget-title lighter">
+                                                            <i class="ace-icon fa fa-signal"></i>
+                                                            雷达图
+                                                        </h5>
+                                                    </div>
+
+                                                    <div class="widget-body">
+                                                        <div class="widget-main padding-4">
+                                                            <svg width="100%" id="radar-${eva.evaID}" class="radar" data-evaid="${eva.evaID}"></svg>
+                                                        </div><!-- /.widget-main -->
+                                                    </div><!-- /.widget-body -->
+                                                </div><!-- /.widget-box -->
+                                            </div><!-- /.col -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </#list>
             </div>
             <!-- /.page-content -->
         </div>
@@ -277,7 +368,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title" id="import-new-eva-label">创建新的评价体系</h4>
+                        <h4 class="modal-title" id="import-new-eva-label">导入已有的评价体系</h4>
                     </div>
                     <div class="modal-body">
                         <table id="import-new-eva-table">
@@ -287,7 +378,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-success" onclick="addProjectEva()">创建新的评价体系</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal -->
@@ -317,8 +407,11 @@
         <script src="/webresources/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
         <script src="/webresources/bootstrap/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
         <script src="/webresources/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js"></script>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
 
+        <script src="/templates/project/assets/js/improveRadar.js"></script>
         <script src="/templates/project/assets/js/projectEva.js"></script>
+
     </div>
 </div>
 

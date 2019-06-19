@@ -43,17 +43,11 @@ $(() => {
     //初始化导入评价体系的列表
     initImportNewEvaTable();
     $('#import-new-eva').on('show.bs.modal',function (e) {
-        $.ajax({
-            url:API.getEvaList,
-            type: 'GET',
-            success:function (data) {
-                if(data.code==1){
-                    $("#import-new-eva-table").bootstrapTable('load',data.data)
-                }
-            }
-        })
+        $("#import-new-eva-table").bootstrapTable('refresh')
     })
     initIndexTable();
+    initRadar();
+    initEasyPieChart();
 })
 
 /**
@@ -90,7 +84,7 @@ function addProjectEva() {
  */
 function initImportNewEvaTable() {
     let importEvaTableLayout = {
-
+        url:API.getEvaList,
         columns: [{
             checkbox: true,
             visible: true                  //是否显示复选框
@@ -122,13 +116,17 @@ function initImportNewEvaTable() {
             field: 'opt',
             title: '操作',
             formatter: function (v, row) {
-                return '<button class="btn btn-xs btn-white btn-success bigger" onclick="importNewEva(' + row.evaID + ')">\n' +
-                    '                                        <i class="ace-icon fa fa-link"></i>\n' +
-                    '                                        导入\n' +
-                    '                                    </button>' + '<button class="btn btn-xs btn-white btn-primary bigger" onclick="jumpEvaView(' + row.evaID + ')">\n' +
-                    '                                        <i class="ace-icon fa fa-eye"></i>\n' +
-                    '                                        查看\n' +
-                    '                                    </button>'
+                const importBtn = $('<button class="btn btn-xs btn-white btn-success bigger" onclick="importNewEva(' + row.evaID + ')"><i class="ace-icon fa fa-link"></i>导入</button>')
+                const viewBtn = $('<button class="btn btn-xs btn-white btn-primary bigger" onclick="jumpEvaView(' + row.evaID + ')"><i class="ace-icon fa fa-eye"></i>查看</button>')
+                const deleteBtn = $('<button class="btn btn-xs btn-white btn-danger bigger" onclick="deleteEva(' + row.evaID + ')"><i class="ace-icon fa fa-trash"></i>删除</button>')
+                let res = viewBtn[0].outerHTML;
+                if(row.linkID!=PROJECT_ID){
+                    res+=importBtn[0].outerHTML
+                }
+                if(row.canEdit){
+                    res+=deleteBtn[0].outerHTML
+                }
+                return res;
             }
         }],
         pagination: true,//启用分页
@@ -235,29 +233,71 @@ function importNewEva(evaID) {
         success:function (data) {
             if(data.code==1){
                 alert("导入评价体系成功")
-                $('#import-new-eva').modal('hide')
-            }
-        }
-    })
-}
-
-
-function removeEva(evaID) {
-    $.ajax({
-        url:`${API.bindEva}/${evaID}/bind`,
-        method:'DELETE',
-        data:{
-            linkID:PROJECT_ID
-        },
-        success:function (data) {
-            if(data.code==1){
-                alert("取消成功")
                 window.location.reload();
             }
         }
     })
-
 }
 
-function refreshPage() {
+
+
+function initRadar() {
+    EVA_LIST.forEach(eva=>{
+        const table = $(`#eva-index-table-${eva.evaID}`);
+        const svg = $(`#radar-${eva.evaID}`);
+        svg.attr('height',table.height())
+        const radar = new ImproveRadar(eva.evaIndexList,`#radar-${eva.evaID}`);
+        radar.init();
+    })
 }
+
+function initEasyPieChart() {
+    $('.easy-pie-chart.percentage').each(function(){
+        var $box = $(this).closest('.infobox');
+        var barColor = $(this).data('color') || (!$box.hasClass('infobox-dark') ? $box.css('color') : 'rgba(255,255,255,0.95)');
+        var trackColor = barColor == 'rgba(255,255,255,0.95)' ? 'rgba(255,255,255,0.25)' : '#E2E2E2';
+        var size = parseInt($(this).data('size')) || 50;
+        $(this).easyPieChart({
+            barColor: barColor,
+            trackColor: trackColor,
+            scaleColor: false,
+            lineCap: 'butt',
+            lineWidth: parseInt(size/10),
+            animate: ace.vars['old_ie'] ? false : 1000,
+            size: size
+        });
+    })
+}
+
+
+function deleteEva(evaID,linkID) {
+    $.ajax({
+        url:`${API.bindEva}${evaID}/bind`,
+        type:'DELETE',
+        data:{
+            linkID:linkID
+        },
+        success:function (data) {
+            if(data.code==1){
+                alert("删除成功")
+                window.location.reload();
+            }
+        }
+    })
+}
+
+
+function deleteEva(evaID) {
+    $.ajax({
+        url:`${API.deleteEva}${evaID}`,
+        type:'DELETE',
+        success:function (data) {
+            if(data.code==1){
+                alert("删除成功")
+                $("#import-new-eva-table").bootstrapTable('refresh',{silent: true} )
+            }
+        }
+    })
+    
+}
+

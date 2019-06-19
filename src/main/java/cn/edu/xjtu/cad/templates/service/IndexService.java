@@ -34,10 +34,8 @@ public class IndexService {
 
     public void deleteEvaIndex(long indexID, User user) {
         evaMapper.deleteEvaIndex(indexID);
-    }
-
-    public void refreshEvaIndexRange(long indexID, User user) {
-
+        evaMapper.deleteEvaLinkIndexByIndexID(indexID);
+        evaMapper.deleteIndexResByIndexID(indexID);
     }
 
     /**
@@ -63,12 +61,20 @@ public class IndexService {
     }
 
 
-    public void updateIndexRest(long indexID, long linkID, double res, User user) {
+    /**
+     * 更新指标值的结果
+     * @param indexID 指标ID
+     * @param linkID 关联ID
+     * @param res 结果
+     * @param user
+     */
+    public void updateIndexRes(long indexID, long linkID, double res, User user) {
         EvaIndexRes evaIndexRes = evaMapper.getIndexRes(indexID,linkID);
         if(evaIndexRes==null){
             evaIndexRes = new EvaIndexRes(indexID,linkID,res);
             evaMapper.addIndexRes(evaIndexRes);
         }else {
+            evaIndexRes = new EvaIndexRes(indexID,linkID,res);
             evaMapper.updateIndexRes(evaIndexRes);
         }
 

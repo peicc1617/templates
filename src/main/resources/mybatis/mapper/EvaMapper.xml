@@ -11,11 +11,16 @@
 
     <!--查询当前用户可以看到的所有评价体系    -->
     <select id="getUserEvaList" resultType="cn.edu.xjtu.cad.templates.model.Eva">
-        SELECT * FROM `eva` WHERE `creator` = ${userID}
+        SELECT * FROM `eva`
+        LEFT JOIN `eva_link`
+            ON `eva_link`.evaID = `eva`.evaID
+            AND `eva_link`.linkID = #{linkID}
+        WHERE `creator` = #{userID}
+        OR `open` = 1
     </select>
 
     <select id="getEvaByID" resultType="cn.edu.xjtu.cad.templates.model.Eva">
-        SELECT * FROM `eva` WHERE `evaID` = ${evaID}
+        SELECT * FROM `eva` WHERE `evaID` = #{evaID}
     </select>
 
     <!-- 创建新的评价体系   -->
@@ -25,24 +30,30 @@
     </insert>
 
     <!-- 删除已有的评价体系   -->
-    <delete id="deleteLog">
-        DELETE FROM  `eva` where `evaID` = #{evaID}
+    <delete id="deleteEva">
+        DELETE FROM `eva` WHERE `evaID` = #{evaID};
     </delete>
 
+    <!-- 删除已有的评价体系   -->
+    <delete id="deleteEvaLinkByEvaID">
+        DELETE FROM `eva_link` WHERE `evaID` = #{evaID};
+    </delete>
     <!-- 更新现有的评价体系   -->
     <update id="editEva">
-        UPDATE `eva` SET
-        `name` = #{name},
-        `des` = #{des},
-        `tags` = #{tags},
-        `open` = #{open}
+        UPDATE `eva`
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">`name` = #{name},</if>
+            <if test="des != null">`des` = #{des},</if>
+            <if test="tags != null">`tags` = #{tags},</if>
+        </trim>
+
         where `evaID` = #{evaID}
     </update>
 
     <!-- 添加新的评估指标   -->
     <insert id="addEvaIndex" keyProperty="indexID" useGeneratedKeys="true">
-        INSERT INTO eva_index (`indexID`,`name`,`des`,`rangeR`,`rangeL`)
-        VALUES (#{indexID},#{name},#{des},#{w},#{rangeR},#{rangeL})
+        INSERT INTO eva_index (`indexID`,`name`,`des`,`rangeR`,`rangeL`,`creator`)
+        VALUES (#{indexID},#{name},#{des},#{rangeR},#{rangeL},#{creator})
     </insert>
 
     <!-- 删除已有的评估指标  -->
@@ -94,7 +105,6 @@
     <update id="updateEvaIndexRes">
         UPDATE eva_index SET
         `res`  =`res`,
-        `tiem` = `time`
         WHERE `linkedID` = #{linkedID},`indexID`=#{indexID}
     </update>
 
@@ -104,7 +114,7 @@
     </select>
 
     <insert id="addEvaLink">
-        INSERT INTO eva_link `evaID`,`linkID` VALUE (#{evaID},#{linkID})
+        INSERT INTO eva_link (`evaID`,`linkID`) VALUE (#{evaID},#{linkID})
             </insert>
 
     <delete id="deleteEvaLink">
@@ -113,7 +123,7 @@
     </delete>
 
     <select id="getEvaByLinkID" resultType="cn.edu.xjtu.cad.templates.model.Eva">
-        SELECT * FROM `eva` WHERE `evaID` IN (SELECT evaID FROM `eva_link` WHERE linkID = #{linkID})
+        SELECT * FROM `eva`,`eva_link` WHERE `eva_link`.linkID = #{linkID} AND `eva`.evaID =  `eva_link`.evaID
     </select>
 
     <select id="getIndexRes" resultType="cn.edu.xjtu.cad.templates.model.EvaIndexRes">
@@ -129,9 +139,12 @@
     </update>
 
     <select id="getIndexList" resultType="cn.edu.xjtu.cad.templates.model.EvaIndex">
-        SELECT * FROM `eva_index`,`eva_index_res`
-        WHERE `eva_index_res`.`linkID` =  #{linkID}
-        AND `eva_index_res`.`indexID` = `eva_index`.`indexID`
+       SELECT * FROM eva_index  left join eva_index_res  on eva_index_res.indexID=eva_index.indexID
+        WHERE eva_index.indexID IN (
+            SELECT DISTINCT (eva_link_index.indexID) FROM `eva_link`,`eva_link_index`
+            WHERE eva_link.linkID = #{linkID}
+            AND eva_link_index.evaID =eva_link.evaID
+        )
     </select>
     <update id="editIndexW">
         UPDATE `eva_link_index` SET
@@ -139,5 +152,21 @@
         WHERE `evaID` = #{evaID} AND `indexID` = #{indexID}
     </update>
 
+    <delete id="deleteEvaRes">
+        DELETE FROM `eva_index_res`
+        WHERE indexID IN
+            (SELECT indexID FROM eva_link_index
+            WHERE evaID =#{evaID}
+            AND indexID NOT IN
+                (SELECT indexID FROM eva_link_index WHERE evaID !=#{evaID} AND linkID =#{linkID}))
+    </delete>
+    
+    <delete id="deleteEvaLinkIndexByIndexID">
+        DELETE FROM `eva_link_index` WHERE `indexID` =#{indexID}
+    </delete>
+
+    <delete id="deleteIndexResByIndexID">
+        DELETE FROM `eva_index_res` WHERE `indexID` =#{indexID}
+    </delete>
 
 </mapper>

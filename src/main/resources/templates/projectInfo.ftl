@@ -63,7 +63,6 @@
             deleteProject:"/templates/api/project/${project.projectID}",
             updateProjectInCode:"/templates/api/project/${project.projectID}/invitationCode",
             startProject:"/templates/api/project/${project.projectID}/doStart",
-            updateProjectIndex:"/templates/api/project/${project.projectID}/index"
         }
         ProcessStaticDate = ${processStatic!"[]"};
         CalendarData = ${calendarData!"[]"};
@@ -151,19 +150,12 @@
 
                                             <span class="btn btn-app btn-sm btn-light  no-hover" onclick="jaavascript:window.location='/templates/project/${project.projectID}/eva.html#'">
 													<span class="line-height-1 bigger-170"
-                                                          id="project-value">${project.dea?string("#.##")}</span>
+                                                          id="project-value"></span>
 
 													<br>
-													<span class="line-height-1 smaller-90"> 应用效果 </span>
+													<span class="line-height-1 smaller-90"> 进入评价 </span>
 												</span>
 
-                                            <span class="btn btn-app btn-sm btn-light  no-hover" onclick="jaavascript:window.location='/templates/project/${project.projectID}/eva.html#'">
-													<span class="line-height-1 bigger-170"
-                                                          id="project-value">${project.dea?string("#.##")}</span>
-
-													<br>
-													<span class="line-height-1 smaller-90"> 自定义指标 </span>
-												</span>
 
                                         </div>
                                     </div>

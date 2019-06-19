@@ -52,8 +52,10 @@
         const API = {
             evaIndexAddAndGet:"/templates/api/eva/${eva.evaID}/index",
             editIndex:"/templates/api/index",
+            importIndex:"/templates/api/eva/${eva.evaID}/index",
             editIndexW:"/templates/api/eva/${eva.evaID}/index/",
             editEva:"/templates/api/eva/${eva.evaID}",
+            deleteIndex:"/templates/api/index/",
             getAllIndex:"/templates/api/index/list?evaID=${eva.evaID}",
         }
     </script>

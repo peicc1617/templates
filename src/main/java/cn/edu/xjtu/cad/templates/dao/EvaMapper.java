@@ -12,7 +12,7 @@ import java.util.List;
 public interface EvaMapper {
     List<Eva> getOpenEvaList();
 
-    List<Eva> getUserEvaList(@Param("userID") long userID);
+    List<Eva> getUserEvaList( @Param("linkID")long linkID, @Param("userID") long userID);
 
     int addEva(Eva eva);
 
@@ -70,4 +70,12 @@ public interface EvaMapper {
     List<EvaIndex> getIndexList(@Param("linkID")long linkID);
 
     void editIndexW(@Param("evaID")long evaID, @Param("indexID")long indexID, @Param("w")double w);
+
+    void deleteEvaRes(@Param("evaID")long evaID, @Param("linkID")long linkID);
+
+    void deleteEvaLinkByEvaID(@Param("evaID") long evaID);
+
+    void deleteEvaLinkIndexByIndexID(@Param("indexID")long indexID);
+
+    void deleteIndexResByIndexID(@Param("indexID")long indexID);
 }

@@ -34,6 +34,12 @@ public class Eva {
      */
     private boolean open;
 
+    private long linkID;
+
+    private double res;
+
+    private boolean canEdit;
+
     private List<EvaIndex> evaIndexList = new LinkedList<>();
 
 
@@ -91,5 +97,29 @@ public class Eva {
 
     public void setEvaIndexList(List<EvaIndex> evaIndexList) {
         this.evaIndexList = evaIndexList;
+    }
+
+    public double getRes() {
+        return res;
+    }
+
+    public void setRes(double res) {
+        this.res = res;
+    }
+
+    public long getLinkID() {
+        return linkID;
+    }
+
+    public void setLinkID(long linkID) {
+        this.linkID = linkID;
+    }
+
+    public boolean isCanEdit() {
+        return canEdit;
+    }
+
+    public void setCanEdit(boolean canEdit) {
+        this.canEdit = canEdit;
     }
 }

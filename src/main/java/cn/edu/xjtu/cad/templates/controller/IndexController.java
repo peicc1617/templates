@@ -40,7 +40,7 @@ public class IndexController {
      * @return
      */
     @RequestMapping(value = "/{indexID}",method = RequestMethod.DELETE)
-    public void deleteProjectEvaIndex( @PathVariable long indexID){
+    public void deleteEvaIndex( @PathVariable long indexID){
         indexService.deleteEvaIndex(indexID,user);
     }
 
@@ -55,15 +55,9 @@ public class IndexController {
         indexService.updateEvaIndex(evaIndex,user);
     }
 
-    @RequestMapping(value = "/{indexID}/refreshRange",method = RequestMethod.PUT)
-    public void refreshEvaIndexRange(@PathVariable long indexID){
-        indexService.refreshEvaIndexRange(indexID,user);
-    }
-
-
     @RequestMapping(value = "/{indexID}/res/{linkID}",method = RequestMethod.PUT)
     public void updateIndexRes(@PathVariable long indexID,@PathVariable long linkID,double res){
-        indexService.updateIndexRest(indexID,linkID,res,user);
+        indexService.updateIndexRes(indexID,linkID,res,user);
     }
 
 }

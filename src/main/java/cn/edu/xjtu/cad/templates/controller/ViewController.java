@@ -284,11 +284,38 @@ public class ViewController {
         //获取项目预定义的指标
 //        model.addAttribute("projectIndex",projectService.getProjectIndex(project));
 
+        //获取评估体系列表，同时填充评估体系内的指标列表
         List<Eva> evaList = evaService.getProjectEvaList(projectID,user);
+        //获取所有的指标及当前值
         Map<Long,EvaIndex> evaIndexMap = evaService.getIndexList(projectID,user)
                 .stream()
                 .collect(Collectors.toMap(index->index.getIndexID(), Function.identity()));
+
+        //设置评估体系的结果
+        evaList.forEach(eva -> {
+            List<EvaIndex> evaIndexList =  eva.getEvaIndexList();
+            if(evaIndexList!=null&&evaIndexList.size()>0){
+                //设置评估指标体系的指标的标准值
+                evaIndexList.forEach(evaIndex -> {
+                    //获取指标值
+                    double res = evaIndexMap.get(evaIndex.getIndexID()).getRes();
+                    //对值进行标准化
+                    double nRes = (res-evaIndex.getRangeL())/(evaIndex.getRangeR()-evaIndex.getRangeL());
+                    evaIndex.setRes(nRes);
+                });
+                //根据标准值计算加权平均结果
+                double resSum =evaIndexList.stream()
+                        .mapToDouble(evaIndex ->
+                                evaIndex.getRes()*evaIndex.getW())
+                        .sum();
+                double wSum =evaIndexList.stream().mapToDouble(evaIndex -> evaIndex.getW()).sum();
+                double res = resSum/wSum;
+                eva.setRes(res);
+            }
+
+        });
         model.addAttribute("evaList",evaList);
+        model.addAttribute("evaListJSONString",JSON.toJSONString(evaList));
         model.addAttribute("indexList",JSON.toJSONString(evaIndexMap.values()));
         return "projectEva";
     }

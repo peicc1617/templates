@@ -132,9 +132,9 @@ function addDiyIndex(){
     const rowData={
         name:'修改指标名称',
         des:'修改指标描述',
-        w:'0',
         rangeL:'0',
-        rangeR:'0'
+        rangeR:'1',
+        canEdit:true
     }
     $.ajax({
         url:API.evaIndexAddAndGet,
@@ -158,7 +158,7 @@ function deleteDiyIndex(){
     const rArr = $("#diyIndexTable").bootstrapTable("getSelections");
     const indexIDs = rArr.map(r=>r.indexID)
     $.ajax({
-        url:API.editEvaIndex,
+        url:API.importIndex,
         type:"DELETE",
         data:{
             indexIDs:indexIDs
@@ -173,17 +173,6 @@ function deleteDiyIndex(){
 
 }
 
-/**
- * 保存自定义指标
- * @param indexID
- * @param rowData
- * @returns {string}
- */
-function saveDiyIndex(rowData) {
-    let flag = false;
-
-    return flag;
-}
 
 function validateEvaInfo(v) {
     if (!$.trim(v)) {
@@ -276,6 +265,15 @@ function initImportTable() {
         },{
             field: 'creator',
             title: '创建者'
+        },{
+            field: 'op',
+            title: '操作',
+            formatter:function (value,row,index) {
+                if(row.canEdit){
+                    return                `<button class="btn btn-xs btn-white btn-danger bigger" onclick="deleteIndex(${row.indexID})"><i class="ace-icon fa fa-trash"></i>删除</button>`
+
+                }
+            }
         }],
         pagination: true,//启用分页
         pageNumber: 1,//默认是第一页
@@ -317,7 +315,7 @@ function importIndex() {
     const rArr = $("#import-table").bootstrapTable("getSelections");
     const indexIDs = rArr.map(r=>r.indexID)
     $.ajax({
-        url:API.editEvaIndex,
+        url:API.importIndex,
         type:"PUT",
         data:{
             indexIDs:indexIDs
@@ -325,6 +323,22 @@ function importIndex() {
         success:function (data) {
             if(data.code==1){
                 $("#diyIndexTable").bootstrapTable('append',rArr)
+                $("#import-table").bootstrapTable('refresh')
+            }
+        }
+    })
+}
+
+/**
+ * 删除指标
+ */
+function deleteIndex(indexID) {
+    $.ajax({
+        url:`${API.deleteIndex}${indexID}`,
+        type:"DELETE",
+        success:function (data) {
+            if(data.code==1){
+                alert("删除成功")
                 $("#import-table").bootstrapTable('refresh')
             }
         }

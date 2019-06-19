@@ -33,9 +33,9 @@ public class EvaController {
      * 获取当前用户可以看到的所有评价体系
      * @return
      */
-    @RequestMapping(value = "/user",method = RequestMethod.GET)
-    public List<Eva> getUserEvaList(){
-        return evaService.getUserEvaList(user);
+    @RequestMapping(value = "/list",method = RequestMethod.GET)
+    public List<Eva> getUserEvaList(long linkID){
+        return evaService.getUserEvaList(linkID,user);
     }
 
     /**
@@ -119,6 +119,12 @@ public class EvaController {
         evaService.addIndex2Eva(evaID,indexIDs,user);
     }
 
+    /**
+     * 修改指标在评估体系内的权重
+     * @param evaID 评估体系ID
+     * @param indexID 指标ID
+     * @param w 权重值
+     */
     @RequestMapping(value = "/{evaID}/index/{indexID}/w",method = RequestMethod.PUT)
     public void editIndexW(@PathVariable long evaID, @PathVariable long indexID, double w){
         evaService.editIndexW(evaID,indexID,w,user);
