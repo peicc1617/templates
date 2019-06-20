@@ -273,7 +273,6 @@
                     }, {
                         field: 'nickName',
                         title: '姓名',
-
                     }, {
                         field: 'projectRole',
                         title: '项目内角色',

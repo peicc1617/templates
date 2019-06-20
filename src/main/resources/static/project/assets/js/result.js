@@ -85,6 +85,10 @@ $(function () {
             title: '用户ID',
 
         }, {
+            field: 'nickName',
+            title: '用户名',
+
+        },{
             field: 'resultName',
             title: '项目名',
 

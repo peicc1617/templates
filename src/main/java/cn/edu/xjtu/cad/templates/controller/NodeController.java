@@ -253,11 +253,7 @@ public class NodeController {
     @SystemControllerLog(content = "将节点${nodeIndex}和模板项目${templateProjectID}进行绑定",logType = LogType.NODE,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/template",method = RequestMethod.PUT)
     public void updateNodeTemplate(@PathVariable long projectID,String nodeIndex,int templateProjectID){
-        Node node = nodeMapper.getNode(projectID,nodeIndex);
-        if(node!=null){
-            node.setTemplateProjectID(templateProjectID);
-            nodeMapper.updateNode(node);
-        }
+        nodeService.updateNodeTemplate(projectID,nodeIndex,templateProjectID);
     }
 
     /**
@@ -268,7 +264,8 @@ public class NodeController {
      */
     @RequestMapping(value = "/result",method = RequestMethod.GET)
     public List<NodeResult> getResultListOfNodeIndex(@PathVariable long projectID,String nodeIndex){
-        return nodeResultMapper.getResultListByNodeIndex(projectID,nodeIndex);
+        return nodeService.getResultListByNodeIndex(projectID,nodeIndex);
+
     }
 
     /**
@@ -279,8 +276,9 @@ public class NodeController {
      */
     @RequestMapping(value = "/result/my",method = RequestMethod.GET)
     public NodeResult getMyResultOfNodeIndex(@PathVariable long projectID,String nodeIndex){
-        return nodeResultMapper.getMyNodeResultInNode(projectID,nodeIndex,user.getUserID());
+        return nodeService.getMyResultOfNodeIndex(projectID,nodeIndex,user);
     }
+
 
     /**
      * 发送失效信息
@@ -292,19 +290,7 @@ public class NodeController {
     @SystemControllerLog(content = "处于节点${nodeIndex}下的属于用户${userID}的数据已经失效",logType = LogType.RESULT,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/result/list/disable",method = RequestMethod.PUT)
     public List<NodeResult> disableResult(@PathVariable long projectID,String nodeIndex,@RequestParam(value = "userIDList[]")List<Long> userIDList){
-        List<NodeResult> nodeResultList = nodeResultMapper.getResultListByNodeIndexAndUserIDList(projectID,nodeIndex,userIDList);
-        nodeResultList.forEach(nodeResult -> {
-            nodeResult.setState(NodeResultState.UN_BIND);
-            nodeResult.setMessage(NodeResult.DISABLE_MESSAGE);
-            nodeResult.setResultID(0);
-            nodeResult.setResultKey(null);
-            nodeResult.setResultName(null);
-        });
-       
-        for (NodeResult nodeResult : nodeResultList) {
-            nodeResultMapper.updateNodeResult(nodeResult);
-        }
-        return nodeResultList;
+        return nodeService.disableResult(projectID,nodeIndex,userIDList);
     }
 
     /**
@@ -317,15 +303,7 @@ public class NodeController {
     @SystemControllerLog(content = "处于节点${nodeIndex}下的属于用户${userID}的数据已经更新",logType = LogType.RESULT,methodType = MethodType.DELETE)
     @RequestMapping(value = "/result/list/outDate",method = RequestMethod.PUT)
     public List<NodeResult> outDateResult(@PathVariable long projectID,String nodeIndex,@RequestParam("userIDList[]")List<Long> userIDList){
-        List<NodeResult> nodeResultList = nodeResultMapper.getResultListByNodeIndexAndUserIDList(projectID,nodeIndex,userIDList);
-        nodeResultList.forEach(nodeResult -> {
-            nodeResult.setState(NodeResultState.PENDING_CONFIRM);
-            nodeResult.setMessage(NodeResult.EDIT_MESSAGE);
-        });
-        for (NodeResult nodeResult : nodeResultList) {
-            nodeResultMapper.updateNodeResult(nodeResult);
-        }
-        return nodeResultList;
+        return nodeService.outDateResult(projectID,nodeIndex,userIDList);
     }
 
 
@@ -338,14 +316,7 @@ public class NodeController {
     @SystemControllerLog(content = "解绑了自己的处于节点${nodeIndex}下的数据",logType = LogType.RESULT,methodType = MethodType.DELETE)
     @RequestMapping(value = "/result/unbinding",method = RequestMethod.PUT)
     public NodeResult unbindingResult(@PathVariable long projectID,String nodeIndex){
-        NodeResult nodeResult = nodeService.getNodeResultByUserAndNodeIndex(user,projectID,nodeIndex);
-        nodeResult.setState(NodeResultState.UN_BIND);
-        nodeResult.setMessage("");
-        nodeResult.setResultKey("");
-        nodeResult.setResultID(0);
-        nodeResult.setResultName("");
-        nodeResultMapper.updateNodeResult(nodeResult);
-        return nodeResult;
+        return nodeService.unbindingMyResult(projectID,nodeIndex,user);
     }
 
     /**
@@ -360,13 +331,8 @@ public class NodeController {
     @SystemControllerLog(content = "将自己的数据${resultName}绑定在节点${nodeIndex}下",logType = LogType.RESULT,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/result/binding",method = RequestMethod.PUT)
     public NodeResult bindingResult(@PathVariable long projectID,String nodeIndex,String resultKey,int resultID,String resultName){
-        NodeResult nodeResult = nodeService.getNodeResultByUserAndNodeIndex(user,projectID,nodeIndex);
-        nodeResult.setResultKey(resultKey);
-        nodeResult.setResultID(resultID);
-        nodeResult.setResultName(resultName);
-        nodeResult.setState(NodeResultState.PENDING_VIEW);
-        nodeService.updateNodeResult(user,nodeResult);
-        return nodeResult;
+        return nodeService.bindMyResult(projectID,nodeIndex,resultKey,resultID,resultName,user);
+
     }
 
     /**
@@ -377,30 +343,11 @@ public class NodeController {
     @SystemControllerLog(content = "修改了绑定数据${resultName}的状态为${state}",logType = LogType.RESULT,methodType = MethodType.UPDATE)
     @RequestMapping(value = "/result",method = RequestMethod.PUT)
     public void updateStateOfResult(NodeResult nodeResult){
-        switch (nodeResult.getState()){
-            case ACCEPT:
-                nodeResult.setMessage(NodeResult.PASSED_MESSAGE);
-                break;
-            case PENDING_VIEW:
-                nodeResult.setMessage(NodeResult.APPLY_MESSAGE);
-                break;
-            case TO_MODIFIED:
-                nodeResult.setMessage(NodeResult.TO_EDIT_MESSAGE);
-                break;
-            case PENDING_CONFIRM:
-            case UN_BIND:
-                nodeResult.setMessage(NodeResult.PASSED_MESSAGE);
-                nodeResult.setMessage("");
-                nodeResult.setResultKey("");
-                nodeResult.setResultID(0);
-                nodeResult.setResultName("");
-                break;
-        }
-        nodeResultMapper.updateNodeResult(nodeResult);
+        nodeService.updateStateOfResult(nodeResult,user);
     }
 
     /**
-     * 获取当前节点内的权限
+     * 获取当前节点内的所有用户权限
      * @param projectID
      * @param nodeIndex
      */
@@ -409,6 +356,11 @@ public class NodeController {
         return nodeService.getNodeRoleList(user,projectID,nodeIndex);
     }
 
+    /**
+     * 修改用户在节点内的权限
+     * @param projectID
+     * @param nodeRole
+     */
     @RequestMapping(value = "/role",method = RequestMethod.PUT)
     public void NodeRole(@PathVariable long projectID,NodeRole nodeRole){
         nodeService.updateNodeRole(user,nodeRole);

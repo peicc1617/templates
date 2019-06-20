@@ -10,6 +10,8 @@ public class ProjectRole {
     private long userID;
     private ProjectRoleType projectRole;
 
+    private String nickName;
+
     public ProjectRole() {
     }
 
@@ -51,4 +53,11 @@ public class ProjectRole {
         this.projectRole = projectRole;
     }
 
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
 }

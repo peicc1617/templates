@@ -29,6 +29,8 @@ public class Eva {
      * 指标体系的创建者
      */
     private long creator;
+
+    private String nickName;
     /**
      * 是否公开
      */
@@ -121,5 +123,13 @@ public class Eva {
 
     public void setCanEdit(boolean canEdit) {
         this.canEdit = canEdit;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 }

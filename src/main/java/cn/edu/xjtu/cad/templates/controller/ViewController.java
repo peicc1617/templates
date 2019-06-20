@@ -1,13 +1,9 @@
 package cn.edu.xjtu.cad.templates.controller;
 
-import cn.edu.xjtu.cad.templates.annotation.CurUser;
-import cn.edu.xjtu.cad.templates.config.API;
 import cn.edu.xjtu.cad.templates.model.Eva;
 import cn.edu.xjtu.cad.templates.model.EvaIndex;
-import cn.edu.xjtu.cad.templates.model.log.Log;
 import cn.edu.xjtu.cad.templates.model.log.ProjectLog;
 import cn.edu.xjtu.cad.templates.model.project.Project;
-import cn.edu.xjtu.cad.templates.model.project.ProjectRole;
 import cn.edu.xjtu.cad.templates.model.project.ProjectRoleType;
 import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.model.project.node.NodeResultState;
@@ -19,7 +15,6 @@ import cn.edu.xjtu.cad.templates.service.ReferService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,12 +23,8 @@ import org.springframework.util.comparator.Comparators;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
@@ -42,9 +33,6 @@ import java.util.stream.Collectors;
 
 @Controller
 public class ViewController {
-
-    @Resource(name = "projectManagerAPI")
-    API projectManagerAPI;
 
     @Autowired
     User user;
@@ -63,7 +51,6 @@ public class ViewController {
 
     @ModelAttribute
     public void addProject(Model model, @PathVariable(required = false) Long projectID) {
-        model.addAttribute("pmAPI", projectManagerAPI);
         List<Project> projectList = projectService.getMyProjectList(user.getUserID());
         Map<ProjectRoleType, List<Project>> map = projectList.stream().collect(Collectors.toMap(
                 Project::getProjectRole,
@@ -223,6 +210,7 @@ public class ViewController {
     @RequestMapping("/project/{projectID}/info.html")
     public String viewProjectInfo(Model model,@PathVariable long projectID) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
         List<ProjectLog> logs = logService.getProjectLogCut(projectID,1000);
         addProjectLog(model,logs);
         Map<String,List<ProjectLog>> dayLog = new HashMap<>();
@@ -270,6 +258,7 @@ public class ViewController {
                     .collect(Collectors.toList()));
             model.addAttribute("processStatic",process );
         }
+        
         return "projectInfo";
     }
 

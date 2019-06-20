@@ -70,9 +70,9 @@ $(document).ready(function () {
             field: 'userID',
             title: '用户ID',
 
-        }, {
+        },{
             field: 'nickName',
-            title: '姓名',
+            title: '用户名',
 
         }, {
             field: 'roleType',

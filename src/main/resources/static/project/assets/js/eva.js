@@ -70,7 +70,11 @@ function initDiyIndexTable() {
             }
         },{
             field: 'creator',
-            title: '创建者'
+            title: '创建者',
+            formatter:function (v,row) {
+                return `${v}:${row.nickName}`
+            }
+
         }],
         pagination: true,//启用分页
         pageNumber: 1,//默认是第一页

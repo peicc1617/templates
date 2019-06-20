@@ -7,6 +7,7 @@ public class NodeRole {
     private long projectID;
     private String nodeIndex;
     private long userID;
+    private String nickName;
     private NodeRoleType roleType;
 
     public NodeRole() {
@@ -57,5 +58,13 @@ public class NodeRole {
 
     public void setRoleType(NodeRoleType roleType) {
         this.roleType = roleType;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 }

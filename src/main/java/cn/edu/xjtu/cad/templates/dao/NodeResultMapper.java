@@ -43,4 +43,6 @@ public interface NodeResultMapper {
     long updateNodeResult(NodeResult nodeResult);
 
     void deleteNodeResult(@Param("id") long projectID,@Param("index")String nodeIndex,@Param("userID") long userID);
+
+    NodeResult getResultByResultKey(String resultKey);
 }

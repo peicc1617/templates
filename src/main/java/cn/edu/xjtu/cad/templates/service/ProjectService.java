@@ -5,6 +5,8 @@ import cn.edu.xjtu.cad.templates.annotation.UserRoleFilter;
 import cn.edu.xjtu.cad.templates.aop.MyException;
 import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.dao.*;
+import cn.edu.xjtu.cad.templates.feign.UserRemote;
+import cn.edu.xjtu.cad.templates.model.CAIUser;
 import cn.edu.xjtu.cad.templates.model.Result;
 import cn.edu.xjtu.cad.templates.model.ResultCode;
 import cn.edu.xjtu.cad.templates.model.project.*;
@@ -51,6 +53,9 @@ public class ProjectService {
 
     @Autowired
     NodeRoleMapper nodeRoleMapper;
+
+    @Autowired
+    UserRemote userRemote;
 
     public List<Project> getOwnedProjectList(User user) {
         return projectMapper.getProjectListByUserAndRole(user.getUserID(), ProjectRoleType.CREATOR);
@@ -185,7 +190,16 @@ public class ProjectService {
 
         project.setNodeMap(nodeMap);
         //获取当前项目的用户
-        project.setMembers(projectRoleMapper.getRoleOfProject(projectID));
+        List<ProjectRole> members = projectRoleMapper.getRoleOfProject(projectID);
+        List<Long> userIDs = members.stream().map(ProjectRole::getUserID).collect(Collectors.toList());
+        Map<Long, CAIUser> map = userRemote.listIn(userIDs)
+                .stream().collect(Collectors.toMap(u->u.getId(),Function.identity()));
+
+        members.forEach(projectRole -> {
+            String name = map.get(projectRole.getUserID()).getNickName();
+            projectRole.setNickName(name);
+        });
+        project.setMembers(members);
         return project;
     }
 
@@ -410,6 +424,14 @@ public class ProjectService {
         }
         //对结果根据在项目内的权限进行排序
         projectRoleList.sort(Comparator.comparing(ProjectRole::getProjectRole));
+        List<Long> userIDList = projectRoleList.stream().map(ProjectRole::getUserID).collect(Collectors.toList());
+        Map<Long,CAIUser> map = userRemote.listIn(userIDList)
+                .stream().collect(Collectors.toMap(u->u.getId(),Function.identity()));
+        projectRoleList.forEach(projectRole -> {
+            String name = map.get(projectRole.getUserID()).getNickName();
+            projectRole.setNickName(name);
+        });
+
         return projectRoleList;
     }
 

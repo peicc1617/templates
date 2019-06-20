@@ -110,7 +110,10 @@ function initImportNewEvaTable() {
             }
         }, {
             field: 'creator',
-            title: '指标的创建者',
+            title: '体系的创建者',
+            formatter:function (v,row) {
+                return `${v}:${row.nickName}`
+            }
 
         }, {
             field: 'opt',

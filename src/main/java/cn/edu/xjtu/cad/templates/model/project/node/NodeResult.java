@@ -23,6 +23,8 @@ public class NodeResult {
      */
     private long userID;
 
+    private String nickName;
+
 
     /**
      * 当前结果的状态
@@ -142,5 +144,13 @@ public class NodeResult {
 
     public void setResultID(int resultID) {
         this.resultID = resultID;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 }

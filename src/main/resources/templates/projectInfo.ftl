@@ -283,7 +283,7 @@
                                                 </div>
                                                 <div class="body">
                                                     <div class="name">
-                                                        <a href="#">${member.userID}</a>
+                                                        <a href="#">${member.userID}:${member.nickName}</a>
                                                     </div>
 
                                                     <div>
@@ -355,13 +355,8 @@
 
                                                                                                 </#list>
                                                                                             </#if>
-
-
-
                                                                                         </ul>
                                                                                     </div>
-
-
                                                                                 </div>
                                                                             </div>
                                                                         </div>

@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    url: jdbc:mysql://innovation.xjtu.edu.cn:3306/innovation_templates?serverTimezone=GMT
+    username: xjtucad
+    password: xjtucad
+    driverClassName: com.mysql.cj.jdbc.Driver
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+  aop:
+    auto=true:
+  freemarker:
+    cache: false
+    template-loader-path: classpath:/templates/
+    suffix: .ftl
+    content-type: text/html
+    charset: UTF-8
+    request-context-attribute: 'request'
+    settings:
+      number_format: '0.##'
+      template_update_delay: 0
+  application:
+    name: templates
+  server:
+    port: 8080
+  jmx:
+    default-domain: templates
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8080/server/eureka
+  instance:
+    preferIpAddress: true
+    hostname: ${spring.cloud.client.ip-address}
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${spring.server.port}
+
+
+mybatis:
+  type-aliases-package: cn.edu.xjtu.cad.templates.model
+  mapper-locations: classpath:mybatis/mapper/*.xml
+
+
+logging:
+  level:
+    cn.edu.xjtu.cad.templates.dao: DEBUG

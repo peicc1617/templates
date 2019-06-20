@@ -31,6 +31,8 @@ public class EvaIndex {
      */
     private long creator;
 
+    private String nickName;
+
     /**
      * 是否可以编辑
      */
@@ -113,5 +115,13 @@ public class EvaIndex {
 
     public void setRes(double res) {
         this.res = res;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 }

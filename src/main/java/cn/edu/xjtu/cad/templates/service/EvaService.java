@@ -2,19 +2,27 @@ package cn.edu.xjtu.cad.templates.service;
 
 import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.dao.EvaMapper;
+import cn.edu.xjtu.cad.templates.feign.UserRemote;
+import cn.edu.xjtu.cad.templates.model.CAIUser;
 import cn.edu.xjtu.cad.templates.model.Eva;
 import cn.edu.xjtu.cad.templates.model.EvaIndex;
+import cn.edu.xjtu.cad.templates.model.project.ProjectRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class EvaService {
 
     @Autowired
     EvaMapper evaMapper;
+
+    @Autowired
+    UserRemote userRemote;
 
     /**
      * 创建新的评价体系
@@ -46,12 +54,29 @@ public class EvaService {
      */
     public List<Eva> getUserEvaList(long linkID, User user) {
         List<Eva>  list = evaMapper.getUserEvaList(linkID,user.getUserID());
+
+        packageEvaCreatorName(list);
+
         list.forEach(eva->{
             List<EvaIndex> evaIndexList = evaMapper.getEvaIndexByEvaID(eva.getEvaID());
             eva.setEvaIndexList(evaIndexList);
             eva.setCanEdit(eva.getCreator()==user.getUserID());
         });
         return list;
+    }
+
+    /**
+     * 包装用户名
+     * @param evaList
+     */
+    private void packageEvaCreatorName(List<Eva> evaList){
+        List<Long> userIDList = evaList.stream().map(Eva::getCreator).collect(Collectors.toList());
+        Map<Long, CAIUser> map = userRemote.listIn(userIDList)
+                .stream().collect(Collectors.toMap(u->u.getId(), Function.identity()));
+        evaList.forEach(eva -> {
+            String name = map.get(eva.getCreator()).getNickName();
+            eva.setNickName(name);
+        });
     }
 
     /**
@@ -127,6 +152,7 @@ public class EvaService {
      */
     public List<EvaIndex> getEvaIndex(long evaID, User user) {
         List<EvaIndex> evaIndexList = evaMapper.getEvaIndexByEvaID(evaID);
+        packageIndexCreatorName(evaIndexList);
         evaIndexList.forEach(evaIndex -> evaIndex.setCanEdit(evaIndex.getCreator()==user.getUserID()));
         return evaIndexList;
     }
@@ -146,5 +172,15 @@ public class EvaService {
 
     public void editIndexW(long evaID, long indexID, double w, User user) {
         evaMapper.editIndexW(evaID,indexID,w);
+    }
+
+    private void packageIndexCreatorName(List<EvaIndex> evaIndices){
+        List<Long> userIDList = evaIndices.stream().map(EvaIndex::getCreator).collect(Collectors.toList());
+        Map<Long, CAIUser> map = userRemote.listIn(userIDList)
+                .stream().collect(Collectors.toMap(u->u.getId(), Function.identity()));
+        evaIndices.forEach(eva -> {
+            String name = map.get(eva.getCreator()).getNickName();
+            eva.setNickName(name);
+        });
     }
 }

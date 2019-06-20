@@ -2,13 +2,18 @@ package cn.edu.xjtu.cad.templates.service;
 
 import cn.edu.xjtu.cad.templates.config.User;
 import cn.edu.xjtu.cad.templates.dao.EvaMapper;
+import cn.edu.xjtu.cad.templates.feign.UserRemote;
+import cn.edu.xjtu.cad.templates.model.CAIUser;
+import cn.edu.xjtu.cad.templates.model.Eva;
 import cn.edu.xjtu.cad.templates.model.EvaIndex;
 import cn.edu.xjtu.cad.templates.model.EvaIndexRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,6 +21,8 @@ public class IndexService {
     @Autowired
     EvaMapper evaMapper;
 
+    @Autowired
+    UserRemote userRemote;
     /**
      * 修改评价指标体系内的具体指标
      *
@@ -52,6 +59,7 @@ public class IndexService {
                         evaIndex.getIndexID())
                 .collect(Collectors.toSet());
         List<EvaIndex> evaIndexList = evaMapper.getAllEvaIndex();
+        packageIndexCreatorName(evaIndexList);
         evaIndexList.forEach(evaIndex -> evaIndex.setCanEdit(evaIndex.getCreator()==user.getUserID()));
         return evaIndexList
                 .stream()
@@ -78,5 +86,15 @@ public class IndexService {
             evaMapper.updateIndexRes(evaIndexRes);
         }
 
+    }
+
+    private void packageIndexCreatorName(List<EvaIndex> evaIndices){
+        List<Long> userIDList = evaIndices.stream().map(EvaIndex::getCreator).collect(Collectors.toList());
+        Map<Long, CAIUser> map = userRemote.listIn(userIDList)
+                .stream().collect(Collectors.toMap(u->u.getId(), Function.identity()));
+        evaIndices.forEach(eva -> {
+            String name = map.get(eva.getCreator()).getNickName();
+            eva.setNickName(name);
+        });
     }
 }

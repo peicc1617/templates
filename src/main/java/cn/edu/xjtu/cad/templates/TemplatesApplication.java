@@ -3,18 +3,21 @@
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
+@EnableFeignClients
+@EnableDiscoveryClient
 @EnableTransactionManagement
 @ComponentScan({"cn.edu.xjtu.cad.templates.controller",
         "cn.edu.xjtu.cad.templates.service",
         "cn.edu.xjtu.cad.templates.aop",
         "cn.edu.xjtu.cad.templates.config",
         "cn.edu.xjtu.cad.templates.resolver",
-        "cn.edu.xjtu.cad.templates.advice",
-        "cn.edu.xjtu.cad.templates.dea"})
+        "cn.edu.xjtu.cad.templates.advice"})
 @MapperScan("cn.edu.xjtu.cad.templates.dao")
 public class TemplatesApplication {
 
