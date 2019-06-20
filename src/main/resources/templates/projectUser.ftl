@@ -215,8 +215,8 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-xs-12">
-                                <table id="user-list-table" data-height="400"
-                                       data-url="/templates/user/list">
+                                <table id="user-list-table"
+                                       data-url="/user/list">
                                     <thead>
                                     <tr>
                                         <th data-field="id">用户编号</th>

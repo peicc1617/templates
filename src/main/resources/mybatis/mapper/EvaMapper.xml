@@ -24,7 +24,7 @@
     </select>
 
     <!-- 创建新的评价体系   -->
-    <insert id="addEva" keyProperty="id" useGeneratedKeys="true">
+    <insert id="addEva" keyProperty="evaIDring" useGeneratedKeys="true">
         INSERT INTO `eva` (`name`,`des`,`tags`,`creator`,`open`)
         VALUES (#{name},#{des},#{tags},#{creator},#{open})
     </insert>
